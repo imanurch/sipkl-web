@@ -1,0 +1,60 @@
+<div class="space-y-3">
+    {{-- toolbar --}}
+    {{-- <div class="flex justify-between place-items-center">
+        <h3 class="text-sm-semibold">{{ $tableTitle ?? '' }}</h3>
+        <div class="flex space-x-2">
+            <form action="{{ $actionForm ?? ''}}" method="GET" class="flex space-x-2">
+                {{ $filter ?? '' }}
+                <button type="submit" class="btn btn-default-fill btn-sm">
+                    <span>Terapkan</span>
+                </button>
+                <a href="{{ $actionForm ?? '' }}" class="btn btn-default-fill btn-sm" >
+                    <span>Reset</span>
+                </a>
+            </form>
+            {{ $toolbar ?? '' }}
+        </div>
+    </div> --}}
+
+    <div class="space-y-2">
+        <div class="flex justify-between place-items-center">
+            <h3 class="text-sm-semibold">{{ $tableTitle }}</h3>
+            <div class="space-x-1">
+                {{ $btnAdd ?? '' }}
+            </div>
+        </div>
+        <form action="{{ $filterActionForm ?? '' }}" method="GET">
+            <div class="w-full flex place-items-end space-x-3 px-4 py-3 border border-neutral-100 rounded">
+                <div class="flex w-full space-x-2">
+                    {{ $filter ?? '' }}
+                </div>
+                <div class="flex space-x-2">
+                    <button type="submit" class="btn btn-success-fill btn-xs">
+                        <span>Terapkan</span>
+                    </button>
+                    <a href="{{ $filterActionForm ?? '' }}" class="btn btn-error-fill btn-xs">
+                        <span>Hapus</span>
+                    </a>
+                </div>
+            </div>
+        </form>
+    </div>
+
+    {{-- table --}}
+    <div class="border border-neutral-200 rounded px-5">
+        <div class="overflow-x-auto overflow-hidden">
+            <table class="table">
+                <thead>
+                    <tr>
+                        {{ $tHeader ?? '' }}
+                    </tr>
+                </thead>
+                <tbody>
+                    {{ $tBody ?? '' }}
+                </tbody>
+            </table>
+        </div>
+    </div>
+    {{-- pagination --}}
+    {{ $pagination ?? '' }}
+</div>

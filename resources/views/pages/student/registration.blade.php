@@ -1,0 +1,167 @@
+@extends('layouts.app')
+
+@section('page-title', 'Pendaftaran PKL')
+@section('profil', 'Student')
+@section('content')
+
+<x-guide guideTitle="Pendaftaran">
+    <li>1</li>
+    <li>2</li>
+</x-guide>
+
+<div class="space-y-4">
+    <h6 class="text-md-semibold">Alur Pendaftaran PKL</h6>
+    <div class="space-y-4">
+        {{-- card --}}
+        <div class="flex space-x-2 border-b border-neutral-200 pb-4">
+            <div class="flex space-x-2 place-items-end p-6 rounded w-fit border border-brand-600 text-brand-800">
+                <span class="display-lg-semibold">1</span>
+                <h6 class="text-xs-reguler w-16">Pilih Lokasi PKL</h6>
+            </div>
+            <div class="flex space-x-2 place-items-end p-6 rounded w-fit {{ !Route::is('student.registration') ? 'border border-brand-600 text-brand-800' : 'bg-neutral-50 text-neutral-0' }}">
+                <span class="display-lg-semibold">2</span>
+                <h6 class="text-xs-reguler w-16">Isi Data Anggota Kelompok</h6>
+            </div>
+            <div class="flex space-x-2 place-items-end p-6 rounded w-fit {{ !Route::is('student.registration') && !Route::is('student.registration.step2') ? 'border border-brand-600 text-brand-800' : 'bg-neutral-50 text-neutral-0' }}">
+                <span class="display-lg-semibold">3</span>
+                <h6 class="text-xs-reguler w-16">Isi Data Pendaftaran PKL</h6>
+            </div>
+            <div class="flex space-x-2 place-items-end p-6 rounded w-fit {{ Route::is('student.registration.step4') || Route::is('student.registration.step5') ? 'border border-brand-600 text-brand-800' : 'bg-neutral-50 text-neutral-0' }}">
+                <span class="display-lg-semibold">4</span>
+                <h6 class="text-xs-reguler w-16">Lengkapi Berkas Pendaftaran</h6>
+            </div>
+            <div class="flex space-x-2 place-items-end p-6 rounded w-fit {{ Route::is('student.registration.step5') ? 'border border-brand-600 text-brand-800' : 'bg-neutral-50 text-neutral-0' }}">
+                <span class="display-lg-semibold">5</span>
+                <h6 class="text-xs-reguler w-16">Hasil Pendaftaran</h6>
+            </div>
+        </div>
+        {{-- form --}}
+        <div x-data="{currentStep:1}">
+            {{-- step 1 --}}
+            @if(Route::is('student.registration'))   
+            <div x-show="currentStep===1">
+                <x-registration_step.step1 :industryData="$industryData"></x-registration_step.step1>
+            </div>     
+            @endif
+            
+            {{-- step pengajuan industry --}}
+            <div x-show="currentStep==='newIndustry'">
+                <x-registration_step.newIndustry></x-registration_step.newIndustry>
+            </div>   
+
+            {{-- step 2 --}}
+            @if(Route::is('student.registration.step2'))
+            <div>
+                <x-registration_step.step2 :studentData="$studentData"></x-registration_step.step2>
+            </div> 
+            @endif
+            
+            {{-- step 3 --}}
+            @if(Route::is('student.registration.step3'))
+            <div>
+                <x-registration_step.step3 :locationInternship="$locationInternship" :teamMember="$teamMember"></x-registration_step.step3>
+            </div> 
+            @endif
+            
+            {{-- step 4 --}}
+            @if(Route::is('student.registration.step4'))
+            <div>
+                <x-registration_step.step4 :registrationData="$registrationData"></x-registration_step.step4>
+            </div> 
+            @endif
+
+            {{-- step 5 --}}
+            @if(Route::is('student.registration.step5'))
+            <div>
+                <x-registration_step.step5 :filename="$filename"></x-registration_step.step5>
+            </div> 
+            @endif
+            
+        </div>
+    </div>
+</div>
+
+
+{{-- <div class="space-y-4">
+    <h6 class="text-md-semibold">Alur Pendaftaran PKL</h6>
+    <div x-data="{ step1:true, newIndustry:false, step2:false, step3:false, step4:false, step5:false }" class="space-y-4">
+        <div class="flex space-x-2 border-b border-neutral-200 pb-4">
+            <div class="flex space-x-2 place-items-end p-6 rounded w-fit" :class="step1 || newIndustry ? 'border border-brand-600 text-brand-800' : 'bg-neutral-50 text-neutral-0'">
+                <span class="display-lg-semibold">1</span>
+                <h6 class="text-xs-reguler w-16">Pilih Lokasi PKL</h6>
+            </div>
+            <div class="flex space-x-2 place-items-end p-6 rounded w-fit" :class="step2 ? 'border border-brand-600 text-brand-800' : 'bg-neutral-50 text-neutral-0'">
+                <span class="display-lg-semibold">2</span>
+                <h6 class="text-xs-reguler w-16">Isi Data Anggota Kelompok</h6>
+            </div>
+            <div class="flex space-x-2 place-items-end p-6 rounded w-fit" :class="step3 ? 'border border-brand-600 text-brand-800' : 'bg-neutral-50 text-neutral-0'">
+                <span class="display-lg-semibold">3</span>
+                <h6 class="text-xs-reguler w-16">Isi Data Pendaftaran PKL</h6>
+            </div>
+            <div class="flex space-x-2 place-items-end p-6 rounded w-fit" :class="step4 ? 'border border-brand-600 text-brand-800' : 'bg-neutral-50 text-neutral-0'">
+                <span class="display-lg-semibold">4</span>
+                <h6 class="text-xs-reguler w-16">Lengkapi Berkas Pendaftaran</h6>
+            </div>
+            <div class="flex space-x-2 place-items-end p-6 rounded w-fit" :class="step5 ? 'border border-brand-600 text-brand-800' : 'bg-neutral-50 text-neutral-0'">
+                <span class="display-lg-semibold">5</span>
+                <h6 class="text-xs-reguler w-16">Hasil Pendaftaran</h6>
+            </div>
+        </div>
+        <div x-data="{currentStep:1}" class="space-y-3">
+            <h6 class="text-xs-medium" x-text="currentStep===1 ? 'Pilih Lokasi PKL' : (currentStep===2 ? 'Isi Data Anggota Kelompok' : (currentStep===3 ? 'Isi Data Pengajuan PKL' : (currentStep===4 ? 'Lengkapi Berkas Administrasi' : 'Hasil Pendaftaran')))"></h6>
+               
+            <div x-show="currentStep===1">
+                <x-registration_step.step1></x-registration_step.step1>
+            </div>          
+            
+            
+            <div x-show="currentStep==='newIndustry'">
+                <x-registration_step.newIndustry></x-registration_step.newIndustry>
+            </div>   
+
+            
+            <div x-show="currentStep===2">
+                <x-registration_step.step2></x-registration_step.step2>
+            </div> 
+            
+            
+            <div x-show="currentStep===3">
+                <x-registration_step.step3></x-registration_step.step3>
+            </div> 
+            
+            
+            <div x-show="currentStep===4">
+                <x-registration_step.step4></x-registration_step.step4>
+            </div> 
+            
+        </div>
+    </div>
+</div> --}}
+
+<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+@endsection
+
+
+{{-- card --}}
+{{-- <div class="flex space-x-2 border-b border-neutral-200 pb-4">
+    <div class="flex space-x-2 place-items-end p-6 rounded w-fit" :class="step1 || newIndustry ? 'border border-brand-600 text-brand-800' : 'bg-neutral-50 text-neutral-0'">
+        <span class="display-lg-semibold">1</span>
+        <h6 class="text-xs-reguler w-16">Pilih Lokasi PKL</h6>
+    </div>
+    <div class="flex space-x-2 place-items-end p-6 rounded w-fit" :class="step2 ? 'border border-brand-600 text-brand-800' : 'bg-neutral-50 text-neutral-0'">
+        <span class="display-lg-semibold">2</span>
+        <h6 class="text-xs-reguler w-16">Isi Data Anggota Kelompok</h6>
+    </div>
+    <div class="flex space-x-2 place-items-end p-6 rounded w-fit" :class="step3 ? 'border border-brand-600 text-brand-800' : 'bg-neutral-50 text-neutral-0'">
+        <span class="display-lg-semibold">3</span>
+        <h6 class="text-xs-reguler w-16">Isi Data Pendaftaran PKL</h6>
+    </div>
+    <div class="flex space-x-2 place-items-end p-6 rounded w-fit" :class="step4 ? 'border border-brand-600 text-brand-800' : 'bg-neutral-50 text-neutral-0'">
+        <span class="display-lg-semibold">4</span>
+        <h6 class="text-xs-reguler w-16">Lengkapi Berkas Pendaftaran</h6>
+    </div>
+    <div class="flex space-x-2 place-items-end p-6 rounded w-fit" :class="step5 ? 'border border-brand-600 text-brand-800' : 'bg-neutral-50 text-neutral-0'">
+        <span class="display-lg-semibold">5</span>
+        <h6 class="text-xs-reguler w-16">Hasil Pendaftaran</h6>
+    </div>
+</div> --}}

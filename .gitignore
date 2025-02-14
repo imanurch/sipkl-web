@@ -18,15 +18,20 @@ yarn-error.log
 /.vscode
 
 
-tailwind.config.js
-tailwindxxx.config.js
-postcss.config.js
-resources/css
-resources/js/app.js
-resources/views/components
-resources/views/errors
-resources/views/layouts
-resources/views/pages
-web.php
-Controllers
-
+# tailwind.config.js
+# tailwindxxx.config.js
+# postcss.config.js
+# resources/css
+# resources/js/app.js
+# resources/views/components
+# resources/views/errors
+# resources/views/layouts
+# resources/views/pages
+# web.php
+# # Controllers
+# node_modules
+# database
+# Models
+# migrations
+# factories
+# seeders
