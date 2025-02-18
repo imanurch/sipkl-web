@@ -15,4 +15,9 @@ class Assessment extends Model
     {
         return $this->belongsTo(Student::class, 'student_id');
     }
+
+    public function internship(): BelongsTo
+    {
+        return $this->belongsTo(Internship::class, 'internship_id');
+    }
 }

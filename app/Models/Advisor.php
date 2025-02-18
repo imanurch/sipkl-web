@@ -24,6 +24,6 @@ class Advisor extends Model
     }
     public function internship(): HasMany
     {
-        return $this->hasMany(Internship::class, 'id');
+        return $this->hasMany(Internship::class,'advisor_id', 'id');
     }
 }

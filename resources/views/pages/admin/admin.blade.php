@@ -30,7 +30,7 @@
         <x-slot name="tBody">
             @foreach ($data as $dt)
                 <tr>
-                    <td class="text-center">{{ $loop->iteration }}</td>               
+                    <td class="text-center">{{ $data->firstItem() + $loop->index }}</td>               
                     <td hidden dataId={{ $dt->id }} >{{ $dt->id }}</td>
                     <td>{{ $dt->username }}</td>
                     <td>{{ $dt->email }}</td>

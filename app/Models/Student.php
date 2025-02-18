@@ -26,7 +26,7 @@ class Student extends Model
     }
     public function internDocument(): HasMany
     {
-        return $this->hasMany(InternDocument::class, 'id');
+        return $this->hasMany(InternDocument::class, 'student_id');
     }
     public function logbook(): HasMany
     {

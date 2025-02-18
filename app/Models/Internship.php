@@ -2,10 +2,11 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Internship extends Model
 {
@@ -40,4 +41,8 @@ class Internship extends Model
     {
         return $this->hasMany(Logbook::class, 'id');
     }
+    // public function internship(): HasOne
+    // {
+    //     return $this->hasOne(Internship::class, 'id');
+    // }
 }

@@ -8,7 +8,6 @@ class AdminRepository
 {
     public function getAdmin($searchFilter)
     {
-        // return Admin::get();
         $query = Admin::query();
 
         // filter search
@@ -17,13 +16,13 @@ class AdminRepository
                 ->orWhere('email', 'like', '%' . $searchFilter . '%');
         };
 
-        return $query->paginate(10);
+        return $query->paginate(5);
     }
 
-    public function findAdminById($admin_id)
-    {
-        return Admin::find($admin_id);
-    }
+    // public function findAdminById($admin_id)
+    // {
+    //     return Admin::find($admin_id);
+    // }
 
     public function createAdmin(array $data)
     {

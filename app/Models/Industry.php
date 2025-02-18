@@ -17,6 +17,6 @@ class Industry extends Model
     }
     public function internship(): HasMany
     {
-        return $this->hasMany(Internship::class, 'id');
+        return $this->hasMany(Internship::class, 'industry_id', 'id');
     }
 }

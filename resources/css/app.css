@@ -166,7 +166,7 @@
         /* @apply sticky h-96 */
     }
     .layout-content {
-        @apply w-screen min-h-screen flex flex-col place-self-start space-y-4 py-7 px-9 bg-neutral-0 rounded;
+        @apply w-full max-w-full overflow-x-hidden min-h-screen flex flex-col place-self-start space-y-4 py-7 px-9 bg-neutral-0 rounded;
     }
     .layout-card {
         @apply flex flex-wrap gap-2;
@@ -310,7 +310,7 @@
         }
     }
     .card-title {
-        @apply w-28 break-words text-xs-medium text-neutral-300;
+        @apply w-[6.5rem] break-words text-xs-medium text-neutral-300;
     }
     .card-data {
         @apply text-xl-bold text-brand-900;
@@ -452,5 +452,12 @@
     }
     .option-filter-toolbar-table {
         @apply text-xs-reguler px-4 py-2 hover:bg-brand-600 hover:text-neutral-0 hover:text-xs-medium cursor-pointer;
+    }
+
+
+
+    /* dialog box / confirm */
+    .confirm-modal {
+        @apply h-screen w-screen fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-neutral-100 bg-opacity-40 backdrop-blur-sm;
     }
 }

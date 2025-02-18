@@ -68,24 +68,26 @@ class StudentRepository
         return $data;
     }
 
-    public function getStudentList(){
-        return Student::get();
+    public function getNonInternStudentList($activeBatch_id)
+    {
+        return Student::whereDoesntHave('groupMember.group.internship', function ($query) use ($activeBatch_id) {
+            $query->where('batch_id', $activeBatch_id);
+        })->select('id', 'name', 'nisn')->get();
     }
 
     public function countStudentByStatus($year, $batch_id, $status)
     {
-        // dd(Student::whereHas('groupMember.group.registration', function ($query) use ($batch_id) {
-        //     $query->where('batch_id', $batch_id);
-        // })->where('year', $year)->get());
         if ($status == 'registered') {
             return Student::whereHas('groupMember.group.registration', function ($query) use ($batch_id) {
                 $query->where('batch_id', $batch_id)->whereIn('status', ['0', '1']);
             })->where('year', $year)->count();
         }
-        // yang udh di regis tp ditolak blm dihitung
+        
         elseif ($status == 'unregistered') {
             return Student::whereDoesntHave('groupMember.group.registration', function ($query) use ($batch_id) {
                 $query->where('batch_id', $batch_id);
+            })->orWhereHas('groupMember.group.registration', function ($query) use ($batch_id) {
+                $query->where('batch_id', $batch_id)->where('status','2');
             })->where('year', $year)->count();
         }
     }

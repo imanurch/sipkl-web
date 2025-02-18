@@ -7,20 +7,22 @@ use App\Services\BatchService;
 use App\Services\IndustryService;
 use App\Services\DepartmentService;
 use App\Http\Controllers\Controller;
+use App\Services\AdvisorService;
 use Illuminate\Support\Facades\Hash;
 use App\Services\internshipService;
 use App\Services\StudentService;
 
 class InternshipAdminController extends Controller
 {
-    protected $internshipService, $studentService, $batchService;
+    protected $internshipService, $studentService, $batchService, $advisorService;
 
     // Constructor Injection
-    public function __construct(InternshipService $internshipService, StudentService $studentService, BatchService $batchService)
+    public function __construct(InternshipService $internshipService, StudentService $studentService, BatchService $batchService, AdvisorService $advisorService)
     {
         $this->internshipService = $internshipService;
         $this->studentService = $studentService;
         $this->batchService = $batchService;
+        $this->advisorService = $advisorService;
     }
 
     public function index(Request $request)
@@ -43,12 +45,25 @@ class InternshipAdminController extends Controller
         // $data = $this->internshipService->getIntern($filters);
         // dd($data);
         $intern = $this->internshipService->getInternCount($batch_id);
+        $advisorListData = $this->advisorService->getAdvisorList();
 
         return view('pages.admin.intern', [
             'data' => $data,
             'intern' => $intern,
             'filters' => $filters,
             'batchData' => $batchData,
+            'advisorListData' => $advisorListData,
         ]);
+    }
+
+    public function updateAdvisor(Request $request, $internship_id)
+    {
+        // dd($request->all(), $internship_id);
+        $validatedData = $request->validate([
+            'advisor_id' => 'required'
+        ]);
+        $this->internshipService->updateInternshipAdvisor($internship_id, $validatedData['advisor_id']);
+
+        return back();
     }
 }

@@ -70,10 +70,11 @@ class RegistrationStudentController extends Controller
         $request->session()->put('internshipLocation.registration', $validatedData['internshipLocation']);
         // dd(session()->get('internshipLocation.registration'));
 
-        $studentData = $this->studentService->getStudentList();
+        $activeBatch = $this->batchService->getBatchByStatus('active');
+        $studentListData = $this->studentService->getNonInternStudentList($activeBatch->id);
 
         return view('pages.student.registration', [
-            'studentData' => $studentData,
+            'studentListData' => $studentListData,
         ]);
     }
 

@@ -6,11 +6,31 @@ use App\Models\Monitoring;
 
 class MonitoringRepository
 {
-    public function getByAdvisorIdAndBatch($advisor_id, $batch_id)
+    public function getMonitoringByAdvisorIdAndBatch($advisor_id, $batch_id, $filters = [])
     {
-        return Monitoring::whereHas('internships', function ($query) use ($batch_id, $advisor_id) {
+        $query = Monitoring::query();
+
+        // filter type
+        if ($filters['type'] != null) {
+            $query->where('type', $filters['type']);
+        }
+
+        // filter search
+        if ($filters['search'] != null) {
+            $query->where(function ($subQuery) use ($filters) {
+                $subQuery->whereHas('internship', function ($nestedSubQuery) use ($filters) {
+                    $nestedSubQuery->where('group_id', 'like', '%' . $filters['search'] . '%');
+                })
+                    ->orWhereHas('internship.industry', function ($nestedSubQuery) use ($filters) {
+                        $nestedSubQuery->where('name', 'like', '%' . $filters['search'] . '%');
+                    })
+                ;
+            });
+        }
+
+        return $query->whereHas('internship', function ($query) use ($batch_id, $advisor_id) {
             $query->where('advisor_id', $advisor_id)->where('batch_id', $batch_id);
-        })->get();
+        })->with('monitoringDocument')->get();
     }
 
     public function findById($id)
@@ -27,7 +47,7 @@ class MonitoringRepository
     {
         return Monitoring::where('id', $id)->update($data);
     }
-    
+
     public function deleteMonitoring($id)
     {
         return Monitoring::where('id', $id)->delete();

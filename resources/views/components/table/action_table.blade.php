@@ -23,7 +23,7 @@
     </button>
 </td>    --}}
 
-<td class="flex">
+<td class="flex justify-center">
     <button @click="modalAction='isView';dataId={{ $data->toJson() }}" class="{{ $detail ?? '' }}">
         <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
             <path d="M1.81497 9.53488C1.71283 9.37315 1.66176 9.29229 1.63317 9.16756C1.6117 9.07387 1.6117 8.92613 1.63317 8.83244C1.66176 8.70771 1.71283 8.62685 1.81497 8.46512C2.65902 7.12863 5.17143 3.75 9.00018 3.75C12.8289 3.75 15.3413 7.12863 16.1854 8.46512C16.2875 8.62685 16.3386 8.70771 16.3672 8.83244C16.3887 8.92613 16.3887 9.07387 16.3672 9.16756C16.3386 9.29229 16.2875 9.37315 16.1854 9.53488C15.3413 10.8714 12.8289 14.25 9.00018 14.25C5.17143 14.25 2.65903 10.8714 1.81497 9.53488Z" stroke="#079455" stroke-width="0.933333" stroke-linecap="round" stroke-linejoin="round"/>
@@ -40,10 +40,10 @@
             <path d="M6.75 2.25H11.25M2.25 4.5H15.75M14.25 4.5L13.724 12.3895C13.6451 13.5732 13.6057 14.165 13.35 14.6138C13.1249 15.0088 12.7854 15.3265 12.3762 15.5248C11.9115 15.75 11.3183 15.75 10.132 15.75H7.86799C6.68168 15.75 6.08852 15.75 5.62375 15.5248C5.21457 15.3265 4.87507 15.0088 4.64999 14.6138C4.39433 14.165 4.35488 13.5732 4.27596 12.3895L3.75 4.5M7.5 7.875V11.625M10.5 7.875V11.625" stroke="#D73328" stroke-width="0.933333" stroke-linecap="round" stroke-linejoin="round"/>
         </svg>
     </button>
-    <button @click="modal=true;dataId={{ $data->toJson() }}" class="btn btn-xs btn-default-fill {{ $btnInput ?? '' }}">
+    {{-- <button @click="modal=true;dataId={{ $data->toJson() }}" class="btn btn-xs btn-default-fill {{ $btnInput ?? '' }}">
         <svg xmlns="http://www.w3.org/2000/svg" width="15" height="14" viewBox="0 0 15 14" fill="none">
             <path d="M7.49984 2.91669V11.0834M3.4165 7.00002H11.5832" stroke="white" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
           </svg>
         <span>Input Nilai</span>
-    </button>
+    </button> --}}
 </td>   

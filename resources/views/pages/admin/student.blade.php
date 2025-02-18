@@ -152,7 +152,7 @@
             <x-slot name="tBody">
                 @foreach ($data as $dt)
                     <tr>
-                        <td class="text-center">{{ $loop->iteration }}</td>
+                        <td class="text-center">{{ $data->firstItem() + $loop->index }}</td>
                         <td>{{ $dt->name }}</td>
                         <td>{{ $dt->nisn }}</td>
                         <td>{{ $dt->gender }}</td>
@@ -167,6 +167,7 @@
             {{-- pagination --}}
             <x-slot name="pagination">{{ $data->links() }}</x-slot>
         </x-table.table>
+        
         <div x-show="modalAction != null" class="form-modal">
             <x-form>
                 <x-slot name="formTitle">Data Siswa</x-slot>

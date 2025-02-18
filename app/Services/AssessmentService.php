@@ -19,4 +19,19 @@ class AssessmentService
     {
         return $this->assessmentRepository->getAssessment($filters);
     }
+
+    public function getAssessmentByStudentIdAndInternshipId($student_id, $internship_id)
+    {
+        return $this->assessmentRepository->getAssessmentByStudentIdAndInternshipId($student_id, $internship_id);
+    }
+
+    public function addAssessment(array $data)
+    {
+        return $this->assessmentRepository->createAssessment($data);
+    }
+
+    public function updateScoreAssessment($id, array $data)
+    {
+        return $this->assessmentRepository->updateScoreAssessment($id, $data);
+    }
 }

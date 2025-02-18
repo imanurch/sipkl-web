@@ -8,17 +8,28 @@ use App\Services\AdminService;
 use App\Services\AssessmentService;
 use App\Http\Controllers\Controller;
 use App\Services\BatchService;
+use App\Services\InternDocumentService;
+use App\Services\LogbookService;
 use Illuminate\Support\Facades\Hash;
 
 class AssessmentAdminController extends Controller
 {
-    protected $assessmentService, $batchService;
+    protected $assessmentService,
+        $batchService,
+        $internDocumentService,
+        $logbookService;
 
     // Constructor Injection
-    public function __construct(AssessmentService $assessmentService, BatchService $batchService)
-    {
+    public function __construct(
+        AssessmentService $assessmentService,
+        BatchService $batchService,
+        InternDocumentService $internDocumentService,
+        LogbookService $logbookService
+    ) {
         $this->assessmentService = $assessmentService;
         $this->batchService = $batchService;
+        $this->internDocumentService = $internDocumentService;
+        $this->logbookService = $logbookService;
     }
 
     public function index(Request $request)
@@ -34,43 +45,73 @@ class AssessmentAdminController extends Controller
             'batch_id' => $batch_id,
         ];
 
+        // card
+        $countNotAssessed = 0;
+        $countPass = 0;
+        $countNotPass = 0;
+
         // table data
         $data = $this->assessmentService->getAssessment($filters);
+
+        foreach ($data as $dt) {
+            // hitung nilai akhir internship
+            if ($dt->industry_score && $dt->advisor_score && $dt->final_test_score) {
+                $dt->internship_score = round((($dt->industry_score) + ($dt->advisor_score) + ($dt->final_test_score)) / 3, 2);
+
+                // cek kelulusan
+                if($dt->internship_score >= 75){
+                    $dt->internship_status = 'Lulus';
+                    $countPass +=1;
+                } else{
+                    $dt->internship_status = 'Tidak Lulus';
+                    $countNotPass +=1;
+                }
+            } else{
+                $countNotAssessed +=1;
+            }
+
+            // cek final report
+            $isCompleteFinalReport = $this->internDocumentService->checkIsCompleteFinalReportByInternshipAndStudentId($dt->internship_id, $dt->student_id);
+            // dd($isCompleteFinalReport);
+            if ($isCompleteFinalReport == true) {
+                // cek logbook
+                $isCompleteLogbook = $this->logbookService->checkIsCompleteLogbookByInternshipAndStudentId($dt->internship_id, $dt->student_id);
+                if ($isCompleteLogbook == true) {
+                    $dt->isCompleteOutput = 'Lengkap';
+                } else {
+                    $dt->isCompleteOutput = 'Tidak Lengkap';
+                }
+            } else {
+                $dt->isCompleteOutput = 'Tidak Lengkap';
+            }
+            // dd($dt->isCompleteOutput);
+        }
 
         return view('pages.admin.assessment', [
             'data' => $data,
             'batchData' => $batchData,
             'filters' => $filters,
+            'countNotAssessed' => $countNotAssessed,
+            'countPass' => $countPass,
+            'countNotPass' => $countNotPass,
         ]);
     }
-    // /**
-    //  * Update the specified resource in storage.
-    //  */
-    // public function update(Request $request, $id)
-    // {
-    //     // dd($request->all());
-    //     // dd($id);
-    //     if ($request->check_password !== $request->password) {
-    //         return back()->withErrors(['password' => 'Passwords do not match.']);
-    //     }
-    //     $data = $request->except(['_token', '_method']);
-    //     // dd($request->all());
-    //     // dd($data);
-    //     $validatedData = $request->validate([
-    //         'username' => 'required|string',
-    //         'email' => 'required|email|unique:admins,email,' . $id,
-    //         'phone_num' => 'required|string|min:10|max:14|unique:admins,phone_num,' . $id,
-    //         'password' => 'required|string|size:8',
-    //     ]);
-    //     // dd($validatedData);
-    //     $validatedData['password'] = Hash::make($validatedData['password']);
-    //     // dd($validatedData);
-    //     try {
-    //         $this->adminService->updateAdmin($id, $validatedData);
-    //         return redirect()->route('admin')->with('success', 'Admin added successfully.');
-    //     } catch (\Exception $e) {
-    //         // \Log::error($e->getMessage());
-    //         return back()->withErrors(['error' => 'Failed to add admin.']);
-    //     }
-    // }
+    
+    public function update(Request $request, $id)
+    {
+        // dd($request->all());
+        // dd($id);
+        $data = $request->except(['_token', '_method']);
+        // dd($request->all());
+        // dd($data);
+        $validatedData = $request->validate([
+            'industry_score' => 'nullable|numeric',
+            'advisor_score' => 'nullable|numeric',
+            'final_test_score' => 'nullable|numeric',
+        ]);
+        // dd($validatedData);
+        
+        $this->assessmentService->updateScoreAssessment($id, $validatedData);
+        return back();
+    }
 }

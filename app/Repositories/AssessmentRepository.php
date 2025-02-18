@@ -8,22 +8,28 @@ class AssessmentRepository
 {
     public function getAssessment($filters = [])
     {
-        return Assessment::with(
-            'students:id,name',
-            'internships.industries:id,name',
-            'internships.internDocument'
-        )->paginate(5);
+        $query = Assessment::query();
 
         // filter batch
         if ($filters['batch_id'] != null) {
-            $query->where('batch_id', $filters['batch_id']);
+            $query->whereHas('internship', function ($subQuery) use ($filters) {
+                $subQuery->where('batch_id', $filters['batch_id']);
+            });
         };
 
         // filter search
-        if ($searchFilter != null) {
-            $query->where('username', 'like', '%' . $searchFilter . '%')
-                ->orWhere('email', 'like', '%' . $searchFilter . '%');
+        if ($filters['search'] != null) {
+            $query->whereHas('student',function ($subQuery) use ($filters) {
+                $subQuery->where('name', 'like', '%' . $filters['search'] . '%');
+            });
         };
+
+        return $query->with(
+            'student:id,name,department_id',
+            'student.department:id,name',
+            'internship.industry:id,name',
+            'internship.internDocument'
+        )->paginate(5);
     }
 
     // public function getAssessmentByAdvisor($advisor_id)
@@ -48,35 +54,20 @@ class AssessmentRepository
     //     )->get();
     // }
 
-    // public function countUnconfirmedAssessment($batch_id)
-    // {
-    //     return Assessment::where('status', '0')->where('batch_id', $batch_id)->count();
-    // }
+    public function getAssessmentByStudentIdAndInternshipId($student_id, $internship_id)
+    {
+        return Assessment::where('student_id', $student_id)->where('internship_id', $internship_id)->first();
+    }
 
-    // public function countAcceptedAssessment($batch_id)
-    // {
-    //     return Assessment::where('status', '1')->where('batch_id', $batch_id)->count();
-    // }
+    public function createAssessment(array $data)
+    {
+        return Assessment::create($data);
+    }
 
-    // public function countRejectedAssessment($batch_id)
-    // {
-    //     return Assessment::where('status', '2')->where('batch_id', $batch_id)->count();
-    // }
-
-    // public function getAssessmentByStudentIdAndInternshipId($studentId, $internship_id)
-    // {
-    //     return Assessment::where('studentId', $studentId)->where('internship_id', $internship_id)->first();
-    // }
-
-    // public function createAssessment(array $data)
-    // {
-    //     return Assessment::create($data);
-    // }
-
-    // public function updateScoreAssessment($studentId, $internship_id, array $data)
-    // {
-    //     return Assessment::where('studentId', $studentId)->where('internship_id', $internship_id)->update($data);
-    // }
+    public function updateScoreAssessment($id, array $data)
+    {
+        return Assessment::where('id', $id)->update($data);
+    }
 
     // public function deleteAssessment($id)
     // {

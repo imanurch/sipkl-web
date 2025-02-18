@@ -19,6 +19,11 @@ class InternshipService
         return $this->internshipRepository->getInternship($filters);
     }
 
+    public function getInternshipListByAdvisor($advisor_id, $batch)
+    {
+        return $this->internshipRepository->getInternshipListByAdvisor($advisor_id, $batch);
+    }
+
     public function getIntern($filters = [])
     {
         return $this->internshipRepository->getIntern($filters);
@@ -52,5 +57,20 @@ class InternshipService
     public function getInternshipByStudentId($batch_id, $student_id)
     {
         return $this->internshipRepository->getInternshipByStudentId($batch_id, $student_id);
-    }    
+    }
+
+    public function getInternshipByInternshipId($internship_id)
+    {
+        return $this->internshipRepository->findInternshipById($internship_id);
+    }
+
+    public function addInternship(array $data)
+    {
+        return $this->internshipRepository->createInternship($data);
+    }
+
+    public function updateInternshipAdvisor($internship_id, $advisor_id)
+    {
+        return $this->internshipRepository->updateInternshipAdvisor($internship_id, $advisor_id);
+    }
 }

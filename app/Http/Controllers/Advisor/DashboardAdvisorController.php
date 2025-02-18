@@ -24,19 +24,32 @@ class DashboardAdvisorController extends Controller
     {
         $currentBatch = $this->batchService->getBatchByStatus('active');
         $batch_id = $currentBatch->id;
-        $advisor_id = '7';
+        $advisor_id = '2';
 
         $mentee = $this->internshipService->getInternByAdvisorCount($batch_id, $advisor_id);
         $industry = $this->internshipService->getIndustryByAdvisorCount($batch_id, $advisor_id);
 
         $data = $this->advisorService->getAdvisorById($advisor_id);
         $surat_tugas = $this->advisorService->getAdvisorDocumentByAdvisorIdAndBatchId($advisor_id, $batch_id);
+        $data->surat_tugas = $surat_tugas;
+        // dd($surat_tugas);
 
         return view('pages.advisor.dashboard', [
             'data' => $data,
-            'surat_tugas' => $surat_tugas,
+            // 'surat_tugas' => $surat_tugas,
             'mentee' => $mentee,
             'industry' => $industry,
         ]);
+    }
+
+    public function downloadSuratTugas($filename)
+    {
+        $path = storage_path('app/registration_document/surat_pengantar/' . $filename);
+
+        if (file_exists($path)) {
+            return response()->download($path);
+        } else {
+            return response()->json(['message' => 'File tidak ditemukan'], 404);
+        }
     }
 }

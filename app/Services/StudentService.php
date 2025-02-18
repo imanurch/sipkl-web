@@ -19,9 +19,9 @@ class StudentService
         return $this->studentRepository->getStudent($filters);
     }
 
-    public function getStudentList()
+    public function getNonInternStudentList($activeBatch_id)
     {
-        return $this->studentRepository->getStudentList();
+        return $this->studentRepository->getNonInternStudentList($activeBatch_id);
     }
 
     public function getStudentById($student_id)

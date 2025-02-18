@@ -49,7 +49,7 @@
                             </button>
                             <div x-show="option" @click.away="option=false">
                                 <ul class="border border-brand-600 rounded py-2 my-2 max-h-32 overflow-auto">
-                                    @foreach($studentData as $dt)
+                                    @foreach($studentListData as $dt)
                                     <li @click="option=false;selected='{{ $dt->name }} (NISN {{ $dt->nisn }})';valueSelected='{{ $dt->id }}'" class="text-xs-reguler px-4 py-2 hover:bg-brand-600 hover:text-neutral-0 hover:text-xs-medium">{{ $dt->name }} (NISN {{ $dt->nisn }})</li>
                                     @endforeach
                                 </ul>

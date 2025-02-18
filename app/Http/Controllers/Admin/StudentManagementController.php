@@ -23,11 +23,8 @@ class StudentManagementController extends Controller
 
     public function index(Request $request)
     {
-        // batch data
         $currentBatch = $this->batchService->getBatchByStatus('active');
-        // dd($currentBatch->id);
         $batch_id = $request->batch ?? ($currentBatch->id ?? '');
-        // dd($batch_id);
         $year = $request->year ?? ($currentBatch->year ?? '');
 
         // table filters
@@ -39,10 +36,8 @@ class StudentManagementController extends Controller
             'batch_id' => $batch_id,
             'department' => $request->department ?? '',
             'status' => $request->status ?? '',
-            // 'status' => $request->status ? ($request->status == 'Aktif' ? 'active' : 'inactive') : '',
             'search' => $request->searchKeyword ?? '',
         ];
-        // dd($filters);
 
         // table data
         $data = $this->studentService->getStudent($filters);
@@ -64,12 +59,10 @@ class StudentManagementController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->all());
         if ($request->check_password !== $request->password) {
             return back()->withErrors(['password' => 'Passwords do not match.']);
         }
         $data = $request->except(['_token']);
-        // dd($request->all());
         $validatedData = $request->validate([
             'name' => 'required|string',
             'nisn' => 'required|size:10|unique:students,nisn',
@@ -79,12 +72,10 @@ class StudentManagementController extends Controller
             'phone_num' => 'required|string|min:10|max:14|unique:students,phone_num,',
             'password' => 'required|string|size:8',
         ]);
-        // dd($validatedData);
+
         $validatedData['password'] = Hash::make($validatedData['password']);
         $validatedData['department_id'] = $validatedData['department_id'] == 'K3R' ? '1' : ($validatedData['department_id'] == 'DPIB' ? '2' : ($validatedData['department_id'] == 'RPL' ? '3' : ''));
         $validatedData['gender'] = $validatedData['gender'] == 'Laki-Laki' ? 'men' : 'women';
-
-        // dd($validatedData);
 
         try {
             $this->studentService->addStudent($validatedData);
@@ -97,14 +88,11 @@ class StudentManagementController extends Controller
 
     public function update(Request $request, $id)
     {
-        // dd($request->all());
-        // dd($id);
         if ($request->check_password !== $request->password) {
             return back()->withErrors(['password' => 'Passwords do not match.']);
         }
         $data = $request->except(['_token', '_method']);
-        // dd($request->all());
-        // dd($data);
+
         $validatedData = $request->validate([
             'name' => 'required|string',
             'nisn' => 'required|size:10|unique:students,nisn,' . $id,
@@ -115,11 +103,9 @@ class StudentManagementController extends Controller
             'password' => 'required|string|size:8',
         ]);
         $validatedData['password'] = Hash::make($validatedData['password']);
-        // dd($validatedData);
         $validatedData['department_id'] = $validatedData['department_id'] == 'K3R' ? '1' : ($validatedData['department_id'] == 'DPIB' ? '2' : ($validatedData['department_id'] == 'RPL' ? '3' : ''));
         $validatedData['gender'] = $validatedData['gender'] == 'Laki-Laki' ? 'men' : 'women';
 
-        // dd($validatedData);
         try {
             $this->studentService->updateStudent($id, $validatedData);
             return redirect()->route('studentManagement')->with('success', 'student added successfully.');

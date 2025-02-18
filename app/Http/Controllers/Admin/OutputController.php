@@ -7,6 +7,7 @@ use App\Services\BatchService;
 use App\Services\IndustryService;
 use App\Services\DepartmentService;
 use App\Http\Controllers\Controller;
+use App\Services\InternDocumentService;
 use Illuminate\Support\Facades\Hash;
 use App\Services\internshipService;
 use App\Services\LogbookService;
@@ -14,15 +15,25 @@ use App\Services\StudentService;
 
 class OutputController extends Controller
 {
-    protected $logbookService, $internshipService, $studentService, $batchService;
+    protected $logbookService,
+        $internshipService,
+        $studentService,
+        $batchService,
+        $internDocumentService;
 
     // Constructor Injection
-    public function __construct(LogbookService $logbookService, InternshipService $internshipService, StudentService $studentService, BatchService $batchService)
-    {
+    public function __construct(
+        LogbookService $logbookService,
+        InternshipService $internshipService,
+        StudentService $studentService,
+        BatchService $batchService,
+        InternDocumentService $internDocumentService
+    ) {
         $this->logbookService = $logbookService;
         $this->internshipService = $internshipService;
         $this->studentService = $studentService;
         $this->batchService = $batchService;
+        $this->internDocumentService = $internDocumentService;
     }
 
     public function index(Request $request)
@@ -48,12 +59,46 @@ class OutputController extends Controller
         // // dd($data);
         // $intern = $this->internshipService->getInternCount($batch_id);
 
+        // card
+        $completeOutputCount = 0;
+        $incompleteOutputCount = 0;
+        foreach ($data as $dt) {
+            // cek final report
+            foreach ($dt->groupMember as $member) {
+                // dd($member->group->internship->id, $dt->id);                
+                $isCompleteFinalReport = $this->internDocumentService->checkIsCompleteFinalReportByInternshipAndStudentId($member->group->internship->id, $dt->id);
+                // dd($isCompleteFinalReport);
+                if ($isCompleteFinalReport == true) {
+                    // cek logbook
+                    $isCompleteLogbook = $this->logbookService->checkIsCompleteLogbookByInternshipAndStudentId($member->group->internship->id, $dt->id);
+                    if ($isCompleteLogbook == true) {
+                        $completeOutputCount += 1;
+                    } else {
+                        $incompleteOutputCount += 1;
+                    }
+                } else {
+                    $incompleteOutputCount += 1;
+                }
+            }
+        }
+
         return view('pages.admin.output', [
             'data' => $data,
-            // 'completeOutput' => $completeOutput,
-            // 'incompleteOutput' => $incompleteOutput,
+            'completeOutputCount' => $completeOutputCount,
+            'incompleteOutputCount' => $incompleteOutputCount,
             'filters' => $filters,
             'batchData' => $batchData,
         ]);
+    }
+
+    public function downloadFinalReport($filename)
+    {
+        
+        $path = storage_path('app/registration_document/surat_pengantar/' . $filename);
+        if (file_exists($path)) {
+            return response()->download($path);
+        } else {
+            return response()->json(['message' => 'File tidak ditemukan'], 404);
+        }
     }
 }

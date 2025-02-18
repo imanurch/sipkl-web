@@ -52,7 +52,7 @@
             {{-- step 2 --}}
             @if(Route::is('student.registration.step2'))
             <div>
-                <x-registration_step.step2 :studentData="$studentData"></x-registration_step.step2>
+                <x-registration_step.step2 :studentListData="$studentListData"></x-registration_step.step2>
             </div> 
             @endif
             

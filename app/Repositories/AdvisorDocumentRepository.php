@@ -8,7 +8,7 @@ class AdvisorDocumentRepository
 {
     public function getAdvisorDocumentByAdvisorIdAndBatchId($advisor_id, $batch_id)
     {
-        return AdvisorDocument::where('advisor_id', $advisor_id)->where('batch_id',$batch_id);
+        return AdvisorDocument::where('advisor_id', $advisor_id)->where('batch_id',$batch_id)->first();
     }
 
     // public function findAdvisorDocumentById($id)

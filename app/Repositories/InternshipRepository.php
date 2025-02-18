@@ -10,7 +10,7 @@ use App\Models\GroupMember;
 class InternshipRepository
 {
     public function getInternship($filters = [])
-    {        
+    {
         $query = Internship::with(
             'group',
             'group.groupMember.student:id,name,department_id',
@@ -41,9 +41,12 @@ class InternshipRepository
         // });
 
         $query = Student::with(
+            // 'groupMember',
+            // 'groupMember.group',
             'groupMember.group.internship',
             'groupMember.group.internship.advisor:id,name',
             'groupMember.group.internship.industry:id,name',
+            'internDocument'
         )->whereHas('groupMember.group.internship', function ($query) use ($filters) {
             $query->where('batch_id', $filters['batch_id']);
         });
@@ -121,23 +124,26 @@ class InternshipRepository
         })->with('industry:id,name,address', 'advisor:id,name,phone_num')->where('batch_id', $batch_id)->first();
     }
 
+    public function getInternshipListByAdvisor($advisor_id, $batch_id)
+    {
+        return Internship::where('advisor_id', $advisor_id)->where('batch_id', $batch_id)->get();
+    }
 
 
+    public function findInternshipById($id)
+    {
+        return Internship::find($id);
+    }
 
-    // public function findInternshipById($id)
-    // {
-    //     return Internship::find($id);
-    // }
+    public function createInternship(array $data)
+    {
+        return Internship::create($data);
+    }
 
-    // public function createInternship(array $data)
-    // {
-    //     return Internship::create($data);
-    // }
-
-    // public function updateInternship($id, array $data)
-    // {
-    //     return Internship::where('id', $id)->update($data);
-    // }
+    public function updateInternshipAdvisor($internship_id, $advisor_id)
+    {
+        return Internship::where('id', $internship_id)->update(['advisor_id' => $advisor_id]);
+    }
 
     // public function deleteInternship($id)
     // {

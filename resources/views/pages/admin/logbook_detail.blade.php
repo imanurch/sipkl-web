@@ -1,4 +1,4 @@
-@extends('layouts.app')
+{{-- @extends('layouts.app')
 
 @section('page-title', 'Logbook Bimbingan')
 @section('profil', 'Advisor')
@@ -53,4 +53,4 @@
 </div>
 
 <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
-@endsection
+@endsection --}}

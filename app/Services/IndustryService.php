@@ -14,11 +14,6 @@ class IndustryService
         $this->industryRepository = $industryRepository;
     }
 
-    // public function getIndustry($filters = [])
-    // {
-    //     return $this->industryRepository->getIndustry($filters);
-    // }
-
     public function getUnconfirmedIndustry($filters = [])
     {
         return $this->industryRepository->getUnconfirmedIndustry($filters);
@@ -64,9 +59,9 @@ class IndustryService
         return $this->industryRepository->updateIndustry($industry_id, $data);
     }
 
-    public function updateIndustryRequestStatus($id, $status)
+    public function updateIndustryRequestStatus($industry_id, $status)
     {
-        return $this->industryRepository->updateIndustryRequestStatus($id, $status);
+        return $this->industryRepository->updateIndustryRequestStatus($industry_id, $status);
     }
 
     public function deleteIndustry($industry_id)

@@ -1,0 +1,17 @@
+<!-- admins -->
+<!-- departments -->
+<!-- advisors -->
+<!-- students -->
+<!-- groups -->
+<!-- group_members -->
+<!-- industries -->
+<!-- batches -->
+<!-- registrations -->
+<!-- registration_documents -->
+<!-- internships -->
+<!-- intern_documents -->
+<!-- advisor_documents -->
+<!-- monitoring -->
+<!-- monitoring_documents -->
+<!-- logbooks -->
+<!-- assessments -->

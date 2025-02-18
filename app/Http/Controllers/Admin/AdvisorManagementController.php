@@ -25,9 +25,7 @@ class AdvisorManagementController extends Controller
     {
         // batch data
         $currentBatch = $this->batchService->getBatchByStatus('active');
-        // dd($currentBatch->id);
         $batch_id = $request->batch ?? ($currentBatch->id ?? '');
-        // dd($batch_id);
 
         // table filters
         $departmentData = $this->departmentService->getAllDepartment();
@@ -35,14 +33,9 @@ class AdvisorManagementController extends Controller
         $filters = [
             'batch_id' => $batch_id,
             'department' => $request->department ?? '',
-            // 'department_id' => '1',
             'status' => $request->status ?? '',
-            // 'status' => $request->status ? ($request->status == 'Aktif' ? 'active' : 'inactive') : '',
-            // 'status' => 'inactive',
             'search' => $request->searchKeyword ?? '',
-            // 'search' => 'Mica',
         ];
-        // dd($filters);
 
         // table data
         $data = $this->advisorService->getAdvisor($filters);
@@ -50,11 +43,6 @@ class AdvisorManagementController extends Controller
         // card data
         $activeAdvisor = $this->advisorService->getAdvisorByStatusCount($batch_id, 'active');
         $inactiveAdvisor = $this->advisorService->getAdvisorByStatusCount($batch_id, 'inactive');
-
-        // return view('pages.admin.advisor', compact('data'));
-        // if (empty($filters['department']) && empty($filters['status']) && empty($filters['search'])) {
-        // return redirect()->to('advisor');
-        // }
 
         return view('pages.admin.advisor', [
             'data' => $data,
@@ -68,12 +56,10 @@ class AdvisorManagementController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->all());
         if ($request->check_password !== $request->password) {
             return back()->withErrors(['password' => 'Passwords do not match.']);
         }
         $data = $request->except(['_token']);
-        // dd($request->all());
         $validatedData = $request->validate([
             'name' => 'required|string',
             'nip' => 'required|size:18',
@@ -85,8 +71,6 @@ class AdvisorManagementController extends Controller
         $validatedData['password'] = Hash::make($validatedData['password']);
         $validatedData['department_id'] = $validatedData['department_id'] == 'K3R' ? '1' : ($validatedData['department_id'] == 'DPIB' ? '2' : ($validatedData['department_id'] == 'RPL' ? '3' : ''));
         
-        // dd($validatedData);
-
         try {
             $this->advisorService->addAdvisor($validatedData);
             return redirect()->route('advisor')->with('success', 'advisor added successfully.');
@@ -103,14 +87,11 @@ class AdvisorManagementController extends Controller
 
     public function update(Request $request, $id)
     {
-        // dd($request->all());
-        // dd($id);
         if ($request->check_password !== $request->password) {
             return back()->withErrors(['password' => 'Passwords do not match.']);
         }
         $data = $request->except(['_token', '_method']);
-        // dd($request->all());
-        // dd($data);
+
         $validatedData = $request->validate([
             'name' => 'required|string',
             'nip' => 'required|size:18',
@@ -120,9 +101,9 @@ class AdvisorManagementController extends Controller
             'password' => 'required|string|size:8',
         ]);
         $validatedData['password'] = Hash::make($validatedData['password']);
-        // dd($validatedData);
+
         $validatedData['department_id'] = $validatedData['department_id'] == 'K3R' ? '1' : ($validatedData['department_id'] == 'DPIB' ? '2' : ($validatedData['department_id'] == 'RPL' ? '3' : ''));
-        // dd($validatedData);
+
         try {
             $this->advisorService->updateAdvisor($id, $validatedData);
             return redirect()->route('advisor')->with('success', 'advisor added successfully.');
@@ -134,7 +115,6 @@ class AdvisorManagementController extends Controller
 
     public function destroy($id)
     {
-        // dd($id);
         try {
             $this->advisorService->deleteAdvisor($id);
             return redirect()->route('advisor')->with('success', 'advisor deleted successfully.');

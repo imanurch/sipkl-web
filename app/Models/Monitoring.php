@@ -19,6 +19,6 @@ class Monitoring extends Model
     }
     public function monitoringDocument(): HasMany
     {
-        return $this->hasMany(MonitoringDocument::class, 'id');
+        return $this->hasMany(MonitoringDocument::class, 'monitoring_id');
     }
 }

@@ -6,7 +6,6 @@ use App\Http\Controllers\Controller;
 use Illuminate\Http\Request;
 use App\Services\AdminService;
 use Illuminate\Support\Facades\Hash;
-use Log;
 
 class AdminManagementController extends Controller
 {
@@ -34,12 +33,10 @@ class AdminManagementController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->all());
         if ($request->check_password !== $request->password) {
             return back()->withErrors(['password' => 'Passwords do not match.']);
         }
         $data = $request->except(['_token']);
-        // dd($request->all());
         $validatedData = $request->validate([
             'username' => 'required|string',
             'email' => 'required|unique:admins,email|email',
@@ -59,23 +56,18 @@ class AdminManagementController extends Controller
 
     public function update(Request $request, $id)
     {
-        // dd($request->all());
-        // dd($id);
         if ($request->check_password !== $request->password) {
             return back()->withErrors(['password' => 'Passwords do not match.']);
         }
         $data = $request->except(['_token', '_method']);
-        // dd($request->all());
-        // dd($data);
         $validatedData = $request->validate([
             'username' => 'required|string',
             'email' => 'required|email|unique:admins,email,' . $id,
             'phone_num' => 'required|string|min:10|max:14|unique:admins,phone_num,' . $id,
             'password' => 'required|string|size:8',
         ]);
-        // dd($validatedData);
         $validatedData['password'] = Hash::make($validatedData['password']);
-        // dd($validatedData);
+        
         try {
             $this->adminService->updateAdmin($id, $validatedData);
             return redirect()->route('admin')->with('success', 'Admin added successfully.');
@@ -87,7 +79,6 @@ class AdminManagementController extends Controller
 
     public function destroy($id)
     {
-        // dd($id);
         try {
             $this->adminService->deleteAdmin($id);
             return redirect()->route('admin')->with('success', 'Admin deleted successfully.');

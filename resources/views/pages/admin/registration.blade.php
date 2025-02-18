@@ -27,7 +27,7 @@
         </x-card>
     </div>
 
-    <div x-data="{ modalAction: null, modalConfirm: null, registrationId: null, dataId: [] }">
+    <div x-data="{ modalAction: null, modalConfirm: null, id: null, dataId: [] }">
         <x-table.table>
             <x-slot name="tableTitle">Pendaftaran PKL</x-slot>
             <x-slot name="filterActionForm">registration</x-slot>
@@ -75,7 +75,7 @@
                 @foreach ($data as $dt)
                     <tr>
                         <td>{{ $dt->id }}</td>
-                        <td class="text-center">{{ $loop->iteration }}</td>
+                        <td class="text-center">{{ $data->firstItem() + $loop->index }}</td>
                         <td>{{ $dt->group->name }}</td>
                         <td>{{ $dt->start_date }} s/d {{ $dt->end_date }}</td>
                         <td>{{ $dt->industry->name ?? '' }}</td>
@@ -85,12 +85,13 @@
                                     @if ($doc->url != '')
                                         {{-- surat pengantar --}}
                                         <x-table.action_btn_table name="Lihat File"
-                                            href="{{ route('admin.registration.download.file', ['filename' => $doc->url]) }}"></x-table.action_btn_table>
+                                            href="{{ route('admin.registration.download.file', ['type' => 'suratPengantar', 'filename' => $doc->url]) }}"></x-table.action_btn_table>
                                     @else
                                         {{-- surat pengantar --}}
                                         {{-- <td>Belum Tersedia</td> --}}
                                         <td class="text-center">
-                                            <a href="" class="btn btn-xs btn-success-fill min-w-max">
+                                            <a href="{{ route('admin.registration.generateSuratPengantar', ['registrationId' => $dt->id]) }}"
+                                                class="btn btn-xs btn-success-fill min-w-max">
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                                     viewBox="0 0 18 18" fill="none">
                                                     <path
@@ -105,7 +106,7 @@
                                 @if ($doc->type == 'surat balasan')
                                     @if ($doc->url != '')
                                         <x-table.action_btn_table name="Lihat File"
-                                            href="{{ route('admin.registration.download.file', ['filename' => $doc->url]) }}"></x-table.action_btn_table>
+                                            href="{{ route('admin.registration.download.file', ['type' => 'suratBalasan', 'filename' => $doc->url]) }}"></x-table.action_btn_table>
                                         <x-table.action_table edit="hidden" delete="hidden" btnInput="hidden"
                                             :data="$dt"></x-table.action_table>
                                         @if ($dt->status == '0')
@@ -184,20 +185,39 @@
             </x-form>
         </div>
 
-        {{-- modal confirm --}}
-        <div x-show="modalConfirm=='accept'" class="bg-neutral-0 border rounded justify-center w-80 border-success-400">
-            <h6 class="text-xs-reguler py-5 px-6 text-center max-w-72">Apakah Anda Yakin
-                Ingin <span class="text-xs-medium text-success-800">Menerima Registrasi PKL
-                    Ini?</span>
-            </h6>
-            <div class="flex justify-center py-3 space-x-4 border-t border-success-400">
-                <button @click="modalConfirm=null" class="btn btn-xs btn-success-outline">Tidak</button>
-                <a :href="`{{ route('admin.registration.status.confirm', ['registrationId' => 'id', 'status' => 'accept']) }}`
-                .replace('id', registrationId)"
-                    class="btn btn-xs btn-success-fill">Ya</a>
+        {{-- modal --}}
+        {{-- accept modal confirm --}}
+        <div x-show="modalConfirm=='accept'" class="confirm-modal">
+            <div class="place-self-center bg-neutral-0 border rounded justify-center w-80 border-success-400">
+                <h6 class="text-xs-reguler py-5 px-6 text-center max-w-72">Apakah Anda Yakin
+                    Ingin <span class="text-xs-medium text-success-800">Menerima Registrasi PKL
+                        Ini?</span>
+                </h6>
+                <div class="flex justify-center py-3 space-x-4 border-t border-success-400">
+                    <button @click="modalConfirm=null" class="btn btn-xs btn-success-outline">Tidak</button>
+                    <a :href="`{{ route('admin.registration.status.confirm', ['registrationId' => 'id', 'status' => 'accept']) }}`
+                    .replace('id', id)"
+                        class="btn btn-xs btn-success-fill">Ya</a>
+                </div>
             </div>
         </div>
 
+
+        {{-- reject modal confirm --}}
+        <div x-show="modalConfirm=='reject'" class="confirm-modal">
+            <div class="place-self-center bg-neutral-0 border rounded justify-center w-80 border-error-400">
+                <h6 class="text-xs-reguler py-5 px-6 text-center max-w-72">Apakah Anda Yakin
+                    Ingin <span class="text-xs-medium text-error-800">Menolak Registrasi PKL
+                        Ini?</span>
+                </h6>
+                <div class="flex justify-center py-3 space-x-4 border-t border-error-400">
+                    <button @click="modalConfirm=null" class="btn btn-xs btn-error-outline">Tidak</button>
+                    <a :href="`{{ route('admin.registration.status.confirm', ['registrationId' => 'id', 'status' => 'reject']) }}`
+                    .replace('id', id)"
+                        class="btn btn-xs btn-error-fill">Ya</a>
+                </div>
+            </div>
+        </div>
     </div>
 
 @endsection

@@ -33,15 +33,11 @@ class IndustryManagementController extends Controller
             'rejectedIndustrySearch' => $request->rejectedSearchKeyword ?? '',
             'status' => $request->status ?? '',
         ];
-        // $searchFilter = $request->searchKeyword ?? '';
-        // dd($filters);
 
-        // table data
-        // $data = $this->industryService->getIndustry($filters);
+        // data table
         $unconfirmedData = $this->industryService->getUnconfirmedIndustry($filters);
         $partnerData = $this->industryService->getPartnerIndustry($filters, $batch_id);
         $rejectedData = $this->industryService->getRejectedIndustry($filters);
-        // dd($data);
 
         // card data
         $activeIndustry = $this->industryService->getIndustryByStatusCount($batch_id, 'active');
@@ -65,9 +61,7 @@ class IndustryManagementController extends Controller
 
     public function store(Request $request)
     {
-        // dd($request->all());
         $data = $request->except(['_token']);
-        // dd($request->all());
         $validatedData = $request->validate([
             'name' => 'required|string',
             'address' => 'required|string',
@@ -87,18 +81,14 @@ class IndustryManagementController extends Controller
 
     public function update(Request $request, $id)
     {
-        // dd($request->all());
-        // dd($id);
         $data = $request->except(['_token', '_method']);
-        // dd($request->all());
-        // dd($data);
         $validatedData = $request->validate([
             'name' => 'required|string',
             'address' => 'required|string',
             'email' => 'required|email|unique:industries,email,' . $id,
             'phone_num' => 'required|string|min:10|max:14|unique:industries,phone_num,' . $id,
         ]);
-        // dd($validatedData);
+
         try {
             $this->industryService->updateIndustry($id, $validatedData);
             return redirect()->route('industryManagement')->with('success', 'industry added successfully.');
@@ -108,9 +98,14 @@ class IndustryManagementController extends Controller
         }
     }
 
+    public function confirmStatusIndustry($industryId, $status)
+    {
+        $this->industryService->updateIndustryRequestStatus($industryId, $status);
+        return back();
+    }
+
     public function destroy($id)
     {
-        // dd($id);
         try {
             $this->industryService->deleteIndustry($id);
             return redirect()->route('industryManagement')->with('success', 'industry deleted successfully.');
@@ -119,9 +114,4 @@ class IndustryManagementController extends Controller
             return back()->withErrors(['error' => 'Failed to delete industry.']);
         }
     }
-
-    // public function confirm(Request $request, $id){
-    //     $status = $request->status;
-    //     $this->industryService->updateIndustryRequestStatus($id, $status);
-    // }
 }

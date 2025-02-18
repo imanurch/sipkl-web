@@ -114,7 +114,7 @@
             <x-slot name="tBody">
                 @foreach ($data as $dt)
                     <tr>
-                        <td class="text-center">{{ $loop->iteration }}</td>
+                        <td class="text-center">{{ $data->firstItem() + $loop->index }}</td>
                         <td>{{ $dt->name }}</td>
                         <td>{{ $dt->nip }}</td>
                         <td>{{ $dt->department->name }}</td>

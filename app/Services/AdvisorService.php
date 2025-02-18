@@ -21,6 +21,11 @@ class AdvisorService
         return $this->advisorRepository->getAdvisor($filters);
     }
 
+    public function getAdvisorList()
+    {
+        return $this->advisorRepository->getAdvisorList();
+    }
+
     public function getAdvisorById($advisor_id)
     {
         return $this->advisorRepository->findAdvisorById($advisor_id);

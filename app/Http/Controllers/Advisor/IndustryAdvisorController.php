@@ -22,7 +22,7 @@ class IndustryAdvisorController extends Controller
 
     public function index(Request $request)
     {
-        $advisor_id = '7';
+        $advisor_id = '2';
 
         // batch data
         $currentBatch = $this->batchService->getBatchByStatus('active');
