@@ -19,10 +19,15 @@ class AdminService
         return $this->adminRepository->getAdmin($searchFilter);
     }
 
-    // public function getAdminById($admin_id)
-    // {
-    //     return $this->adminRepository->findAdminById($admin_id);
-    // }
+    public function getAdminByUserId($id)
+    {
+        return $this->adminRepository->getAdminByUserId($id);
+    }
+
+    public function getAdminById($id)
+    {
+        return $this->adminRepository->findAdminById($id);
+    }
 
     public function addAdmin(array $data)
     {

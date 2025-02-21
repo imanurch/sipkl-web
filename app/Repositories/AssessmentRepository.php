@@ -19,7 +19,7 @@ class AssessmentRepository
 
         // filter search
         if ($filters['search'] != null) {
-            $query->whereHas('student',function ($subQuery) use ($filters) {
+            $query->whereHas('student', function ($subQuery) use ($filters) {
                 $subQuery->where('name', 'like', '%' . $filters['search'] . '%');
             });
         };
@@ -32,16 +32,41 @@ class AssessmentRepository
         )->paginate(5);
     }
 
-    // public function getAssessmentByAdvisor($advisor_id)
-    // {
-    //     return Assessment::whereHas('internships', function ($query) use ($advisor_id) {
-    //         $query->where('advisor_id', $advisor_id);
-    //     })->with(
-    //         'students:id,name',
-    //         'internships.industries:id,name',
-    //         'internships.internDocument'
-    //     )->get();
-    // }
+    public function getAssessmentByAdvisor($advisor_id, $filters = [])
+    {
+        // return Assessment::whereHas('internships', function ($query) use ($advisor_id) {
+        //     $query->where('advisor_id', $advisor_id);
+        // })->with(
+        //     'students:id,name',
+        //     'internships.industries:id,name',
+        //     'internships.internDocument'
+        // )->get();
+
+        $query = Assessment::query();
+
+        // filter batch
+        if ($filters['batch_id'] != null) {
+            $query->whereHas('internship', function ($subQuery) use ($filters) {
+                $subQuery->where('batch_id', $filters['batch_id']);
+            });
+        };
+
+        // filter search
+        if ($filters['search'] != null) {
+            $query->whereHas('student', function ($subQuery) use ($filters) {
+                $subQuery->where('name', 'like', '%' . $filters['search'] . '%');
+            });
+        };
+
+        return $query->whereHas('internship', function ($query) use ($advisor_id) {
+            $query->where('advisor_id', $advisor_id);
+        })->with(
+            'student:id,name,department_id',
+            'student.department:id,name',
+            'internship.industry:id,name',
+            'internship.internDocument'
+        )->paginate(5);
+    }
 
     // public function getAssessmentByBatchAndAdvisor($batch_id, $advisor_id)
     // {

@@ -1,6 +1,6 @@
 <div class="space-y-3">
     <h6 class="text-xs-medium">Ajukan Lokasi PKL Baru</h6>
-    <form action="{{ route('student.registration.step2') }}" method="POST">
+    <form action="{{ route('student.registration.industry.request') }}" method="POST">
         @csrf
         <div class="space-y-4">
             <div class="space-y-3">

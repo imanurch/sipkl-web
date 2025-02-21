@@ -20,6 +20,7 @@ return new class extends Migration
             $table->foreignId('batch_id')->constrained('batches');
             // status 0 unconfirmed, 1 accepted, 2 rejected
             $table->enum('status', ['0', '1', '2'])->default('0');
+            $table->enum('step', ['1', '2', '3', '4', '5'])->default('1');
             $table->timestamps();
         });
     }

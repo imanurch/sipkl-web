@@ -19,10 +19,15 @@ class AdminRepository
         return $query->paginate(5);
     }
 
-    // public function findAdminById($admin_id)
-    // {
-    //     return Admin::find($admin_id);
-    // }
+    public function getAdminByUserId($id)
+    {
+        return Admin::where('user_id', $id)->first();
+    }
+
+    public function findAdminById($id)
+    {
+        return Admin::where('id', $id)->first();
+    }
 
     public function createAdmin(array $data)
     {

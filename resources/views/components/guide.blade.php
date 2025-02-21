@@ -5,7 +5,7 @@
             <path d="M9 12V9M9 6H9.0075M16.5 9C16.5 13.1421 13.1421 16.5 9 16.5C4.85786 16.5 1.5 13.1421 1.5 9C1.5 4.85786 4.85786 1.5 9 1.5C13.1421 1.5 16.5 4.85786 16.5 9Z" stroke="#1F2228" stroke-width="1" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
     </div>
-    <ul class="list-disc text-xs-reguler px-5">
+    <ul class="list-disc text-xs-reguler px-5 space-y-1">
         {{ $slot }}
     </ul>
 </div>

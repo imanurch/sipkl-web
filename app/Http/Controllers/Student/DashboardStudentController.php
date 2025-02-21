@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Student;
 
 use Illuminate\Http\Request;
+use App\Services\BatchService;
+use App\Services\AdvisorService;
+use App\Services\StudentService;
 use App\Services\InternshipService;
 use App\Http\Controllers\Controller;
-use App\Services\AdvisorService;
-use App\Services\BatchService;
-use App\Services\StudentService;
+use Illuminate\Support\Facades\Auth;
 
 class DashboardStudentController extends Controller
 {
@@ -24,20 +25,19 @@ class DashboardStudentController extends Controller
 
     public function index(Request $request)
     {
+        $user_id = Auth::user()->id;
+        // $student_id = $this->studentService->getStudentIdByUserId($user_id);
+        $student_id = session('user_bio')->id;
+        
         $currentBatch = $this->batchService->getBatchByStatus('active');
-        $batch_id = $currentBatch->id;
-        $student_id = '5';
+        $batch_id = $currentBatch != null ? $currentBatch->id : '';
 
-        // $mentee = $this->internshipService->getInternByAdvisorCount($batch_id, $advisor_id);
-        // $industry = $this->internshipService->getIndustryByAdvisorCount($batch_id, $advisor_id);
-
-        $studentData = $this->studentService->getStudentById($student_id);
+           // $studentData = $this->studentService->getStudentById($student_id);
         $internshipData = $this->internshipService->getInternshipByStudentId($batch_id, $student_id);
         // dd($internshipData);
         return view('pages.student.dashboard', [
-            'studentData' => $studentData,
+            // 'studentData' => $studentData,
             'internshipData' => $internshipData,
-            // 'industry' => $industry,
         ]);
     }
 }

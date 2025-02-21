@@ -23,8 +23,12 @@ class IndustryManagementController extends Controller
     public function index(Request $request)
     {
         // batch data
-        $current_id = $this->batchService->getBatchByStatus('active');
-        $batch_id = $current_id->id;
+        $current_batch = $this->batchService->getBatchByStatus('active');
+        if ($current_batch != null) {
+            $batch_id = $current_batch->id;
+        } else {
+            $batch_id = '';
+        }
 
         // table filters
         $filters = [

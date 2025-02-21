@@ -24,6 +24,11 @@ class BatchService
         return $this->batchRepository->getBatchByStatus($status);
     }
 
+    public function getActiveOrLastBatch()
+    {
+        return $this->batchRepository->getActiveOrLastBatch();
+    }
+
     public function createBatch($data)
     {
         return $this->batchRepository->createBatch($data);
@@ -32,6 +37,11 @@ class BatchService
     public function updateBatch($id, $data)
     {
         return $this->batchRepository->updateBatch($id, $data);
+    }
+
+    public function setActiveBatch($id)
+    {
+        return $this->batchRepository->setActiveBatch($id);
     }
 
     public function deleteBatch($id)

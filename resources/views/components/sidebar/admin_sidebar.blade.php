@@ -5,7 +5,8 @@
             <p>SIPKL</p>
         </div>
         <div class="sidebar-body">
-            <a href="{{ route('admin.dashboard') }}" class="sidebar-menu">
+            <a href="{{ auth()->user()->role == 'admin' ? route('admin.dashboard') : (auth()->user()->role == 'advisor' ? route('advisor.dashboard') : route('student.dashboard')) }}"
+                class="sidebar-menu">
                 <svg class="" xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18"
                     fill="none">
                     <path
@@ -14,7 +15,7 @@
                 </svg>
                 <p>Beranda</p>
             </a>
-            <div>
+            <div class="{{ auth()->user()->role != 'admin' ? 'hidden' : '' }}">
                 <p class="sidebar-label">Manajemen Data</p>
                 <a href="{{ route('admin.adminManagement') }}" class="sidebar-menu">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18"
@@ -55,7 +56,8 @@
             </div>
             <div>
                 <p class="sidebar-label">Manajemen PKL</p>
-                <a href="{{ route('admin.batchManagement') }}" class="sidebar-menu">
+                <a href="{{ route('admin.batchManagement') }}"
+                    class="sidebar-menu {{ auth()->user()->role != 'admin' ? 'hidden' : '' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18"
                         fill="none">
                         <path
@@ -64,7 +66,8 @@
                     </svg>
                     <p>Batch PKL</p>
                 </a>
-                <a href="{{ route('admin.registration') }}" class="sidebar-menu">
+                <a href="{{ auth()->user()->role == 'admin' ? route('admin.registration') : route('student.registration') }}"
+                    class="sidebar-menu {{ auth()->user()->role == 'advisor' ? 'hidden' : '' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18"
                         fill="none">
                         <path
@@ -73,7 +76,8 @@
                     </svg>
                     <p>Pendaftaran PKL</p>
                 </a>
-                <a href="{{ route('admin.intern') }}" class="sidebar-menu">
+                <a href="{{ auth()->user()->role == 'admin' ? route('admin.intern') : route('advisor.intern') }}"
+                    class="sidebar-menu {{ auth()->user()->role == 'student' ? 'hidden' : '' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18"
                         fill="none">
                         <path
@@ -82,7 +86,8 @@
                     </svg>
                     <p>Peserta PKL</p>
                 </a>
-                <a href="{{ route('admin.output') }}" class="sidebar-menu">
+                <a href="{{ route('admin.output') }}"
+                    class="sidebar-menu {{ auth()->user()->role != 'admin' ? 'hidden' : '' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18"
                         fill="none">
                         <path
@@ -91,7 +96,38 @@
                     </svg>
                     <p>Luaran</p>
                 </a>
-                <a href="{{ route('admin.assessment') }}" class="sidebar-menu">
+                <a href="{{ route('advisor.industry') }}"
+                    class="sidebar-menu {{ auth()->user()->role != 'advisor' ? 'hidden' : '' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18"
+                        fill="none">
+                        <path
+                            d="M9.75 8.25H13.35C14.1901 8.25 14.6101 8.25 14.931 8.41349C15.2132 8.5573 15.4427 8.78677 15.5865 9.06901C15.75 9.38988 15.75 9.80992 15.75 10.65V15.75M9.75 15.75V4.65C9.75 3.80992 9.75 3.38988 9.58651 3.06901C9.4427 2.78677 9.21323 2.5573 8.93099 2.41349C8.61012 2.25 8.19008 2.25 7.35 2.25H4.65C3.80992 2.25 3.38988 2.25 3.06901 2.41349C2.78677 2.5573 2.5573 2.78677 2.41349 3.06901C2.25 3.38988 2.25 3.80992 2.25 4.65V15.75M16.5 15.75H1.5M4.875 5.25H7.125M4.875 8.25H7.125M4.875 11.25H7.125"
+                            stroke="#525A6A" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <p>Industri</p>
+                </a>
+                <a href="{{ route('advisor.monitoring') }}"
+                    class="sidebar-menu {{ auth()->user()->role != 'advisor' ? 'hidden' : '' }}">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M1.5 9H16.5M1.5 9C1.5 13.1421 4.85786 16.5 9 16.5M1.5 9C1.5 4.85786 4.85786 1.5 9 1.5M16.5 9C16.5 13.1421 13.1421 16.5 9 16.5M16.5 9C16.5 4.85786 13.1421 1.5 9 1.5M9 1.5C10.876 3.55376 11.9421 6.21903 12 9C11.9421 11.781 10.876 14.4462 9 16.5M9 1.5C7.12404 3.55376 6.05794 6.21903 6 9C6.05794 11.781 7.12404 14.4462 9 16.5"
+                            stroke="#525A6A" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <p>Monitoring</p>
+                </a>
+                <a href="{{ auth()->user()->role == 'student' ? route('student.logbook') : route('advisor.logbook') }}"
+                    class="sidebar-menu {{ auth()->user()->role == 'admin' ? 'hidden' : '' }}">
+                    <svg width="18" height="18" viewBox="0 0 18 18" fill="none"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path
+                            d="M7.5 11.25L5.19356 13.5853C4.87184 13.911 4.71098 14.0739 4.57271 14.0854C4.45276 14.0953 4.33531 14.0471 4.25697 13.9557C4.16667 13.8504 4.16667 13.6215 4.16667 13.1637V11.9937C4.16667 11.583 3.83031 11.2858 3.4239 11.2262V11.2262C2.44031 11.0822 1.66783 10.3097 1.52376 9.3261C1.5 9.16391 1.5 8.97039 1.5 8.58333V5.1C1.5 3.83988 1.5 3.20982 1.74524 2.72852C1.96095 2.30516 2.30516 1.96095 2.72852 1.74524C3.20982 1.5 3.83988 1.5 5.1 1.5H10.65C11.9101 1.5 12.5402 1.5 13.0215 1.74524C13.4448 1.96095 13.789 2.30516 14.0048 2.72852C14.25 3.20982 14.25 3.83988 14.25 5.1V8.25M14.25 16.5L12.6177 15.3652C12.3882 15.2056 12.2735 15.1259 12.1487 15.0693C12.0378 15.0191 11.9213 14.9826 11.8017 14.9606C11.6669 14.9357 11.5271 14.9357 11.2477 14.9357H9.9C9.05992 14.9357 8.63988 14.9357 8.31901 14.7722C8.03677 14.6284 7.8073 14.3989 7.66349 14.1167C7.5 13.7958 7.5 13.3758 7.5 12.5357V10.65C7.5 9.80992 7.5 9.38988 7.66349 9.06901C7.8073 8.78677 8.03677 8.5573 8.31901 8.41349C8.63988 8.25 9.05992 8.25 9.9 8.25H14.1C14.9401 8.25 15.3601 8.25 15.681 8.41349C15.9632 8.5573 16.1927 8.78677 16.3365 9.06901C16.5 9.38988 16.5 9.80992 16.5 10.65V12.6857C16.5 13.3846 16.5 13.7341 16.3858 14.0097C16.2336 14.3773 15.9416 14.6693 15.574 14.8215C15.2984 14.9357 14.9489 14.9357 14.25 14.9357V16.5Z"
+                            stroke="#525A6A" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <p>Logbook</p>
+                </a>
+                <a href="{{ auth()->user()->role == 'admin' ? route('admin.assessment') : route('advisor.assessment') }}"
+                    class="sidebar-menu {{ auth()->user()->role == 'student' ? 'hidden' : '' }}">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18"
                         fill="none">
                         <path
@@ -100,8 +136,18 @@
                     </svg>
                     <p>Penilaian</p>
                 </a>
+                <a href="{{ route('student.finalReport') }}"
+                    class="sidebar-menu {{ auth()->user()->role != 'student' ? 'hidden' : '' }}">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18"
+                        fill="none">
+                        <path
+                            d="M12.75 6.74996C12.75 6.36609 12.6035 5.98222 12.3107 5.68934C12.0178 5.39645 11.6339 5.25 11.25 5.25M11.25 11.25C13.7353 11.25 15.75 9.23528 15.75 6.75C15.75 4.26472 13.7353 2.25 11.25 2.25C8.76472 2.25 6.75 4.26472 6.75 6.75C6.75 6.95526 6.76374 7.15731 6.79036 7.35528C6.83413 7.68089 6.85602 7.84369 6.84129 7.94669C6.82594 8.05399 6.8064 8.11181 6.75352 8.20642C6.70275 8.29725 6.61328 8.38672 6.43435 8.56565L2.60147 12.3985C2.47176 12.5282 2.4069 12.5931 2.36052 12.6688C2.3194 12.7359 2.2891 12.809 2.27072 12.8856C2.25 12.9719 2.25 13.0636 2.25 13.2471V14.55C2.25 14.97 2.25 15.1801 2.33175 15.3405C2.40365 15.4816 2.51839 15.5963 2.65951 15.6683C2.81994 15.75 3.02996 15.75 3.45 15.75H5.25V14.25H6.75V12.75H8.25L9.43435 11.5657C9.61328 11.3867 9.70275 11.2973 9.79358 11.2465C9.88819 11.1936 9.94601 11.1741 10.0533 11.1587C10.1563 11.144 10.3191 11.1659 10.6447 11.2096C10.8427 11.2363 11.0447 11.25 11.25 11.25Z"
+                            stroke="" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                    <p>Laporan Akhir</p>
+                </a>
             </div>
-            <div>
+            <div class="{{ auth()->user()->role != 'admin' ? 'hidden' : '' }}">
                 <p class="sidebar-label">Administrasi</p>
                 <a href="{{ route('admin.document') }}" class="sidebar-menu">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18"
@@ -116,7 +162,7 @@
         </div>
     </div>
     <div class="logout">
-        <a href="" class="menu-logout">
+        <a href="{{ route('sipkl.logout') }}" class="menu-logout">
             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14"
                 fill="none">
                 <path

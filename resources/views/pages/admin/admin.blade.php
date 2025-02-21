@@ -22,6 +22,7 @@
         {{-- table --}}
         <x-slot name="tHeader">                    
             <th>NO</th>
+            <th>NAMA</th>
             <th>USERNAME</th>
             <th>EMAIL</th>
             <th>NO TELP</th>
@@ -31,9 +32,10 @@
             @foreach ($data as $dt)
                 <tr>
                     <td class="text-center">{{ $data->firstItem() + $loop->index }}</td>               
-                    <td hidden dataId={{ $dt->id }} >{{ $dt->id }}</td>
-                    <td>{{ $dt->username }}</td>
-                    <td>{{ $dt->email }}</td>
+                    {{-- <td>{{ $dt->id }}</td> --}}
+                    <td>{{ $dt->name }}</td>
+                    <td>{{ $dt->user->username }}</td>
+                    <td>{{ $dt->user->email }}</td>
                     <td>{{ $dt->phone_num }}</td>        
                     <x-table.action_table detail="hidden" btnInput="hidden" :data="$dt"></x-table.action_table>
                 </tr>
@@ -47,13 +49,18 @@
         <x-form>
             <x-slot name="formTitle">Data Administrator</x-slot>
             <x-slot name="formBody" >
+                <input type="hidden" name="user_id" :value="modalAction=='isEdit' || modalAction=='isDelete' ? dataId.user_id : ''">
+                <div class="input-group">
+                    <label class="input-label" for="">Nama</label>
+                    <input name="name" class="input" type="text" placeholder="Masukkan Nama" :disabled="modalAction=='isDelete'" :value="modalAction=='isEdit' || modalAction=='isDelete' ? dataId.name : ''" required>
+                </div>
                 <div class="input-group">
                     <label class="input-label" for="">Username</label>
-                    <input name="username" class="input" type="text" placeholder="Masukkan Username" :disabled="modalAction=='isDelete'" :value="modalAction=='isEdit' || modalAction=='isDelete' ? dataId.username : ''" required>
+                    <input name="username" class="input" type="text" placeholder="Masukkan Username" :disabled="modalAction=='isDelete'" :value="modalAction=='isEdit' || modalAction=='isDelete' ? dataId.user.username : ''" required>
                 </div>
                 <div class="input-group">
                     <label class="input-label" for="">Email</label>
-                    <input name="email" class="input" type="email" placeholder="Masukkan Email" :disabled="modalAction=='isDelete'" :value="modalAction=='isEdit' || modalAction=='isDelete' ? dataId.email : ''" required>
+                    <input name="email" class="input" type="email" placeholder="Masukkan Email" :disabled="modalAction=='isDelete'" :value="modalAction=='isEdit' || modalAction=='isDelete' ? dataId.user.email : ''" required>
                 </div>
                 <div class="input-group">
                     <label class="input-label" for="">Nomor Telepon</label>

@@ -34,9 +34,26 @@ class RegistrationService
         return $this->registrationRepository->findRegistrationById($id);
     }
 
+    public function getRegistrationByStudentId($batch_id, $student_id)
+    {
+        return $this->registrationRepository->getRegistrationByStudentId($batch_id, $student_id);
+    }
+
     public function updateStatusRegistration($id, $status)
     {
         // dd($id, $status);
         return $this->registrationRepository->updateStatusRegistration($id, $status);
+    }
+
+    public function updateRegistrationStep($id, $step)
+    {
+        // dd($id, $step);
+        return $this->registrationRepository->updateRegistrationStep($id, $step);
+    }
+
+    public function deleteRegistration($id)
+    {
+        // dd($id);
+        return $this->registrationRepository->deleteRegistration($id);
     }
 }

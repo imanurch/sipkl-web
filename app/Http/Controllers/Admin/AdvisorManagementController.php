@@ -7,18 +7,28 @@ use App\Services\BatchService;
 use App\Services\AdvisorService;
 use App\Services\DepartmentService;
 use App\Http\Controllers\Controller;
+use App\Services\UserService;
 use Illuminate\Support\Facades\Hash;
 
 class AdvisorManagementController extends Controller
 {
-    protected $advisorService, $batchService, $departmentService;
+    protected
+        $advisorService,
+        $batchService,
+        $departmentService,
+        $userService;
 
     // Constructor Injection
-    public function __construct(AdvisorService $advisorService, BatchService $batchService, DepartmentService $departmentService)
-    {
+    public function __construct(
+        AdvisorService $advisorService,
+        BatchService $batchService,
+        DepartmentService $departmentService,
+        UserService $userService
+    ) {
         $this->advisorService = $advisorService;
         $this->batchService = $batchService;
         $this->departmentService = $departmentService;
+        $this->userService = $userService;
     }
 
     public function index(Request $request)
@@ -64,63 +74,80 @@ class AdvisorManagementController extends Controller
             'name' => 'required|string',
             'nip' => 'required|size:18',
             'department_id' => 'required',
-            'email' => 'required|unique:advisors,email|email',
+            'username' => 'required|string',
+            'email' => 'required|unique:users,email|email',
             'phone_num' => 'required|unique:advisors,phone_num|string|min:10|max:14',
             'password' => 'required|string|size:8',
         ]);
         $validatedData['password'] = Hash::make($validatedData['password']);
         $validatedData['department_id'] = $validatedData['department_id'] == 'K3R' ? '1' : ($validatedData['department_id'] == 'DPIB' ? '2' : ($validatedData['department_id'] == 'RPL' ? '3' : ''));
-        
-        try {
-            $this->advisorService->addAdvisor($validatedData);
-            return redirect()->route('advisor')->with('success', 'advisor added successfully.');
-        } catch (\Exception $e) {
-            // \Log::error($e->getMessage());
-            return back()->withErrors(['error' => 'Failed to add advisor.']);
-        }
-    }
 
-    // public function show($advisor_id)
-    // {
-    //     $data = $this->advisorService->getadvisorById($advisor_id);
-    // }
+        $newUser = $this->userService->addUser([
+            'username' => $validatedData['username'],
+            'email' => $validatedData['email'],
+            'password' => $validatedData['password'],
+            'role' => 'advisor',
+        ]);
+        $this->advisorService->addAdvisor([
+            'user_id' => $newUser->id,
+            'name' => $validatedData['name'],
+            'nip' => $validatedData['nip'],
+            'department_id' => $validatedData['department_id'],
+            'phone_num' => $validatedData['phone_num'],
+        ]);
+
+        return back();
+    }
 
     public function update(Request $request, $id)
     {
-        if ($request->check_password !== $request->password) {
-            return back()->withErrors(['password' => 'Passwords do not match.']);
-        }
         $data = $request->except(['_token', '_method']);
 
         $validatedData = $request->validate([
+            'user_id' => 'required',
             'name' => 'required|string',
             'nip' => 'required|size:18',
             'department_id' => 'required',
-            'email' => 'required|email|unique:advisors,email,' . $id,
+            'username' => 'required|string',
+            'email' => 'required|email|unique:users,email,' . $request->input('user_id'),
             'phone_num' => 'required|string|min:10|max:14|unique:advisors,phone_num,' . $id,
-            'password' => 'required|string|size:8',
+            'password' => 'nullable|string|size:8',
         ]);
-        $validatedData['password'] = Hash::make($validatedData['password']);
+
+        if (!empty($validatedData['password'])) {
+            if ($request->check_password !== $request->password) {
+                return back()->withErrors(['password' => 'Passwords do not match.']);
+            }
+            $validatedData['password'] = Hash::make($validatedData['password']);
+        }
 
         $validatedData['department_id'] = $validatedData['department_id'] == 'K3R' ? '1' : ($validatedData['department_id'] == 'DPIB' ? '2' : ($validatedData['department_id'] == 'RPL' ? '3' : ''));
 
-        try {
-            $this->advisorService->updateAdvisor($id, $validatedData);
-            return redirect()->route('advisor')->with('success', 'advisor added successfully.');
-        } catch (\Exception $e) {
-            // \Log::error($e->getMessage());
-            return back()->withErrors(['error' => 'Failed to add advisor.']);
+        $this->advisorService->updateAdvisor($id, [
+            'name' => $validatedData['name'],
+            'nip' => $validatedData['nip'],
+            'department_id' => $validatedData['department_id'],
+            'phone_num' => $validatedData['phone_num'],
+        ]);
+
+        $updateUserData = [
+            'username' => $validatedData['username'],
+            'email' => $validatedData['email'],
+        ];
+
+        if (isset($validatedData['password'])) {
+            $updateUserData['password'] = $validatedData['password'];
         }
+
+        $this->userService->updateUser($validatedData['user_id'], $updateUserData);
+        return back();
     }
 
     public function destroy($id)
     {
-        try {
-            $this->advisorService->deleteAdvisor($id);
-            return redirect()->route('advisor')->with('success', 'advisor deleted successfully.');
-        } catch (\Exception $e) {
-            // \Log::error($e->getMessage());
-            return back()->withErrors(['error' => 'Failed to delete advisor.']);
-        }
+        $user_id = $this->advisorService->getAdvisorById($id)->user_id;
+        // dd($id, $user_id);
+        $this->userService->deleteUser($user_id);
+        return back();
     }
 }

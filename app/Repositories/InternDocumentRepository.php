@@ -14,7 +14,7 @@ class InternDocumentRepository
     public function getInternDocumentByStudentId($student_id, $type)
     {
         if ($type == '') {
-            return InternDocument::where('student_id', $student_id)->first();
+            return InternDocument::where('student_id', $student_id)->get();
         } else {
             return InternDocument::where('student_id', $student_id)->where('type', $type)->first();
         }

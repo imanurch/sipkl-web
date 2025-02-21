@@ -16,14 +16,15 @@
             <span>{{ $data->status == 1 ? 'Disetujui' : ($data->status == 2 ? 'Perlu Revisi' : ($data->status == 0 && $data->activities != null ? 'Menunggu Konfirmasi' : 'Belum Diisi')) }}</span>
         </div>
         <div>
-            <h6 class="text-xs-medium">Minggu Ke- </h6>
-            <span class="text-xs-reguler">{{ $data->start_date }} s/d {{ $data->end_date }}</span>
+            <h6 class="text-xs-medium">Minggu Ke- {{ $week }}</h6>
+            <span class="text-xs-reguler">{{ strftime('%d %B', strtotime($data->start_date)) }} s/d
+                {{ strftime('%d %B', strtotime($data->end_date)) }}</span>
+            {{-- <span class="text-xs-reguler">{{ $data->start_date }} s/d {{ $data->end_date }}</span> --}}
         </div>
     </div>
     <svg @click="modalAction='{{ $data->activities != null ? 'isEdit' : 'isAdd' }}';dataId={{ $data->toJson() }};id='{{ $data->id }}'"
-        {{-- <svg @click="setFormAction({{ $data->id }});modalAction='{{ $data->activities != null ? 'isEdit' : 'isAdd' }}';dataId={{ $data->toJson() }}" --}}
-        class="cursor-pointer" xmlns="http://www.w3.org/2000/svg" width="25" height="24" viewBox="0 0 25 24"
-        fill="none">
+        {{-- <svg @click="setFormAction({{ $data->id }});modalAction='{{ $data->activities != null ? 'isEdit' : 'isAdd' }}';dataId={{ $data->toJson() }}" --}} class="cursor-pointer" xmlns="http://www.w3.org/2000/svg" width="25" height="24"
+        viewBox="0 0 25 24" fill="none">
         <path d="M9.5 18L15.5 12L9.5 6" stroke="#3D4350" stroke-width="1.33333" stroke-linecap="round"
             stroke-linejoin="round" />
     </svg>

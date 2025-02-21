@@ -4,9 +4,15 @@
 @section('profil', 'Advisor')
 @section('content')
 
-    <x-guide guideTitle="Monitoring & Generate Dokumen">
-        <li>Guide 1</li>
-        <li>Guide 2</li>
+    <x-guide guideTitle="Monitoring">
+        <li>Klik "<span class="text-xs-semibold">Tambah Data</span>" untuk menambahkan data monitoring</li>
+        <li>Setelah data ditambahkan, sistem akan otomatis menghasilkan dokumen untuk guru:
+            <ul class="list-decimal ps-6">
+                <li><span class="text-xs-semibold">Pelepasan PKL</span> : Surat Pengantar, SPPD, Surat Tugas</li>
+                <li><span class="text-xs-semibold">Kunjungan PKL</span> : SPPD, Surat tugas</li>
+                <li><span class="text-xs-semibold">Penarikan PKL</span> : Surat penarikan, SPPD, Surat tugas</li>
+            </ul>
+        </li>
     </x-guide>
 
     {{-- <div x-data="{ modalAction: null, option: false, optionInternship: false, selected: 'Pilih Opsi', selectedInternship: 'Pilih Opsi' }"> --}}

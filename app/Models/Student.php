@@ -12,9 +12,12 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 class Student extends Model
 {
     use HasFactory;
-    protected $fillable = ['name', 'nisn', 'gender', 'department_id', 'year', 'phone_num', 'password'];
-    protected $hidden = ['password'];
+    protected $fillable = ['user_id', 'name', 'nisn', 'gender', 'department_id', 'year', 'phone_num'];
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class, 'department_id');

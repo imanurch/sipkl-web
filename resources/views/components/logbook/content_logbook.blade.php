@@ -31,7 +31,11 @@
                         <span>Direvisi</span>
                     </div>
                 @endif
-                <textarea class="input w-full" name="" id="" rows="4" disabled>{{ $content }}</textarea>
+                <textarea class="input w-full" name="" id="" rows="3" disabled>{{ $content }}</textarea>
+                @if($data->feedback != null)
+                <label for="" class="input-label">Komentar Guru</label>
+                <textarea class="input w-full" id="" disabled>{{ $data->feedback }}</textarea>
+                @endif
                 <div class="space-x-1">
                     <button @click="modalAction='accept';currentId='{{ $data->id }}'"
                         class="btn btn-xs btn-success-fill">

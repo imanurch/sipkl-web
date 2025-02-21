@@ -10,8 +10,6 @@ class StudentRepository
     {
         // return Student::get();
         $query = Student::query();
-        $batch_id = $filters['batch_id'];
-        $year = $filters['year'];
 
         // filter department
         if ($filters['department'] != null) {
@@ -19,19 +17,19 @@ class StudentRepository
             $query->where('department_id', $department_id);
         }
 
-        if ($filters['year'] != null) {
-            $query->where('year', $year);
-        }
+        // if ($filters['year'] != null) {
+        //     $query->where('year', $filters['year']);
+        // }
 
         // filter status
         if ($filters['status'] != null) {
             if ($filters['status'] == 'registered') {
-                $query->whereHas('groupMember.group.registration', function ($query) use ($batch_id, $year) {
-                    $query->where('batch_id', $batch_id)->where('year', $year);
+                $query->whereHas('groupMember.group.registration', function ($query) use ($filters) {
+                    $query->where('batch_id', $filters['batch_id'])->where('year', $filters['year']);
                 });
             } elseif ($filters['status'] == 'unregistered') {
-                $query->whereDoesntHave('groupMember.group.registration', function ($query) use ($batch_id, $year) {
-                    $query->where('batch_id', $batch_id)->where('year', $year);
+                $query->whereDoesntHave('groupMember.group.registration', function ($query) use ($filters) {
+                    $query->where('batch_id', $filters['batch_id'])->where('year', $filters['year']);
                 });
             }
         }
@@ -45,7 +43,7 @@ class StudentRepository
         }
 
         // belum tambah kolom status
-        $data = $query->paginate(5);
+        $data = $query->where('year', $filters['year'])->paginate(5);
         $data->appends($filters);
         // $data->through(function ($student) use ($batch_id) {
         //     // Pastikan relasi ada sebelum mengaksesnya
@@ -68,27 +66,34 @@ class StudentRepository
         return $data;
     }
 
-    public function getNonInternStudentList($activeBatch_id)
+    // public function getNonInternStudentList($activeBatch_id)
+    // {
+    //     return Student::whereDoesntHave('groupMember.group.internship', function ($query) use ($activeBatch_id) {
+    //         $query->where('batch_id', $activeBatch_id);
+    //     })->select('id', 'name', 'nisn')->get();
+    // }
+
+    public function getNonRegisteredInternList($activeBatch_id)
     {
         return Student::whereDoesntHave('groupMember.group.internship', function ($query) use ($activeBatch_id) {
             $query->where('batch_id', $activeBatch_id);
+        })->WhereDoesntHave('groupMember.group.registration', function ($query) {
+            $query->where('status', ['0', '1']);
         })->select('id', 'name', 'nisn')->get();
     }
 
     public function countStudentByStatus($year, $batch_id, $status)
     {
         if ($status == 'registered') {
-            return Student::whereHas('groupMember.group.registration', function ($query) use ($batch_id) {
+            return Student::where('year', $year)->whereHas('groupMember.group.registration', function ($query) use ($batch_id) {
                 $query->where('batch_id', $batch_id)->whereIn('status', ['0', '1']);
-            })->where('year', $year)->count();
-        }
-        
-        elseif ($status == 'unregistered') {
-            return Student::whereDoesntHave('groupMember.group.registration', function ($query) use ($batch_id) {
+            })->count();
+        } elseif ($status == 'unregistered') {
+            return Student::where('year', $year)->whereDoesntHave('groupMember.group.registration', function ($query) use ($batch_id) {
                 $query->where('batch_id', $batch_id);
             })->orWhereHas('groupMember.group.registration', function ($query) use ($batch_id) {
-                $query->where('batch_id', $batch_id)->where('status','2');
-            })->where('year', $year)->count();
+                $query->where('batch_id', $batch_id)->where('status', '2');
+            })->count();
         }
     }
 
@@ -100,6 +105,16 @@ class StudentRepository
     public function findStudentById($id)
     {
         return Student::find($id);
+    }
+
+    // public function getStudentIdByUserId($user_id)
+    // {
+    //     return Student::where('user_id', $user_id)->select('id')->first();
+    // }
+
+    public function getStudentByUserId($user_id)
+    {
+        return Student::where('user_id', $user_id)->first();
     }
 
     public function createStudent(array $data)

@@ -56,7 +56,7 @@ class OutputController extends Controller
         // $isCompleteLogbook = $this->logbookService->isCompleteLogbook($filters);
         // $isSubmittedReport = $this->internshipService->getInternship($filters);
         // $data = $this->internshipService->getIntern($filters);
-        // // dd($data);
+        // dd($data);
         // $intern = $this->internshipService->getInternCount($batch_id);
 
         // card
@@ -65,19 +65,22 @@ class OutputController extends Controller
         foreach ($data as $dt) {
             // cek final report
             foreach ($dt->groupMember as $member) {
-                // dd($member->group->internship->id, $dt->id);                
-                $isCompleteFinalReport = $this->internDocumentService->checkIsCompleteFinalReportByInternshipAndStudentId($member->group->internship->id, $dt->id);
-                // dd($isCompleteFinalReport);
-                if ($isCompleteFinalReport == true) {
-                    // cek logbook
-                    $isCompleteLogbook = $this->logbookService->checkIsCompleteLogbookByInternshipAndStudentId($member->group->internship->id, $dt->id);
-                    if ($isCompleteLogbook == true) {
-                        $completeOutputCount += 1;
+                if ($member->group->internship) {
+                    // dd($dt->id);
+                    // dd($member->group);                
+                    $isCompleteFinalReport = $this->internDocumentService->checkIsCompleteFinalReportByInternshipAndStudentId($member->group->internship->id, $dt->id);
+                    // dd($isCompleteFinalReport);
+                    if ($isCompleteFinalReport == true) {
+                        // cek logbook
+                        $isCompleteLogbook = $this->logbookService->checkIsCompleteLogbookByInternshipAndStudentId($member->group->internship->id, $dt->id);
+                        if ($isCompleteLogbook == true) {
+                            $completeOutputCount += 1;
+                        } else {
+                            $incompleteOutputCount += 1;
+                        }
                     } else {
                         $incompleteOutputCount += 1;
                     }
-                } else {
-                    $incompleteOutputCount += 1;
                 }
             }
         }
@@ -93,8 +96,8 @@ class OutputController extends Controller
 
     public function downloadFinalReport($filename)
     {
-        
-        $path = storage_path('app/registration_document/surat_pengantar/' . $filename);
+
+        $path = storage_path('app/intern_documents/laporan_akhir/' . $filename);
         if (file_exists($path)) {
             return response()->download($path);
         } else {

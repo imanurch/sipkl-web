@@ -31,6 +31,7 @@ class InternshipAdminController extends Controller
         $batchData = $this->batchService->getAllBatch('');
         $currentBatch = $this->batchService->getBatchByStatus('active');
         $batch_id = $request->batch ?? ($currentBatch->id ?? '');
+        
         // dd($batch_id);
         // table filters
         $filters = [
@@ -64,6 +65,11 @@ class InternshipAdminController extends Controller
         ]);
         $this->internshipService->updateInternshipAdvisor($internship_id, $validatedData['advisor_id']);
 
+        return back();
+    }
+
+    public function destroy($id){
+        $this->internshipService->deleteInternship($id);
         return back();
     }
 }

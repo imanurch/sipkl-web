@@ -71,6 +71,16 @@ class AdvisorRepository
         return Advisor::find($id);
     }
 
+    // public function getAdvisorIdByUserId($user_id)
+    // {
+    //     return Advisor::where('user_id', $user_id)->select('id')->first();
+    // }
+
+    public function getAdvisorByUserId($user_id)
+    {
+        return Advisor::where('user_id', $user_id)->first();
+    }
+
     public function createAdvisor(array $data)
     {
         return Advisor::create($data);

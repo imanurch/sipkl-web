@@ -6,10 +6,12 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Services\BatchService;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Services\AdvisorService;
 use App\Services\LogbookService;
 use App\Services\InternshipService;
 use App\Services\MonitoringService;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Services\MonitoringDocumentService;
 
 class LogbookAdvisorController extends Controller
@@ -17,24 +19,30 @@ class LogbookAdvisorController extends Controller
     protected
         $batchService,
         $internshipService,
-        $logbookService;
+        $logbookService,
+        $advisorService;
 
     // Constructor Injection
     public function __construct(
         BatchService $batchService,
         InternshipService $internshipService,
-        LogbookService $logbookService
+        LogbookService $logbookService,
+        AdvisorService $advisorService
     ) {
         $this->batchService = $batchService;
         $this->internshipService = $internshipService;
         $this->logbookService = $logbookService;
+        $this->advisorService = $advisorService;
     }
 
     public function index(Request $request)
     {
+        // $user_id = Auth::user()->id;
+        // $advisor_id = $this->advisorService->getAdvisorIdByUserId($user_id);
+        $advisor_id = session('user_bio')->id;
+
         $currentBatch = $this->batchService->getBatchByStatus('active');
         $batch_id = $currentBatch->id;
-        $advisor_id = '2';
 
         $batchData = $this->batchService->getAllBatch('');
 
@@ -46,10 +54,12 @@ class LogbookAdvisorController extends Controller
         ];
 
         $data = $this->internshipService->getInternByAdvisor($filters, $advisor_id);
-        foreach($data as $dt){
-            foreach ($dt->groupMember as $member){
-                $isCompleteLogbook = $this->logbookService->checkIsCompleteLogbookByInternshipAndStudentId($member->group->internship->id, $dt->id);
-                $dt->status = $isCompleteLogbook == true ? 'Lengkap' : 'Tidak Lengkap';
+        foreach ($data as $dt) {
+            foreach ($dt->groupMember as $member) {
+                if ($member->group->internship) {
+                    $isCompleteLogbook = $this->logbookService->checkIsCompleteLogbookByInternshipAndStudentId($member->group->internship->id, $dt->id);
+                    $dt->status = $isCompleteLogbook == true ? 'Lengkap' : 'Tidak Lengkap';
+                }
             }
         }
 
@@ -58,7 +68,7 @@ class LogbookAdvisorController extends Controller
         $revisedCount = $this->logbookService->countLogbookByAdvisorStatus('revised', $batch_id, $advisor_id);
         // dd($data);
         // $internshipListData = $this->internshipService->getInternshipListByAdvisor($advisor_id, $batch_id);
-        
+
 
 
         return view('pages.advisor.logbook', [

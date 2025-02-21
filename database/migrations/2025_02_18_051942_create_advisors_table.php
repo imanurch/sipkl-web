@@ -13,12 +13,13 @@ return new class extends Migration
     {
         Schema::create('advisors', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->string('name');
             $table->string('nip')->unique();
             $table->foreignId('department_id')->constrained('departments');
-            $table->string('email')->unique();
+            // $table->string('email')->unique();
             $table->string('phone_num')->unique();
-            $table->string('password');
+            // $table->string('password');
             $table->timestamps();
         });
     }

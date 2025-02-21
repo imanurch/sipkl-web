@@ -13,13 +13,14 @@ return new class extends Migration
     {
         Schema::create('students', function (Blueprint $table) {
             $table->id();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->string('name');
             $table->string('nisn')->unique();
             $table->enum('gender', ['women', 'men'])->default('men');
             $table->foreignId('department_id')->constrained('departments');
             $table->string('year');
             $table->string('phone_num')->unique();
-            $table->string('password');
+            // $table->string('password');
             $table->timestamps();
         });
     }

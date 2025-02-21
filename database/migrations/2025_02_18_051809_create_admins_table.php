@@ -13,10 +13,12 @@ return new class extends Migration
     {
         Schema::create('admins', function (Blueprint $table) {
             $table->id();
-            $table->string('username')->unique();
-            $table->string('email')->unique();
+            $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
+            $table->string('name')->unique();
+            // $table->string('username')->unique();
+            // $table->string('email')->unique();
             $table->string('phone_num')->unique();
-            $table->string('password');
+            // $table->string('password');
             $table->timestamps();
         });
     }

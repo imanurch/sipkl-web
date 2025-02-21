@@ -10,9 +10,11 @@ class IndustryRepository
     {
         $query = Industry::query();
 
-        // filter search
-        if ($filters['unconfirmedIndustrySearch'] != null) {
-            $query->where('name', 'like', '%' . $filters['unconfirmedIndustrySearch'] . '%');
+        if ($filters != null) {
+            // filter search
+            if ($filters['unconfirmedIndustrySearch'] != null) {
+                $query->where('name', 'like', '%' . $filters['unconfirmedIndustrySearch'] . '%');
+            }
         }
 
         return $query->where('status', '0')->paginate(5);
@@ -71,7 +73,7 @@ class IndustryRepository
                 $query->where('batch_id', $batch_id);
             })->count();
         } elseif ($status == 'inactive') {
-            return Industry::where('status','1')->whereDoesntHave('internship', function ($query) use ($batch_id) {
+            return Industry::where('status', '1')->whereDoesntHave('internship', function ($query) use ($batch_id) {
                 $query->where('batch_id', $batch_id);
             })->count();
         }

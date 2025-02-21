@@ -4,85 +4,90 @@
 @section('profil', 'Student')
 @section('content')
 
-<x-guide guideTitle="Pendaftaran">
-    <li>1</li>
-    <li>2</li>
-</x-guide>
+    <x-guide guideTitle="Pendaftaran">
+        <li>Ikuti langkah pendaftaran sesuai petunjuk yang tertera.</li>
+        <li>Hanya <span class="text-xs-semibold">satu perwakilan kelompok yang perlu mendaftar</span> dan mengisi data anggota kelompok.</li>
+        <li>Jika lokasi PKL belum tersedia, ajukan lokasi baru dengan klik "<span class="text-xs-semibold">Pengajuan Lokasi Baru</span>".</li>
+    </x-guide>
 
-<div class="space-y-4">
-    <h6 class="text-md-semibold">Alur Pendaftaran PKL</h6>
     <div class="space-y-4">
-        {{-- card --}}
-        <div class="flex space-x-2 border-b border-neutral-200 pb-4">
-            <div class="flex space-x-2 place-items-end p-6 rounded w-fit border border-brand-600 text-brand-800">
-                <span class="display-lg-semibold">1</span>
-                <h6 class="text-xs-reguler w-16">Pilih Lokasi PKL</h6>
+        <h6 class="text-md-semibold">Alur Pendaftaran PKL</h6>
+        <div class="space-y-4">
+            {{-- card --}}
+            <div class="flex space-x-2 border-b border-neutral-200 pb-4">
+                <div class="flex space-x-2 place-items-end p-6 rounded w-fit border border-brand-600 text-brand-800">
+                    <span class="display-lg-semibold">1</span>
+                    <h6 class="text-xs-reguler w-16">Pilih Lokasi PKL</h6>
+                </div>
+                <div
+                    class="flex space-x-2 place-items-end p-6 rounded w-fit {{ !Route::is('student.registration') ? 'border border-brand-600 text-brand-800' : 'bg-neutral-50 text-neutral-0' }}">
+                    <span class="display-lg-semibold">2</span>
+                    <h6 class="text-xs-reguler w-16">Isi Data Anggota Kelompok</h6>
+                </div>
+                <div
+                    class="flex space-x-2 place-items-end p-6 rounded w-fit {{ !Route::is('student.registration') && !Route::is('student.registration.step2') ? 'border border-brand-600 text-brand-800' : 'bg-neutral-50 text-neutral-0' }}">
+                    <span class="display-lg-semibold">3</span>
+                    <h6 class="text-xs-reguler w-16">Isi Data Pendaftaran PKL</h6>
+                </div>
+                <div
+                    class="flex space-x-2 place-items-end p-6 rounded w-fit {{ Route::is('student.registration.step4') || Route::is('student.registration.step5') ? 'border border-brand-600 text-brand-800' : 'bg-neutral-50 text-neutral-0' }}">
+                    <span class="display-lg-semibold">4</span>
+                    <h6 class="text-xs-reguler w-16">Lengkapi Berkas Pendaftaran</h6>
+                </div>
+                <div
+                    class="flex space-x-2 place-items-end p-6 rounded w-fit {{ Route::is('student.registration.step5') ? 'border border-brand-600 text-brand-800' : 'bg-neutral-50 text-neutral-0' }}">
+                    <span class="display-lg-semibold">5</span>
+                    <h6 class="text-xs-reguler w-16">Hasil Pendaftaran</h6>
+                </div>
             </div>
-            <div class="flex space-x-2 place-items-end p-6 rounded w-fit {{ !Route::is('student.registration') ? 'border border-brand-600 text-brand-800' : 'bg-neutral-50 text-neutral-0' }}">
-                <span class="display-lg-semibold">2</span>
-                <h6 class="text-xs-reguler w-16">Isi Data Anggota Kelompok</h6>
-            </div>
-            <div class="flex space-x-2 place-items-end p-6 rounded w-fit {{ !Route::is('student.registration') && !Route::is('student.registration.step2') ? 'border border-brand-600 text-brand-800' : 'bg-neutral-50 text-neutral-0' }}">
-                <span class="display-lg-semibold">3</span>
-                <h6 class="text-xs-reguler w-16">Isi Data Pendaftaran PKL</h6>
-            </div>
-            <div class="flex space-x-2 place-items-end p-6 rounded w-fit {{ Route::is('student.registration.step4') || Route::is('student.registration.step5') ? 'border border-brand-600 text-brand-800' : 'bg-neutral-50 text-neutral-0' }}">
-                <span class="display-lg-semibold">4</span>
-                <h6 class="text-xs-reguler w-16">Lengkapi Berkas Pendaftaran</h6>
-            </div>
-            <div class="flex space-x-2 place-items-end p-6 rounded w-fit {{ Route::is('student.registration.step5') ? 'border border-brand-600 text-brand-800' : 'bg-neutral-50 text-neutral-0' }}">
-                <span class="display-lg-semibold">5</span>
-                <h6 class="text-xs-reguler w-16">Hasil Pendaftaran</h6>
-            </div>
-        </div>
-        {{-- form --}}
-        <div x-data="{currentStep:1}">
-            {{-- step 1 --}}
-            @if(Route::is('student.registration'))   
-            <div x-show="currentStep===1">
-                <x-registration_step.step1 :industryData="$industryData"></x-registration_step.step1>
-            </div>     
-            @endif
-            
-            {{-- step pengajuan industry --}}
-            <div x-show="currentStep==='newIndustry'">
-                <x-registration_step.newIndustry></x-registration_step.newIndustry>
-            </div>   
+            {{-- form --}}
+            <div x-data="{ currentStep: 1 }">
+                {{-- step 1 --}}
+                @if (Route::is('student.registration'))
+                    <div x-show="currentStep===1">
+                        <x-registration_step.step1 :industryData="$industryData" :industryRequestData="$industryRequestData"></x-registration_step.step1>
+                    </div>
+                @endif
 
-            {{-- step 2 --}}
-            @if(Route::is('student.registration.step2'))
-            <div>
-                <x-registration_step.step2 :studentListData="$studentListData"></x-registration_step.step2>
-            </div> 
-            @endif
-            
-            {{-- step 3 --}}
-            @if(Route::is('student.registration.step3'))
-            <div>
-                <x-registration_step.step3 :locationInternship="$locationInternship" :teamMember="$teamMember"></x-registration_step.step3>
-            </div> 
-            @endif
-            
-            {{-- step 4 --}}
-            @if(Route::is('student.registration.step4'))
-            <div>
-                <x-registration_step.step4 :registrationData="$registrationData"></x-registration_step.step4>
-            </div> 
-            @endif
+                {{-- step pengajuan industry --}}
+                <div x-show="currentStep==='newIndustry'">
+                    <x-registration_step.newIndustry></x-registration_step.newIndustry>
+                </div>
 
-            {{-- step 5 --}}
-            @if(Route::is('student.registration.step5'))
-            <div>
-                <x-registration_step.step5 :filename="$filename"></x-registration_step.step5>
-            </div> 
-            @endif
-            
+                {{-- step 2 --}}
+                @if (Route::is('student.registration.step2'))
+                    <div>
+                        <x-registration_step.step2 :studentListData="$studentListData"></x-registration_step.step2>
+                    </div>
+                @endif
+
+                {{-- step 3 --}}
+                @if (Route::is('student.registration.step3'))
+                    <div>
+                        <x-registration_step.step3 :locationInternship="$locationInternship" :teamMember="$teamMember"></x-registration_step.step3>
+                    </div>
+                @endif
+
+                {{-- step 4 --}}
+                @if (Route::is('student.registration.step4'))
+                    <div>
+                        <x-registration_step.step4 :registrationData="$registrationData"></x-registration_step.step4>
+                    </div>
+                @endif
+
+                {{-- step 5 --}}
+                @if (Route::is('student.registration.step5'))
+                    <div>
+                        <x-registration_step.step5 :registrationData="$registrationData"></x-registration_step.step5>
+                    </div>
+                @endif
+
+            </div>
         </div>
     </div>
-</div>
 
 
-{{-- <div class="space-y-4">
+    {{-- <div class="space-y-4">
     <h6 class="text-md-semibold">Alur Pendaftaran PKL</h6>
     <div x-data="{ step1:true, newIndustry:false, step2:false, step3:false, step4:false, step5:false }" class="space-y-4">
         <div class="flex space-x-2 border-b border-neutral-200 pb-4">
@@ -138,7 +143,7 @@
     </div>
 </div> --}}
 
-<script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 @endsection
 
 

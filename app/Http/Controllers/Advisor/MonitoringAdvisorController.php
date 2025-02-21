@@ -6,9 +6,11 @@ use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Services\BatchService;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Services\AdvisorService;
 use App\Services\InternshipService;
 use App\Services\MonitoringService;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Services\MonitoringDocumentService;
 
 class MonitoringAdvisorController extends Controller
@@ -16,26 +18,32 @@ class MonitoringAdvisorController extends Controller
     protected $monitoringService,
         $batchService,
         $internshipService,
-        $monitoringDocumentService;
+        $monitoringDocumentService,
+        $advisorService;
 
     // Constructor Injection
     public function __construct(
         MonitoringService $monitoringService,
         BatchService $batchService,
         InternshipService $internshipService,
-        MonitoringDocumentService $monitoringDocumentService
+        MonitoringDocumentService $monitoringDocumentService,
+        AdvisorService $advisorService
     ) {
         $this->monitoringService = $monitoringService;
         $this->batchService = $batchService;
         $this->internshipService = $internshipService;
         $this->monitoringDocumentService = $monitoringDocumentService;
+        $this->advisorService = $advisorService;
     }
 
     public function index(Request $request)
     {
+        // $user_id = Auth::user()->id;
+        // $advisor_id = $this->advisorService->getAdvisorIdByUserId($user_id);
+        $advisor_id = session('user_bio')->id;
+        
         $currentBatch = $this->batchService->getBatchByStatus('active');
         $batch_id = $currentBatch->id;
-        $advisor_id = '2';
 
         // filter
         $filters = [

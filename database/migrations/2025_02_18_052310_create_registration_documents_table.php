@@ -13,7 +13,7 @@ return new class extends Migration
     {
         Schema::create('registration_documents', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('registration_id')->constrained('registrations')->cascadeOnDelete;
+            $table->foreignId('registration_id')->constrained('registrations')->cascadeOnDelete();
             $table->enum('type', ['surat pengantar', 'surat balasan', 'ucapan terima kasih']);
             $table->string('url')->nullable();
             $table->timestamps();

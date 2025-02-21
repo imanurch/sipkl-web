@@ -60,52 +60,13 @@
                     </x-table.select_option_filter>
                 </div>
             </x-slot>
-            {{-- toolbar --}}
-            {{-- <x-slot name="toolbar">
-                <x-slot name="filter">
-                    <x-table.search value="{{ $filters['search'] ?? '' }}"></x-table.search>
-                    <x-table.select_option_filter optionName="department"
-                        defaultSelected="{{ $filters['department'] != '' ? $filters['department'] : 'Semua Jurusan' }}">
-                        <x-slot name="option">
-                            @foreach ($departmentData as $dt)
-                                <li class="option-filter-toolbar-table"
-                                    @click="option=false;selected='{{ $dt->name }}';valueSelected='{{ $dt->name }}'">
-                                    {{ $dt->name }}</li>
-                            @endforeach
-                        </x-slot>
-                    </x-table.select_option_filter>
-                    <x-table.select_option_filter optionName="batch">
-                    <x-slot name="option">
-                        @foreach ($batchData as $dt)
-                        <li class="option-filter-toolbar-table" @click="option=false;selected='{{ $dt->name }}';;valueSelected='{{ $dt->id }}'">{{ $dt->name }}</li>
-                        @endforeach
-                    </x-slot>
-                </x-table.select_option_filter>
-                    <x-table.select_option_filter optionName="status"
-                        defaultSelected="{{ $filters['status'] != '' ? $filters['status'] : 'Semua Status' }}">
-                        <x-slot name="option">
-                            @foreach ($statusData as $dt)
-                            <li class="option-filter-toolbar-table" @click="option=false;selected='{{ $dt->name }}';;valueSelected='{{ $dt->id }}'">{{ $dt->name }}</li>
-                            <li class="option-filter-toolbar-table"
-                                @click="option=false;selected='Aktif';valueSelected='active'">Aktif</li>
-                            <li class="option-filter-toolbar-table"
-                                @click="option=false;selected='Non Aktif';valueSelected='inactive'">Non Aktif</li>
-                            @endforeach
-                        </x-slot>
-                    </x-table.select_option_filter>
-                    <button type="submit" class="btn btn-default-fill btn-sm">
-                    <span>Terapkan</span>
-                </button>    
-                </x-slot>
-                <x-table.import></x-table.import>
-                <x-table.add_data></x-table.add_data>
-            </x-slot> --}}
             {{-- table --}}
             <x-slot name="tHeader">
                 <th>NO</th>
                 <th>NAMA</th>
                 <th>NIP</th>
                 <th>JURUSAN</th>
+                <th>USERNAME</th>
                 <th>EMAIL</th>
                 <th>NO TELP</th>
                 <th>STATUS</th>
@@ -118,7 +79,8 @@
                         <td>{{ $dt->name }}</td>
                         <td>{{ $dt->nip }}</td>
                         <td>{{ $dt->department->name }}</td>
-                        <td>{{ $dt->email }}</td>
+                        <td>{{ $dt->user->username }}</td>
+                        <td>{{ $dt->user->email }}</td>
                         <td>{{ $dt->phone_num }}</td>
                         <x-table.status_table status="{{ $dt->status }}"></x-table.status_table>
                         <x-table.action_table detail="hidden" btnInput="hidden" :data="$dt"></x-table.action_table>
@@ -134,6 +96,7 @@
             <x-form>
                 <x-slot name="formTitle">Data Guru Pembimbing</x-slot>
                 <x-slot name="formBody">
+                    <input type="" name="user_id" :value="modalAction=='isEdit' || modalAction=='isDelete' ? dataId.user_id : ''">
                     <div class="input-group">
                         <label class="input-label" for="">Nama</label>
                         <input name="name" class="input" type="text" placeholder="Masukkan Nama"
@@ -154,8 +117,8 @@
                                 :disabled="modalAction == 'isDelete'" required>
                                 {{-- <span x-text="selected" :class="selected=='Pilih Opsi' ? 'text-neutral-300' : 'text-neutral-800'"></span> --}}
                                 <span x-text="selected" class="text-neutral-800"></span>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                    viewBox="0 0 20 20" fill="none">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"
+                                    fill="none">
                                     <path d="M5 7.5L10 12.5L15 7.5" stroke="#667085" stroke-width="0.933333"
                                         stroke-linecap="round" stroke-linejoin="round"
                                         :hidden="modalAction == 'isDelete'" />
@@ -173,10 +136,16 @@
                         </div>
                     </div>
                     <div class="input-group">
-                        <label class="input-label" for="">Email</label>
-                        <input name="email" class="input" type="text" placeholder="Masukkan Email"
+                        <label class="input-label" for="">Username</label>
+                        <input name="username" class="input" type="text" placeholder="Masukkan Username"
                             :disabled="modalAction == 'isDelete'"
-                            :value="modalAction == 'isEdit' || modalAction=='isDelete' ? dataId.email : ''" required>
+                            :value="modalAction == 'isEdit' || modalAction=='isDelete' ? dataId.user.username : ''" required>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label" for="">Email</label>
+                        <input name="email" class="input" type="email" placeholder="Masukkan Email"
+                            :disabled="modalAction == 'isDelete'"
+                            :value="modalAction == 'isEdit' || modalAction=='isDelete' ? dataId.user.email : ''" required>
                     </div>
                     <div class="input-group">
                         <label class="input-label" for="">Nomor Telepon</label>

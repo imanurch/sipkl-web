@@ -4,6 +4,7 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\testingController;
 use App\Http\Controllers\Admin\OutputController;
 use App\Http\Controllers\Admin\LogbookAdminController;
+use App\Http\Controllers\Auth\AuthenticationController;
 use App\Http\Controllers\Admin\DashboardAdminController;
 use App\Http\Controllers\Admin\AdminManagementController;
 use App\Http\Controllers\Admin\AssessmentAdminController;
@@ -11,6 +12,7 @@ use App\Http\Controllers\Admin\BatchManagementController;
 use App\Http\Controllers\Admin\InternshipAdminController;
 use App\Http\Controllers\Advisor\InternAdvisorController;
 use App\Http\Controllers\Advisor\LogbookAdvisorController;
+use App\Http\Controllers\Student\LogbookStudentController;
 use App\Http\Controllers\Admin\AdvisorManagementController;
 use App\Http\Controllers\Admin\RegistrationAdminController;
 use App\Http\Controllers\Admin\StudentManagementController;
@@ -18,12 +20,11 @@ use App\Http\Controllers\Advisor\IndustryAdvisorController;
 use App\Http\Controllers\Admin\IndustryManagementController;
 use App\Http\Controllers\Advisor\DashboardAdvisorController;
 use App\Http\Controllers\Student\DashboardStudentController;
+use App\Http\Controllers\Advisor\AssessmentAdvisorController;
 use App\Http\Controllers\Advisor\MonitoringAdvisorController;
+use App\Http\Controllers\Student\FinalReportStudentController;
 use App\Http\Controllers\Student\RegistrationStudentController;
 use App\Http\Controllers\Advisor\LogbookDetailAdvisorController;
-use App\Http\Controllers\Auth\AuthController;
-use App\Http\Controllers\Student\FinalReportStudentController;
-use App\Http\Controllers\Student\LogbookStudentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -86,10 +87,11 @@ Route::get('content', function () {
 
 // save for later
 
-Route::get('sipkl', [AuthController::class, 'index'])->name('sipkl');
-// Route::get('sipkl/login', [AuthController::class, 'login'])->name('sipkl.login');
+Route::get('sipkl', [AuthenticationController::class, 'index'])->name('sipkl');
+Route::post('sipkl/login', [AuthenticationController::class, 'login'])->name('sipkl.login');
+Route::get('sipkl/logout', [AuthenticationController::class, 'logout'])->name('sipkl.logout');
 
-Route::prefix('admin')->name('admin.')->group(function () {
+Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
     // dashboard
     Route::get('dashboard', [DashboardAdminController::class, 'index'])->name('dashboard');
 
@@ -122,10 +124,12 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('batchManagement', [BatchManagementController::class, 'index'])->name('batchManagement');
     Route::post('batchManagement', [BatchManagementController::class, 'store'])->name('batchManagement.store');
     Route::patch('batchManagement/{id}', [BatchManagementController::class, 'update'])->name('batchManagement.update');
+    Route::get('batchManagement/setActiveBatch/{id}', [BatchManagementController::class, 'setActiveBatch'])->name('batchManagement.updateActiveBatch');
     Route::delete('batchManagement/{id}', [BatchManagementController::class, 'destroy'])->name('batchManagement.destroy');
 
     // registration
     Route::get('registration', [RegistrationAdminController::class, 'index'])->name('registration');
+    Route::delete('registration/{id}', [RegistrationAdminController::class, 'destroy'])->name('registration.destroy');
     Route::get('registration/download/{type}/{filename}', [RegistrationAdminController::class, 'downloadFile'])->name('registration.download.file');
     Route::get('registration/confirmation/{registrationId}/{status}', [RegistrationAdminController::class, 'confirmStatusRegistration'])->name('registration.status.confirm');
     Route::get('registration/generateDokumenPengantar/{registrationId}', [RegistrationAdminController::class, 'generateSuratPengantar'])->name('registration.generateSuratPengantar');
@@ -134,7 +138,7 @@ Route::prefix('admin')->name('admin.')->group(function () {
     Route::get('intern', [InternshipAdminController::class, 'index'])->name('intern');
     Route::patch('intern/updateAdvisor/{id}', [InternshipAdminController::class, 'updateAdvisor'])->name('intern.updateAdvisor');
     Route::delete('intern/delete/{id}', [InternshipAdminController::class, 'destroy'])->name('intern.destroy');
- 
+
     // output
     Route::get('output', [OutputController::class, 'index'])->name('output');
     Route::get('output/logbook/{batch_id}/{id}', [LogbookAdminController::class, 'index'])->name('outputAdmin.logbook');
@@ -146,10 +150,9 @@ Route::prefix('admin')->name('admin.')->group(function () {
 
     // document
     Route::get('document', [OutputController::class, 'index'])->name('document');
-
 });
 
-Route::prefix('advisor')->name('advisor.')->group(function () {
+Route::prefix('advisor')->name('advisor.')->middleware('role:advisor')->group(function () {
     // dashboard
     Route::get('dashboard', [DashboardAdvisorController::class, 'index'])->name('dashboard');
     Route::get('dashboard/download/{filename}', [DashboardAdvisorController::class, 'downloadSuratTugas'])->name('dashboard.downloadSuratTugas');
@@ -159,7 +162,7 @@ Route::prefix('advisor')->name('advisor.')->group(function () {
 
     // industry
     Route::get('industry', [IndustryAdvisorController::class, 'index'])->name('industry');
-    
+
     // monitoring
     Route::get('monitoring', [MonitoringAdvisorController::class, 'index'])->name('monitoring');
     Route::get('monitoring/download/{type}/{filename}', [MonitoringAdvisorController::class, 'downloadFile'])->name('monitoring.downloadFile');
@@ -173,20 +176,26 @@ Route::prefix('advisor')->name('advisor.')->group(function () {
     Route::get('logbook/detail/{studentId}/{internshipId}', [LogbookDetailAdvisorController::class, 'index'])->name('logbook.detail');
     Route::patch('logbook/detail/confirm/{logbookId}/{status}', [LogbookDetailAdvisorController::class, 'statusConfirm'])->name('logbook.detail.confirm');
 
+    // assessment
+    Route::get('assessment', [AssessmentAdvisorController::class, 'index'])->name('assessment');
+    Route::patch('assessment/{id}', [AssessmentAdvisorController::class, 'update'])->name('assessment.update');
+    Route::get('assessment/download/{filename}', [AssessmentAdvisorController::class, 'downloadLaporanAkhir'])->name('assessment.download.finalReport');
 });
 
-Route::prefix('student')->name('student.')->group(function () {
+Route::prefix('student')->name('student.')->middleware('role:student')->group(function () {
     // dashboard
     Route::get('dashboard', [DashboardStudentController::class, 'index'])->name('dashboard');
 
     // registration
     Route::get('registration', [RegistrationStudentController::class, 'index'])->name('registration');
-    Route::post('registration', [RegistrationStudentController::class, 'newIndustryRequest'])->name('registration.industry.request');
+    Route::post('registration/industryRequest', [RegistrationStudentController::class, 'newIndustryRequest'])->name('registration.industry.request');
     Route::post('registration/step2', [RegistrationStudentController::class, 'step2'])->name('registration.step2');
     Route::post('registration/step3', [RegistrationStudentController::class, 'step3'])->name('registration.step3');
     Route::post('registration/step4', [RegistrationStudentController::class, 'step4'])->name('registration.step4');
+    Route::get('registration/step4', [RegistrationStudentController::class, 'step4View'])->name('registration.step4');
     Route::post('registration/step5', [RegistrationStudentController::class, 'step5'])->name('registration.step5');
-    Route::get('registration/download/{filename}', [RegistrationStudentController::class, 'downloadFile'])->name('registration.download.file');
+    Route::get('registration/step5', [RegistrationStudentController::class, 'step5View'])->name('registration.step5');
+    Route::get('registration/download/{type}/{filename}', [RegistrationStudentController::class, 'downloadFile'])->name('registration.download.file');
 
     // logbook
     Route::get('logbook', [LogbookStudentController::class, 'index'])->name('logbook');
@@ -196,6 +205,4 @@ Route::prefix('student')->name('student.')->group(function () {
     Route::get('final-report', [FinalReportStudentController::class, 'index'])->name('finalReport');
     Route::post('final-report', [FinalReportStudentController::class, 'store'])->name('finalReport.store');
     Route::get('final-report/download/{filename}', [FinalReportStudentController::class, 'downloadLaporanAkhir'])->name('finalReport.downloadLaporanAkhir');
-
-
 });

@@ -27,13 +27,13 @@
         </x-card>
     </div>
 
-    <x-guide guideTitle="Bimbingan">
-        <li>Guide 1</li>
-        <li>Guide 2</li>
+    <x-guide guideTitle="Persetujuan Logbook">
+        <li>Guru harus menyetujui logbook mingguan jika sudah sesuai.</li>
+        <li>Jika belum sesuai, guru dapat meminta revisi dan memberikan komentar sebagai masukan kepada siswa.</li>
     </x-guide>
 
     <x-table.table>
-        <x-slot name="tableTitle">Jurnal Mingguan Peserta PKL</x-slot>
+        <x-slot name="tableTitle">Logbook Peserta PKL</x-slot>
         <x-slot name="filterActionForm">logbook</x-slot>
         <x-slot name="filter">
             <div class="flex w-full space-x-2">
@@ -57,23 +57,6 @@
                     </x-table.select_option_filter>
                 </div>
             </div>
-            {{-- <div class="space-y-1 w-full">
-                <span class="text-xs text-neutral-400 w-32">Jenis</span>
-                <x-table.select_option_filter optionName="type"
-                    defaultSelected="{{ $filters['type'] != '' ? $filters['type'] : 'Semua Jenis' }}">
-                    <x-slot name="option">
-                        <li class="option-filter-toolbar-table"
-                            @click="option=false;selected='Pelepasan';valueSelected='Pelepasan'">
-                            Pelepasan </li>
-                        <li class="option-filter-toolbar-table"
-                            @click="option=false;selected='Kunjungan';valueSelected='Kunjungan'">
-                            Kunjungan </li>
-                        <li class="option-filter-toolbar-table"
-                            @click="option=false;selected='Penarikan';valueSelected='Penarikan'">
-                            Penarikan </li>
-                    </x-slot>
-                </x-table.select_option_filter>
-            </div> --}}
         </x-slot>
         <x-slot name="tHeader">
             <th>NO</th>
@@ -81,7 +64,7 @@
             <th>JURUSAN</th>
             <th>INDUSTRI</th>
             <th>STATUS</th>
-            <th>JURNAL</th>
+            <th>LOGBOOK</th>
         </x-slot>
         <x-slot name="tBody">
             @foreach ($data as $dt)
@@ -90,18 +73,19 @@
                     <td>{{ $dt->name }}</td>
                     <td>{{ $dt->department->name }}</td>
                     @foreach ($dt->groupMember as $member)
-                        <td>{{ $member->group->internship->industry->name }}</td>
-                        <x-table.status_table status="{{ $dt->status }}"></x-table.status_table>
-                        <x-table.action_btn_table
-                            href="{{ route('advisor.logbook.detail', ['studentId' => $dt->id ?? '', 'internshipId' => $member->group->internship->id]) }}"
-                            name="Lihat"></x-table.action_btn_table>
+                        @if ($member->group->internship)
+                            <td>{{ $member->group->internship->industry->name }}</td>
+                            <x-table.status_table status="{{ $dt->status }}"></x-table.status_table>
+                            <x-table.action_btn_table
+                                href="{{ route('advisor.logbook.detail', ['studentId' => $dt->id ?? '', 'internshipId' => $member->group->internship->id]) }}"
+                                name="Lihat"></x-table.action_btn_table>
+                        @endif
                     @endforeach
                 </tr>
             @endforeach
         </x-slot>
         {{-- pagination --}}
         <x-slot name="pagination">{{ $data->links() }}</x-slot>
-
     </x-table.table>
 
 @endsection

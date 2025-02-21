@@ -21,7 +21,8 @@
                 <h1 class="display-xs-bold">@yield('page-title')</h1>
                 <div class="flex space-x-2 place-items-center bg-neutral-50 rounded py-2 px-5 text-xs-medium">
                     <img class="size-5" src="" alt=" ">
-                    <span>@yield('profil')</span>
+                    <span>{{ session('user_bio')->name }}</span>
+                    {{-- <span>@yield('profil')</span> --}}
                 </div>
             </div>
             @yield('content')

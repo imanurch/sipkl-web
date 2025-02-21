@@ -199,4 +199,10 @@ class RegistrationAdminController extends Controller
         // Atau, untuk menampilkan PDF di browser:
         // return $pdf->stream('dokumen.pdf');
     }
+
+    public function destroy($id)
+    {
+        $this->registrationService->deleteRegistration($id);
+        return back();
+    }
 }

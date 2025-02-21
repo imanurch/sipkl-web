@@ -58,17 +58,32 @@
                         </x-table.select_option_filter>
                     </div>
                 </div>
+                <div class="flex w-full space-x-2">
+                    <div class="space-y-1 w-full">
+                        <span class="text-xs text-neutral-400 w-32">Batch</span>
+                        <x-table.select_option_filter optionName="batch"
+                            defaultSelected="{{ $filters['batch_id'] != '' ? $filters['batch_id'] : 'Semua batch' }}">
+                            <x-slot name="option">
+                                @foreach ($batchData as $dt)
+                                    <li class="option-filter-toolbar-table"
+                                        @click="option=false;selected='{{ $dt->name }}';valueSelected='{{ $dt->id }}'">
+                                        {{ $dt->name }}</li>
+                                @endforeach
+                            </x-slot>
+                        </x-table.select_option_filter>
+                    </div>
+                </div>
             </x-slot>
             <x-slot name="tHeader">
-                <th>*ID</th>
                 <th>NO</th>
                 <th>KELOMPOK</th>
                 <th>WAKTU</th>
                 <th>LOKASI PKL</th>
                 <th>FILE PENGANTAR</th>
                 <th>FILE BUKTI DITERIMA</th>
-                <th>DETAIL</th>
+                {{-- <th>DETAIL</th> --}}
                 <th>STATUS</th>
+                <th>KONFIRMASI</th>
                 <th>AKSI</th>
             </x-slot>
             <x-slot name="tBody">
@@ -107,8 +122,8 @@
                                     @if ($doc->url != '')
                                         <x-table.action_btn_table name="Lihat File"
                                             href="{{ route('admin.registration.download.file', ['type' => 'suratBalasan', 'filename' => $doc->url]) }}"></x-table.action_btn_table>
-                                        <x-table.action_table edit="hidden" delete="hidden" btnInput="hidden"
-                                            :data="$dt"></x-table.action_table>
+                                        {{-- <x-table.action_table edit="hidden" delete="hidden" btnInput="hidden"
+                                            :data="$dt"></x-table.action_table> --}}
                                         @if ($dt->status == '0')
                                             <x-table.status_table :status="$dt->status"></x-table.status_table>
                                             <x-table.action_confirm_table :id="$dt->id"></x-table.action_confirm_table>
@@ -129,8 +144,8 @@
                                         @endif
                                     @else
                                         <td class="text-center">Belum Tersedia</td>
-                                        <x-table.action_table edit="hidden" delete="hidden" btnInput="hidden"
-                                            :data="$dt"></x-table.action_table>
+                                        {{-- <x-table.action_table edit="hidden" delete="hidden" btnInput="hidden"
+                                            :data="$dt"></x-table.action_table> --}}
                                         <x-table.status_table :status="$dt->status"></x-table.status_table>
                                         <td>Belum Tersedia</td>
                                     @endif
@@ -138,8 +153,7 @@
                             @endforeach
                         @endif
 
-                        {{-- <x-table.action_table edit="hidden" delete="hidden" btnInput="hidden"
-                            :data="$dt"></x-table.action_table> --}}
+                        <x-table.action_table edit="hidden" btnInput="hidden" :data="$dt"></x-table.action_table>
                         {{-- <x-table.action_confirm_table></x-table.action_confirm_table> --}}
                     </tr>
                 @endforeach
@@ -149,18 +163,18 @@
         </x-table.table>
         <div x-show="modalAction!==null" class="form-modal">
             <x-form>
-                <x-slot name="formTitle">Data Industri</x-slot>
+                <x-slot name="formTitle">Data Registrasi</x-slot>
                 <x-slot name="formBody">
                     <div class="input-group">
                         <label class="input-label" for="">Nama Kelompok</label>
                         <input name="group" class="input" type="text" disabled
-                            :value="modalAction == 'isView' ? dataId.group.name : ''">
+                            :value="modalAction != null ? dataId.group.name : ''">
                     </div>
                     <div class="input-group">
                         <label class="input-label" for="">Anggota Kelompok</label>
                         <div class="input">
                             <ul>
-                                {{-- <input x-for="(dt, index) in (modalAction == 'isView' ? dataId.group.groupMember : [])"
+                                {{-- <input x-for="(dt, index) in (modalAction != null ? dataId.group.groupMember : [])"
                                     :key="index" :value="dt.student.name"> --}}
 
                                 {{-- @if ($dt ?? '')
@@ -174,12 +188,12 @@
                     <div class="input-group">
                         <label class="input-label" for="">Waktu</label>
                         <input name="time" class="input" type="text" disabled
-                            :value="modalAction == 'isView' ? dataId.start_date + ' s/d ' + dataId.end_date : ''">
+                            :value="modalAction != null ? dataId.start_date + ' s/d ' + dataId.end_date : ''">
                     </div>
                     <div class="input-group">
                         <label class="input-label" for="">Lokasi PKL</label>
                         <input name="industry" class="input" type="text" disabled
-                            :value="modalAction == 'isView' ? dataId.industry.name : ''">
+                            :value="modalAction != null ? dataId.industry.name : ''">
                     </div>
                 </x-slot>
             </x-form>
@@ -202,7 +216,6 @@
             </div>
         </div>
 
-
         {{-- reject modal confirm --}}
         <div x-show="modalConfirm=='reject'" class="confirm-modal">
             <div class="place-self-center bg-neutral-0 border rounded justify-center w-80 border-error-400">
@@ -221,3 +234,13 @@
     </div>
 
 @endsection
+
+{{-- script Modal Action --}}
+<script>
+    function setFormAction(modalAction, id = null) {
+        const form = document.getElementById('modalForm');
+        if (modalAction === 'isDelete' && id) {
+            form.action = `{{ route('admin.registration.destroy', ':id') }}`.replace(':id', id);
+        }
+    }
+</script>

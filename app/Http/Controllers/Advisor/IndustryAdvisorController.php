@@ -3,10 +3,11 @@
 namespace App\Http\Controllers\Advisor;
 
 use Illuminate\Http\Request;
+use App\Services\BatchService;
+use App\Services\AdvisorService;
 use App\Services\InternshipService;
 use App\Http\Controllers\Controller;
-use App\Services\AdvisorService;
-use App\Services\BatchService;
+use Illuminate\Support\Facades\Auth;
 
 class IndustryAdvisorController extends Controller
 {
@@ -22,7 +23,9 @@ class IndustryAdvisorController extends Controller
 
     public function index(Request $request)
     {
-        $advisor_id = '2';
+        // $user_id = Auth::user()->id;
+        // $advisor_id = $this->advisorService->getAdvisorIdByUserId($user_id);
+        $advisor_id = session('user_bio')->id;
 
         // batch data
         $currentBatch = $this->batchService->getBatchByStatus('active');

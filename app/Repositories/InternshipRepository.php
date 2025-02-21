@@ -20,9 +20,9 @@ class InternshipRepository
         );
 
         // filter batch
-        if ($filters['batch_id'] != null) {
-            $query->where('batch_id', $filters['batch_id']);
-        };
+        // if ($filters['batch_id'] != null) {
+        //     $query->where('batch_id', $filters['batch_id']);
+        // };
 
         // filter search
         if ($filters['search'] != null) {
@@ -31,7 +31,7 @@ class InternshipRepository
             });
         };
 
-        return $query->paginate(5);
+        return $query->where('batch_id', $filters['batch_id'])->paginate(5);
     }
 
     public function getIntern($filters = [])
@@ -145,8 +145,8 @@ class InternshipRepository
         return Internship::where('id', $internship_id)->update(['advisor_id' => $advisor_id]);
     }
 
-    // public function deleteInternship($id)
-    // {
-    //     return Internship::where('id', $id)->delete();
-    // }
+    public function deleteInternship($id)
+    {
+        return Internship::where('id', $id)->delete();
+    }
 }

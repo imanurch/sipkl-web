@@ -7,11 +7,12 @@ use Illuminate\Http\Request;
 use App\Services\BatchService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\LogbookService;
+use App\Services\StudentService;
 use App\Services\InternshipService;
 use App\Services\MonitoringService;
 use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Auth;
 use App\Services\MonitoringDocumentService;
-use App\Services\StudentService;
 
 class LogbookStudentController extends Controller
 {
@@ -36,9 +37,12 @@ class LogbookStudentController extends Controller
 
     public function index()
     {
-        $currentBatch = $this->batchService->getBatchByStatus('active');
+        $user_id = Auth::user()->id;
+        // $student_id = $this->studentService->getStudentIdByUserId($user_id);
+        $student_id = session('user_bio')->id;
 
-        $student_id = '8';
+        $currentBatch = $this->batchService->getBatchByStatus('active');
+        
         // $studentData = $this->studentService->getStudentById($studentId);
         $data = $this->logbookService->getLogbookByStudentIdAndBatch($currentBatch->id, $student_id);
         // $internshipData = $this->internshipService->getInternshipByInternshipId($internshipId);

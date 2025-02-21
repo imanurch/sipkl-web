@@ -11,9 +11,12 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class Advisor extends Model
 {
     use HasFactory;
-    protected $fillable = ['name', 'nip', 'department_id', 'email', 'phone_num', 'password'];
-    protected $hidden = ['password'];
+    protected $fillable = ['user_id', 'name', 'nip', 'department_id', 'phone_num'];
 
+    public function user(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'user_id');
+    }
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class, 'department_id');
@@ -24,6 +27,6 @@ class Advisor extends Model
     }
     public function internship(): HasMany
     {
-        return $this->hasMany(Internship::class,'advisor_id', 'id');
+        return $this->hasMany(Internship::class, 'advisor_id', 'id');
     }
 }

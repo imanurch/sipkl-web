@@ -73,4 +73,9 @@ class InternshipService
     {
         return $this->internshipRepository->updateInternshipAdvisor($internship_id, $advisor_id);
     }
+
+    public function deleteInternship($id)
+    {
+        return $this->internshipRepository->deleteInternship($id);
+    }
 }

@@ -35,7 +35,7 @@ class RegistrationRepository
             });
         };
 
-        return $query->paginate(5);
+        return $query->where('batch_id', $filters['batch_id'])->paginate(5);
     }
 
     public function countRegistrationByStatus($status, $batch_id)
@@ -62,6 +62,13 @@ class RegistrationRepository
         )->where('id', $id)->first();
     }
 
+    public function getRegistrationByStudentId($batch_id, $student_id)
+    {
+        return Registration::whereHas('group.groupMember.student', function ($query) use ($student_id, $batch_id) {
+            $query->where('id', $student_id);
+        })->with('industry:id,name,address')->where('batch_id', $batch_id)->first();
+    }
+
     public function createRegistration(array $data)
     {
         return Registration::create($data);
@@ -80,6 +87,11 @@ class RegistrationRepository
         }else if ($status == 'reject') {
             return Registration::where('id', $id)->update(['status' => '2']);
         }
+    }
+
+    public function updateRegistrationStep($id, $step)
+    {
+        return Registration::where('id', $id)->update(['step' => $step]);
     }
 
     public function deleteRegistration($id)

@@ -3,6 +3,7 @@
 namespace App\Repositories;
 
 use App\Models\Batch;
+use PhpParser\Node\Stmt\Return_;
 
 class BatchRepository
 {
@@ -14,24 +15,26 @@ class BatchRepository
             $query->where('name', 'like', '%' . $searchFilters . '%')->orWhere('year', 'like', '%' . $searchFilters . '%');           
         }
 
-        $data = $query->paginate(5);
-
-        $data->getCollection()->transform(function ($item) {
-            $item->status = $item->status == 1 ? 'Aktif' : 'Non Aktif';
-            return $item;
-        });
-
-        return $data;
+        return $query->paginate(5);
     }
 
     public function getBatchByStatus($status)
     {
-        // $status_id = ($status=='active' ? '1' : '0');
-        // return Batch::where('status', $status_id)->get();
         if ($status == 'active') {
             return Batch::where('status', '1')->first();
         } else {
             return Batch::where('status', '0')->get();
+        }
+    }
+
+    public function getActiveOrLastBatch()
+    {
+        $activeBatch = Batch::where('status', '1')->first();
+        
+        if($activeBatch == null){
+            return Batch::latest('id')->first();
+        }else{
+            return $activeBatch;
         }
     }
 
@@ -48,6 +51,12 @@ class BatchRepository
     public function updateBatch($id, array $data)
     {
         return Batch::where('id', $id)->update($data);
+    }
+
+    public function setActiveBatch($id)
+    {
+        Batch::where('status','1')->update(['status'=>'0']);
+        return Batch::where('id', $id)->update(['status'=>'1']);
     }
 
     public function deleteBatch($id)

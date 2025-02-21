@@ -13,6 +13,7 @@
 <body>
     <div class="">
         <form action="{{ route('sipkl.login') }}" method="POST">
+            @csrf
             <div>
                 <div class="input-group">
                     <label class="input-label" for="">Email/Username</label>

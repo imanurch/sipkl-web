@@ -19,14 +19,29 @@ class StudentService
         return $this->studentRepository->getStudent($filters);
     }
 
-    public function getNonInternStudentList($activeBatch_id)
+    // public function getNonInternStudentList($activeBatch_id)
+    // {
+    //     return $this->studentRepository->getNonInternStudentList($activeBatch_id);
+    // }
+
+    public function getNonRegisteredInternList($activeBatch_id)
     {
-        return $this->studentRepository->getNonInternStudentList($activeBatch_id);
+        return $this->studentRepository->getNonRegisteredInternList($activeBatch_id);
     }
 
     public function getStudentById($student_id)
     {
         return $this->studentRepository->findStudentById($student_id);
+    }
+
+    // public function getStudentIdByUserId($user_id)
+    // {
+    //     return $this->studentRepository->getStudentIdByUserId($user_id)->id;
+    // }
+
+    public function getStudentByUserId($user_id)
+    {
+        return $this->studentRepository->getStudentByUserId($user_id);
     }
 
     public function getStudentByStatusCount($year, $batch_id, $status)

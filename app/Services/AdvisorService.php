@@ -31,6 +31,16 @@ class AdvisorService
         return $this->advisorRepository->findAdvisorById($advisor_id);
     }
 
+    // public function getAdvisorIdByUserId($user_id)
+    // {
+    //     return $this->advisorRepository->getAdvisorIdByUserId($user_id)->id;
+    // }
+
+    public function getAdvisorByUserId($user_id)
+    {
+        return $this->advisorRepository->getAdvisorByUserId($user_id);
+    }
+
     public function getAdvisorDocumentByAdvisorIdAndBatchId($advisor_id, $batch_id)
     {
         return $this->advisorDocumentRepository->getAdvisorDocumentByAdvisorIdAndBatchId($advisor_id, $batch_id);

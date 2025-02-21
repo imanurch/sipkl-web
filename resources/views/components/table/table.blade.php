@@ -1,21 +1,4 @@
 <div class="space-y-3">
-    {{-- toolbar --}}
-    {{-- <div class="flex justify-between place-items-center">
-        <h3 class="text-sm-semibold">{{ $tableTitle ?? '' }}</h3>
-        <div class="flex space-x-2">
-            <form action="{{ $actionForm ?? ''}}" method="GET" class="flex space-x-2">
-                {{ $filter ?? '' }}
-                <button type="submit" class="btn btn-default-fill btn-sm">
-                    <span>Terapkan</span>
-                </button>
-                <a href="{{ $actionForm ?? '' }}" class="btn btn-default-fill btn-sm" >
-                    <span>Reset</span>
-                </a>
-            </form>
-            {{ $toolbar ?? '' }}
-        </div>
-    </div> --}}
-
     <div class="space-y-2">
         <div class="flex justify-between place-items-center">
             <h3 class="text-sm-semibold">{{ $tableTitle }}</h3>
@@ -39,6 +22,8 @@
             </div>
         </form>
     </div>
+
+    {{ $addition ?? '' }}
 
     {{-- table --}}
     <div class="border border-neutral-200 rounded px-5">

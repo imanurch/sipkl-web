@@ -58,10 +58,12 @@
                     <td>{{ $dt->name }}</td>
                     <td>{{ $dt->department->name }}</td>
                     @foreach ($dt->groupMember as $member)
-                        <td>{{ $member->group->internship->industry->name }}</td>
-                        <x-table.action_btn_table
-                             href="{{ route('advisor.logbook.detail', ['studentId' => $dt->id ?? '', 'internshipId' => $member->group->internship->id]) }}"
-                            name="Lihat"></x-table.action_btn_table>
+                        @if ($member->group->internship)
+                            <td>{{ $member->group->internship->industry->name }}</td>
+                            <x-table.action_btn_table
+                                href="{{ route('advisor.logbook.detail', ['studentId' => $dt->id ?? '', 'internshipId' => $member->group->internship->id]) }}"
+                                name="Lihat"></x-table.action_btn_table>
+                        @endif
                     @endforeach
                     @if (!$dt->internDocument->isEmpty())
                         @foreach ($dt->internDocument as $doc)

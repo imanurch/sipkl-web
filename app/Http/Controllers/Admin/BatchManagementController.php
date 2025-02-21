@@ -31,6 +31,7 @@ class BatchManagementController extends Controller
     {
         $searchFilters = $request->searchKeyword;
         $data = $this->batchService->getAllBatch($searchFilters);
+        $data->active_batch = $this->batchService->getBatchByStatus('active');
 
         return view('pages.admin.batch', [
             'data' => $data,
@@ -56,6 +57,7 @@ class BatchManagementController extends Controller
 
     public function update(Request $request, $id)
     {
+        // dd($request->all());
         $validatedData = $request->validate([
             'name' => 'required',
             'year' => 'required',
@@ -68,6 +70,12 @@ class BatchManagementController extends Controller
             // \Log::error($e->getMessage());
             return back()->withErrors(['error' => 'Failed to add batch.']);
         }
+    }
+
+    public function setActiveBatch($id)
+    {
+        $this->batchService->setActiveBatch($id);
+        return back();
     }
 
     public function destroy($id)
