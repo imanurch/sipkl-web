@@ -30,6 +30,7 @@ class AdminManagementController extends Controller
         return view('pages.admin.admin', [
             'data' => $data,
             'filters' => $searchFilter,
+            'pages' => 'adminManagement',
         ]);
     }
 

@@ -35,6 +35,7 @@ class BatchManagementController extends Controller
 
         return view('pages.admin.batch', [
             'data' => $data,
+            'pages' => 'batchManagement',
         ]);
     }
 

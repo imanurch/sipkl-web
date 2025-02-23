@@ -60,6 +60,7 @@ class MonitoringAdvisorController extends Controller
             'data' => $data,
             'filters' => $filters,
             'internshipListData' => $internshipListData,
+            'pages' => 'monitoring',
         ]);
     }
 

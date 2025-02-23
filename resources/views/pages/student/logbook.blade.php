@@ -29,64 +29,73 @@
                 <span>Unduh Logbook</span>
             </button>
         </div>
-    @endif
 
-    <div x-data="{ modalAction: null, id: null }">
-        <div class="space-y-4">
-            @foreach ($data as $month => $logs)
-                <x-logbook.content_group_logbook month="{{ $month }}">
-                    <x-slot name="logbookContent">
-                        <div class="flex space-x-2">
-                            @foreach ($logs as $log)
-                                <x-logbook.card_logbook :data="$log" :week="$loop->iteration"></x-logbook.card_logbook>
-                            @endforeach
+        <div x-data="{ modalAction: null, id: null }">
+            <div class="space-y-4">
+                @foreach ($data as $month => $logs)
+                    <x-logbook.content_group_logbook month="{{ $month }}">
+                        <x-slot name="logbookContent">
+                            <div class="flex space-x-2">
+                                @foreach ($logs as $log)
+                                    <x-logbook.card_logbook :data="$log" :week="$loop->iteration"></x-logbook.card_logbook>
+                                @endforeach
+                            </div>
+                        </x-slot>
+                    </x-logbook.content_group_logbook>
+                @endforeach
+            </div>
+
+            <div x-show="modalAction != null" class="form-modal">
+                <form :action="`{{ route('student.logbook.update', ['id' => '__ID__']) }}`.replace('__ID__', id)"
+                    class="form" method="POST" id="modalForm" @click.away="modalAction=null">
+                    <div class="form-header">
+                        @csrf
+                        @method('PATCH')
+                        <h3><span x-text="modalAction=='isAdd' ? 'Tambah' : 'Ubah'"></span> Logbook</h3>
+                        <svg @click="modalAction=null,selected='Pilih Opsi'" class="cursor-pointer"
+                            xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28"
+                            fill="none">
+                            <path d="M19.8333 8.16675L8.16663 19.8334M8.16663 8.16675L19.8333 19.8334" stroke="#525A6A"
+                                stroke-width="1.03704" stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                    </div>
+                    <div class="form-body">
+                        {{-- <input type="text" :value="modalAction != null ? id : ''"> --}}
+                        <div class="input-group">
+                            <label class="input-label" for="">Tanggal</label>
+                            <input class="input" type="text"
+                                :value="modalAction != null ? dataId.start_date + ' s/d ' + dataId.end_date : ''" disabled>
                         </div>
-                    </x-slot>
-                </x-logbook.content_group_logbook>
-            @endforeach
+                        <div class="input-group">
+                            <label class="input-label" for="">Kegiatan</label>
+                            <textarea class="input" name="activities" id="" rows="8"
+                                :value="modalAction != 'isAdd' ? dataId.activities : ''" required></textarea>
+                        </div>
+                        <div x-show="modalAction == 'isEdit'" class="input-group">
+                            <label class="input-label" for="">Komentar Guru Pembimbing</label>
+                            <textarea class="input" name="feedback" id="" rows="8"
+                                :value="modalAction != 'isAdd' ? dataId.feedback : ''"></textarea>
+                        </div>
+                    </div>
+                    <div class="form-footer">
+                        <button @click="modalAction=null" class="btn btn-sm" :class="modalAction=='isView' ? 'btn-success-fill' : 'btn-error-fill'">
+                            <span x-text="modalAction=='isView' ? 'Kembali' : 'Batalkan'"></span>
+                        </button>
+                        <button x-show="modalAction!='isView'" type="submit" class="btn btn-success-fill btn-sm">
+                            <span x-text="modalAction=='isAdd' ? 'Tambah' : 'Ubah'"></span>
+                        </button>
+                    </div>
+                </form>
+            </div>
         </div>
-
-        <div x-show="modalAction != null" class="form-modal">
-            <form :action="`{{ route('student.logbook.update', ['id' => '__ID__']) }}`.replace('__ID__', id)" class="form"
-                method="POST" id="modalForm" @click.away="modalAction=null">
-                <div class="form-header">
-                    @csrf
-                    @method('PATCH')
-                    <h3><span x-text="modalAction=='isAdd' ? 'Tambah' : 'Ubah'"></span> Logbook</h3>
-                    <svg @click="modalAction=null,selected='Pilih Opsi'" class="cursor-pointer"
-                        xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28" fill="none">
-                        <path d="M19.8333 8.16675L8.16663 19.8334M8.16663 8.16675L19.8333 19.8334" stroke="#525A6A"
-                            stroke-width="1.03704" stroke-linecap="round" stroke-linejoin="round" />
-                    </svg>
-                </div>
-                <div class="form-body">
-                    {{-- <input type="text" :value="modalAction != null ? id : ''"> --}}
-                    <div class="input-group">
-                        <label class="input-label" for="">Tanggal</label>
-                        <input class="input" type="text"
-                            :value="modalAction != null ? dataId.start_date + ' s/d ' + dataId.end_date : ''" disabled>
-                    </div>
-                    <div class="input-group">
-                        <label class="input-label" for="">Kegiatan</label>
-                        <textarea class="input" name="activities" id="" rows="8"
-                            :value="modalAction == 'isEdit' ? dataId.activities : ''" required></textarea>
-                    </div>
-                    <div x-show="modalAction == 'isEdit'" class="input-group">
-                        <label class="input-label" for="">Komentar Guru Pembimbing</label>
-                        <textarea class="input" name="feedback" id="" rows="8"
-                            :value="modalAction == 'isEdit' ? dataId.feedback : ''" required></textarea>
-                    </div>
-                </div>
-                <div class="form-footer">
-                    <button @click="modalAction=null" class="btn btn-error-fill btn-sm">
-                        <span>Batalkan</span>
-                    </button>
-                    <button type="submit" class="btn btn-success-fill btn-sm">
-                        <span x-text="modalAction=='isAdd' ? 'Tambah' : 'Ubah'"></span>
-                    </button>
-                </div>
-            </form>
-        </div>
-    </div>
+    @else
+        <x-not_found_empty_state>
+            <x-slot name="title">Logbook tidak tersedia</x-slot>
+            <x-slot name="desc">Lakukan pendaftaran PKL terlebih dahulu ya!</x-slot>
+            <x-slot name="cta">
+                <a href="{{ route('student.registration') }}" class="btn btn-xs btn-default-fill">Daftar PKL</a>
+            </x-slot>
+        </x-not_found_empty_state>
+    @endif
 
 @endsection

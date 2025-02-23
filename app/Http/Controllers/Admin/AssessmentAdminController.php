@@ -94,6 +94,7 @@ class AssessmentAdminController extends Controller
             'countNotAssessed' => $countNotAssessed,
             'countPass' => $countPass,
             'countNotPass' => $countNotPass,
+            'pages' => 'assessment',
         ]);
     }
     

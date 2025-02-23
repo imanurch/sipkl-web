@@ -78,6 +78,7 @@ class LogbookAdvisorController extends Controller
             'revisedCount' => $revisedCount,
             'filters' => $filters,
             'batchData' => $batchData,
+            'pages' => 'logbook',
         ]);
     }
 

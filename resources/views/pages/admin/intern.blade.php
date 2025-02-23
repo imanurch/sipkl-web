@@ -73,6 +73,9 @@
                             <td class="text-neutral-50">Belum Diatur</td>
                         @endif
                         <td>{{ $dt->industry->name ?? '' }}</td>
+                        @php
+                            $dt->member = $dt->group->groupMember->pluck('student.name')->toArray();
+                        @endphp
                         <x-table.action_table btnInput="hidden" :data="$dt"></x-table.action_table>
                     </tr>
                 @endforeach
@@ -92,8 +95,8 @@
                     </div>
                     <div class="input-group">
                         <label class="input-label" for="">Anggota</label>
-                        <input name="name" class="input" type="text" disabled
-                            :value="modalAction != null ? dataId.group.name : ''">
+                        <input name="member" class="input" type="text" disabled
+                            :value="modalAction != null ? dataId.member : ''">
                     </div>
                     <div class="input-group">
                         <label class="input-label" for="">Waktu</label>
@@ -137,17 +140,12 @@
         </div>
     </div>
 
-    {{-- script Partner Action Modal --}}
-    {{-- <script>
-        function setFormAction(modalAction, id = null) {
-            const form = document.getElementById('modalForm');
-            if (modalAction === 'isEdit' && id) {
-                form.action = `{{ route('admin.intern.update', ':id') }}`.replace(':id', id);
-            } else if (modalAction === 'isDelete' && id) {
-                form.action = `{{ route('admin.intern.destroy', ':id') }}`.replace(':id', id);
-            }
-        }
-    </script> --}}
+    {{-- empty state --}}
+    @if (count($data) == 0)
+        <x-not_found_empty_state>
+            <x-slot name="desc">Belum ada siswa yang terdaftar PKL batch ini</x-slot>
+        </x-not_found_empty_state>
+    @endif
 
     {{-- script Modal Action --}}
     <script>

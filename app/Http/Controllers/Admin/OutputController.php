@@ -91,6 +91,7 @@ class OutputController extends Controller
             'incompleteOutputCount' => $incompleteOutputCount,
             'filters' => $filters,
             'batchData' => $batchData,
+            'pages' => 'output',
         ]);
     }
 

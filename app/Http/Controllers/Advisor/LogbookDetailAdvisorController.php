@@ -46,6 +46,7 @@ class LogbookDetailAdvisorController extends Controller
             'studentData' => $studentData,
             'logbookData' => $logbookData,
             // 'internshipListData' => $internshipListData,
+            'pages' => 'logbook',
         ]);
     }
 

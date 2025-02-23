@@ -43,7 +43,7 @@
         </form>
     </div>
 
-    @if ($industryRequestData != null)
+    @if (count($industryRequestData) > 0)
         <div>
             <h6 class="text-xs-medium">Pengajuan Lokasi Baru</h6>
             <table class="table">

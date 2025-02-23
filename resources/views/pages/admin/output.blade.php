@@ -61,7 +61,7 @@
                         @if ($member->group->internship)
                             <td>{{ $member->group->internship->industry->name }}</td>
                             <x-table.action_btn_table
-                                href="{{ route('advisor.logbook.detail', ['studentId' => $dt->id ?? '', 'internshipId' => $member->group->internship->id]) }}"
+                                href="{{ route('admin.logbook.detail', ['studentId' => $dt->id ?? '', 'internshipId' => $member->group->internship->id]) }}"
                                 name="Lihat"></x-table.action_btn_table>
                         @endif
                     @endforeach
@@ -85,5 +85,12 @@
         <x-slot name="pagination">{{ $data->links() }}</x-slot>
 
     </x-table.table>
+
+    {{-- empty state --}}
+    @if (count($data) == 0)
+        <x-not_found_empty_state>
+            <x-slot name="desc">Belum ada luaran dari peserta PKL batch ini</x-slot>
+        </x-not_found_empty_state>
+    @endif
 
 @endsection

@@ -43,19 +43,27 @@
 
     <div x-data="{ tabs: 'unconfirmed' }" class="space-y-4">
         {{-- tabs --}}
-        <div class="bg-neutral-50 p-2 rounded-sm w-full flex space-x-2">
-            <button @click="tabs='unconfirmed';" class="text-sm btn rounded-sm hover:bg-neutral-0 w-full"
-                :class="tabs == 'unconfirmed' ? 'bg-neutral-0 text-sm-medium' : ''">Pengajuan</button>
-            <button @click="tabs='partner';" class="text-sm btn rounded-sm hover:bg-neutral-0 w-full"
-                :class="tabs == 'partner' ? 'bg-neutral-0 text-sm-medium' : ''">Partner</button>
-            <button @click="tabs='rejected';" class="text-sm btn rounded-sm hover:bg-neutral-0 w-full"
-                :class="tabs == 'rejected' ? 'bg-neutral-0 text-sm-medium' : ''">Ditolak</button>
+
+        <div class="flex w-full justify-between border-b border-neutral-100">
+            <div>
+                <h6 class="py-3 text-sm-medium">Data Industri</h6>
+            </div>
+            <div class="flex">
+                <button @click="tabs='unconfirmed';"
+                    class="text-sm-medium text-neutral-400 py-3 px-6 hover:text-neutral-700"
+                    :class="tabs == 'unconfirmed' ? 'text-brand-500 border-b border-brand-500 hover:text-brand-500' :
+                        ''">Pengajuan</button>
+                <button @click="tabs='partner';" class="text-sm-medium text-neutral-400 py-3 px-6 hover:text-neutral-700"
+                    :class="tabs == 'partner' ? 'text-brand-500 border-b border-brand-500 hover:text-brand-500' : ''">Partner</button>
+                <button @click="tabs='rejected';" class="text-sm-medium text-neutral-400 py-3 px-6 hover:text-neutral-700"
+                    :class="tabs == 'rejected' ? 'text-brand-500 border-b border-brand-500 hover:text-brand-500' : ''">Ditolak</button>
+            </div>
         </div>
 
         {{-- unconfirmed --}}
         <div x-show="tabs=='unconfirmed'" x-data="{ modalConfirm: null, id: null }">
             <x-table.table>
-                <x-slot name="tableTitle">Pengajuan Industri Baru</x-slot>
+                {{-- <x-slot name="tableTitle">Pengajuan Industri Baru</x-slot> --}}
                 <x-slot name="filterActionForm">industryManagement</x-slot>
                 <x-slot name="filter">
                     <div class="flex w-full space-x-2">
@@ -123,12 +131,20 @@
                     </div>
                 </div>
             </div>
+
+            {{-- empty state --}}
+            @if (count($unconfirmedIndustryData) == 0)
+                <x-not_found_empty_state>
+                    <x-slot name="desc">Belum ada pengajuan industri yang harus dikonfirmasi</x-slot>
+                </x-not_found_empty_state>
+            @endif
         </div>
+
 
         {{-- partner --}}
         <div x-show="tabs=='partner'" x-data="{ modalAction: null, option: false, selected: 'Pilih Opsi' }">
             <x-table.table>
-                <x-slot name="tableTitle">Industri Mitra</x-slot>
+                {{-- <x-slot name="tableTitle">Industri Mitra</x-slot> --}}
                 <x-slot name="filterActionForm">industryManagement</x-slot>
                 <x-slot name="btnAdd">
                     <x-table.add_data></x-table.add_data>
@@ -213,12 +229,23 @@
                     </x-slot>
                 </x-form>
             </div>
+
+            {{-- empty state --}}
+            @if (count($partnerIndustryData) == 0)
+                <x-not_found_empty_state>
+                    <x-slot name="desc">Tambah data industri terlebih dahulu ya!</x-slot>
+                    <x-slot name="cta">
+                        <button @click="modalAction='isAdd'" class="btn btn-xs btn-default-fill">Tambah Data</button>
+                    </x-slot>
+                </x-not_found_empty_state>
+            @endif
         </div>
+
 
         {{-- rejected --}}
         <div x-show="tabs=='rejected'">
             <x-table.table>
-                <x-slot name="tableTitle">Riwayat Pengajuan Industri Ditolak</x-slot>
+                {{-- <x-slot name="tableTitle">Riwayat Pengajuan Industri Ditolak</x-slot> --}}
                 <x-slot name="filterActionForm">industryManagement</x-slot>
                 <x-slot name="filter">
                     <div class="flex w-full space-x-2">
@@ -263,7 +290,15 @@
                 {{-- pagination --}}
                 <x-slot name="pagination">{{ $rejectedIndustryData->links() }}</x-slot>
             </x-table.table>
+
+            {{-- empty state --}}
+            @if (count($rejectedIndustryData) == 0)
+                <x-not_found_empty_state>
+                    <x-slot name="desc">Tidak ada riwayat pengajuan industri yang ditolak</x-slot>
+                </x-not_found_empty_state>
+            @endif
         </div>
+
     </div>
 
     {{-- script Partner Action Modal --}}

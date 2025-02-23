@@ -58,7 +58,7 @@
                         <h6 class="text-xs-reguler w-32" for="">Guru Pembimbing</h6>
                         <span>:</span>
                         <input class="input w-full" type="text"
-                            value="{{ $internshipData->advisor->name ?? '' }} ({{ $internshipData->advisor->phone_num ?? '' }})"
+                            value="{{ $internshipData->advisor->name ?? '' }} (No Telp: {{ $internshipData->advisor->phone_num ?? '' }})"
                             disabled>
                     </div>
                     <div class="flex space-x-3 place-items-center">
@@ -68,15 +68,15 @@
                             disabled>
                     </div>
                     <div class="flex space-x-3 place-items-center">
-                        <h6 class="text-xs-reguler w-32" for="">Status</h6>
+                        <h6 class="text-xs-reguler w-32" for="">Status PKL</h6>
                         <span>:</span>
-                        <input class="input w-full" type="text" value="" disabled>
+                        <input class="input w-full" type="text" value="{{ $internshipData->status }}" disabled>
                     </div>
                     <div class="flex space-x-3 place-items-center">
                         <h6 class="text-xs-reguler w-32" for="">Waktu Pelaksanaan</h6>
                         <span>:</span>
                         <input class="input w-full" type="text"
-                            value="{{ $internshipData->start_date ?? '' }} s/d {{ $internshipData->end_date ?? '' }}"
+                            value="{{ strftime('%d %B %Y', strtotime($internshipData->start_date)) ?? '' }} - {{ strftime('%d %B %Y', strtotime($internshipData->end_date)) ?? '' }}"
                             disabled>
                     </div>
                 </div>

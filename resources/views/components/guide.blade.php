@@ -1,4 +1,4 @@
-<div class="guide border border-neutral-200 rounded py-5 px-8 space-y-2">
+<div class="guide border border-neutral-100 rounded py-5 px-8 space-y-2">
     <div class="flex place-items-center space-x-1">
         <h3 class="text-xs-semibold">Panduan {{ $guideTitle }}</h3>
         <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 18 18" fill="none">

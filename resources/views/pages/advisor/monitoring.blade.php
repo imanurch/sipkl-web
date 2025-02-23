@@ -126,8 +126,8 @@
                     </div>
                     <div class="input-group">
                         <label class="input-label" for="">Waktu</label>
-                        <input name="date" class="input" type="date" placeholder="Masukkan Tanggal"
-                            :disabled="modalAction == 'isView' || modalAction == 'isDelete'"
+                        <input onclick="this.showPicker()" name="date" class="input" type="date"
+                            placeholder="Masukkan Tanggal" :disabled="modalAction == 'isView' || modalAction == 'isDelete'"
                             :value="modalAction != null ? dataId.date : ''" required>
                     </div>
                     <div class="input-group">
@@ -189,6 +189,16 @@
                 </x-slot>
             </x-form>
         </div>
+
+        {{-- empty state --}}
+        @if (count($data) == 0)
+            <x-not_found_empty_state>
+                <x-slot name="desc">Tambah data monitoring terlebih dahulu ya!</x-slot>
+                <x-slot name="cta">
+                    <button @click="modalAction='isAdd'" class="btn btn-xs btn-default-fill">Tambah Data</button>
+                </x-slot>
+            </x-not_found_empty_state>
+        @endif
     </div>
 
     {{-- script Modal Action --}}

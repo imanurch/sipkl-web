@@ -45,24 +45,6 @@ class StudentRepository
         // belum tambah kolom status
         $data = $query->where('year', $filters['year'])->paginate(5);
         $data->appends($filters);
-        // $data->through(function ($student) use ($batch_id) {
-        //     // Pastikan relasi ada sebelum mengaksesnya
-        //     $groupMember = $student->groupMember;
-        //     $group = $groupMember ? $groupMember->group : null;
-        //     $registration = $group ? $group->registration : null;
-        //     // Jika ada groupMember, group, dan registration, baru lakukan pengecekan
-        //     $statusCheck = $registration
-        //         ? $registration->where('batch_id', $batch_id)->whereIn('status', ['0', '1'])->get()
-        //         : collect(); // Jika tidak ada registration, gunakan koleksi kosong
-
-        //     // Set status berdasarkan hasil pengecekan
-        //     $student->setAttribute('status', $statusCheck->isNotEmpty() ? 'Terdaftar' : 'Belum Terdaftar');
-
-        //     // $student->setAttribute('status', $student->groupMember->group->registration->where('batch_id', $batch_id)->whereIn('status', ['0', '1'])->get()->isNotEmpty() ? 'Terdaftar' : 'Belum Terdaftar');
-        //     return $student;
-        // });
-
-        // return $query->get();
         return $data;
     }
 

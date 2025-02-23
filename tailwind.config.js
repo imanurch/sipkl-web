@@ -92,8 +92,10 @@ module.exports = {
             8: "8px",
         },
         borderRadius: {
-            DEFAULT: "1rem",
-            sm: "0.75rem",
+            DEFAULT: "0.25rem",
+            xs: "0.25rem",
+            sm: "0.5rem",
+            full: "100%",
         },
     },
     plugins: [],

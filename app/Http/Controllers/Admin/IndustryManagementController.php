@@ -60,6 +60,7 @@ class IndustryManagementController extends Controller
             'partnerIndustry' => $partnerIndustry,
             'rejectedIndustry' => $rejectedIndustry,
             'filters' => $filters,
+            'pages' => 'industryManagement',
         ]);
     }
 

@@ -144,6 +144,9 @@ Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function
     Route::get('output/logbook/{batch_id}/{id}', [LogbookAdminController::class, 'index'])->name('outputAdmin.logbook');
     Route::get('output/download/{filename}', [OutputController::class, 'downloadFinalReport'])->name('output.download.finalReport');
 
+    Route::get('logbook/detail/{studentId}/{internshipId}', [LogbookDetailAdvisorController::class, 'index'])->name('logbook.detail');
+    Route::patch('logbook/detail/confirm/{logbookId}/{status}', [LogbookDetailAdvisorController::class, 'statusConfirm'])->name('logbook.detail.confirm');
+
     // assessment
     Route::get('assessment', [AssessmentAdminController::class, 'index'])->name('assessment');
     Route::patch('assessment/{id}', [AssessmentAdminController::class, 'update'])->name('assessment.update');

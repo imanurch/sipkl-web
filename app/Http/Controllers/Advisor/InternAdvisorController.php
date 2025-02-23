@@ -43,6 +43,7 @@ class InternAdvisorController extends Controller
             'data' => $data,            
             'batchData' => $batchData,
             'filters' => $filters,
+            'pages' => 'intern',
         ]);
     }
 }

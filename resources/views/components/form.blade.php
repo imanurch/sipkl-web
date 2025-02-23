@@ -17,10 +17,10 @@
         {{ $formBody }}           
     </div>
     <div class="form-footer">
-        <button @click="modalAction=null" class="btn btn-error-fill btn-sm">
-            <span>Batalkan</span>
+        <button @click="modalAction=null" class="btn btn-sm" :class="modalAction=='isView' ? 'btn-success-fill' : 'btn-error-fill'">
+            <span x-text="modalAction=='isView' ? 'Kembali' : 'Batalkan'"></span>
         </button>
-        <button type="submit" class="btn btn-success-fill btn-sm">
+        <button x-show="modalAction!='isView'" type="submit" class="btn btn-success-fill btn-sm">
             <span x-text="modalAction=='isAdd' ? 'Tambah' : (modalAction=='isEdit' ? 'Ubah' : (modalAction=='isDelete' ? 'Hapus' : (modalAction=='isImport' ? 'Impor' : '')))"></span>
         </button>
     </div>

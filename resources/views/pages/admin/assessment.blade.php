@@ -158,6 +158,13 @@
         </div>
     </div>
 
+    {{-- empty state --}}
+    @if (count($data) == 0)
+        <x-not_found_empty_state>
+            <x-slot name="desc">Belum ada penilaian yang perlu diberikan</x-slot>
+        </x-not_found_empty_state>
+    @endif
+
     {{-- script Modal Action --}}
     <script>
         function setFormAction(modalAction, id = null) {

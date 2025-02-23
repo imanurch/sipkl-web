@@ -49,12 +49,13 @@ class FinalReportStudentController extends Controller
         // dd($data);
         if ($data != null) {
             $assessment = $this->assessmentService->getAssessmentByStudentIdAndInternshipId($student_id, $data->internship_id);
-            $data->isAssessed = ($assessment->industry_score != null && $assessment->advisor_score != null && $assessment->final_test_score != null ? true : false);
+            $data->isAssessed = ($assessment->advisor_score != null ? true : false);
         }
         // dd($data);
         return view('pages.student.final_report', [
             'data' => $data,
             'isIntern' => $isIntern,
+            'pages' => 'finalReport',
         ]);
     }
 

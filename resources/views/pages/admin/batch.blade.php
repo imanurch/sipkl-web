@@ -22,7 +22,7 @@
             {{-- setting batch status --}}
             <x-slot name="addition">
                 <div x-data="{ modalActiveBatch: false, option: false, selected: 'Pilih Opsi', selectedValue: '' }">
-                    <div class="flex justify-between place-items-center border border-brand-500 rounded-sm py-2 px-4">
+                    <div class="flex justify-between place-items-center border border-brand-500 rounded py-2 px-4">
                         <div>
                             <span class="text-xs">Batch Yang Sedang Aktif : </span>
                             @if ($data->active_batch != null)
@@ -34,7 +34,8 @@
                         </div>
                         <div class="flex space-x-2">
                             <button @click="modalActiveBatch=true" class="btn btn-xs btn-default-fill">Atur</button>
-                            <a href="{{ route('admin.batchManagement.updateActiveBatch',['id'=>'nonaktif']) }}" class="btn btn-xs btn-default-outline">Hapus</a>
+                            <a href="{{ route('admin.batchManagement.updateActiveBatch', ['id' => 'nonaktif']) }}"
+                                class="btn btn-xs btn-default-outline">Hapus</a>
                         </div>
                     </div>
                     {{-- modal active batch --}}
@@ -126,6 +127,16 @@
                 </x-slot>
             </x-form>
         </div>
+
+        {{-- empty state --}}
+        @if (count($data) == 0)
+            <x-not_found_empty_state>
+                <x-slot name="desc">Tambah data batch terlebih dahulu ya!</x-slot>
+                <x-slot name="cta">
+                    <button @click="modalAction='isAdd'" class="btn btn-xs btn-default-fill">Tambah Data</button>
+                </x-slot>
+            </x-not_found_empty_state>
+        @endif
     </div>
 
     {{-- script Modal Action --}}

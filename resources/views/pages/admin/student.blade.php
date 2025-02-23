@@ -106,12 +106,13 @@
             {{-- pagination --}}
             <x-slot name="pagination">{{ $data->links() }}</x-slot>
         </x-table.table>
-        
+
         <div x-show="modalAction != null" class="form-modal">
             <x-form>
                 <x-slot name="formTitle">Data Siswa</x-slot>
                 <x-slot name="formBody">
-                    <input type="text" name="user_id" :value="modalAction=='isEdit' || modalAction=='isDelete' ? dataId.user_id : ''">
+                    <input type="text" name="user_id"
+                        :value="modalAction == 'isEdit' || modalAction=='isDelete' ? dataId.user_id : ''">
                     <div class="input-group">
                         <label class="input-label" for="">Nama</label>
                         <input name="name" class="input" type="text" placeholder="Masukkan Nama"
@@ -185,7 +186,8 @@
                         <label class="input-label" for="">Username</label>
                         <input name="username" class="input" type="text" placeholder="Masukkan Username"
                             :disabled="modalAction == 'isDelete'"
-                            :value="modalAction == 'isEdit' || modalAction=='isDelete' ? dataId.user.username : ''" required>
+                            :value="modalAction == 'isEdit' || modalAction=='isDelete' ? dataId.user.username : ''"
+                            required>
                     </div>
                     <div class="input-group">
                         <label class="input-label" for="">Email</label>
@@ -238,6 +240,16 @@
             </x-slot>
         </x-form>
     </div> --}}
+
+        {{-- empty state --}}
+        @if (count($data) == 0)
+            <x-not_found_empty_state>
+                <x-slot name="desc">Tambah data siswa terlebih dahulu ya!</x-slot>
+                <x-slot name="cta">
+                    <button @click="modalAction='isAdd'" class="btn btn-xs btn-default-fill">Tambah Data</button>
+                </x-slot>
+            </x-not_found_empty_state>
+        @endif
     </div>
 
     {{-- script Modal Action --}}

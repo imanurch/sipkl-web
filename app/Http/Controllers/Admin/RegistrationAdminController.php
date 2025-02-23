@@ -14,6 +14,7 @@ use App\Services\InternshipService;
 use App\Http\Controllers\Controller;
 use App\Models\Logbook;
 use App\Models\RegistrationDocument;
+use App\Services\InternDocumentService;
 use App\Services\LogbookService;
 use Illuminate\Support\Facades\Hash;
 use App\Services\RegistrationService;
@@ -28,7 +29,8 @@ class RegistrationAdminController extends Controller
         $batchService,
         $assessmentService,
         $studentService,
-        $logbookService;
+        $logbookService,
+        $internDocumentService;
 
     // Constructor Injection
     public function __construct(
@@ -39,6 +41,7 @@ class RegistrationAdminController extends Controller
         AssessmentService $assessmentService,
         StudentService $studentService,
         LogbookService $logbookService,
+        InternDocumentService $internDocumentService,
     ) {
         $this->registrationService = $registrationService;
         $this->registrationDocumentService = $registrationDocumentService;
@@ -47,6 +50,7 @@ class RegistrationAdminController extends Controller
         $this->assessmentService = $assessmentService;
         $this->studentService = $studentService;
         $this->logbookService = $logbookService;
+        $this->internDocumentService = $internDocumentService;
     }
 
     public function index(Request $request)
@@ -80,6 +84,7 @@ class RegistrationAdminController extends Controller
             'rejectedRegistration' => $rejectedRegistration,
             'filters' => $filters,
             'batchData' => $batchData,
+            'pages' => 'registration',
         ]);
     }
 
@@ -116,6 +121,7 @@ class RegistrationAdminController extends Controller
 
             foreach ($newInternship->group->groupMember as $member) {
                 $newInternId = $member->student->id;
+
                 // buat tempat di assessment
                 $this->assessmentService->addAssessment([
                     'student_id' => $newInternId,
@@ -123,25 +129,19 @@ class RegistrationAdminController extends Controller
                 ]);
 
                 // buat tempat di logbook
-                // Ubah input tanggal menjadi objek DateTime
                 $logbook_start_date = new DateTime($newInternship->start_date);
                 $logbook_end_date = new DateTime($newInternship->end_date);
 
-                // Lakukan perulangan selama tanggal mulai belum melewati tanggal akhir internship
                 while ($logbook_start_date <= $logbook_end_date) {
-                    // Simpan tanggal mulai untuk interval ini
                     $current_start = clone $logbook_start_date;
 
-                    // Tentukan tanggal akhir interval dengan menambahkan 6 hari (interval 7 hari termasuk hari mulai)
                     $current_end = clone $logbook_start_date;
                     $current_end->modify('+6 days');
 
-                    // Jika tanggal akhir interval melebihi tanggal akhir internship, gunakan tanggal akhir internship
                     if ($current_end > $logbook_end_date) {
                         $current_end = clone $logbook_end_date;
                     }
 
-                    // Siapkan data untuk diinsert ke tabel logbook
                     $logbook_data = [
                         'student_id'    => $newInternId,
                         'internship_id' => $newInternship->id,
@@ -149,13 +149,30 @@ class RegistrationAdminController extends Controller
                         'end_date'      => $current_end->format('Y-m-d')
                     ];
 
-                    // Lakukan insert ke tabel logbook
                     $this->logbookService->addLogbook($logbook_data);
 
-                    // Update tanggal mulai untuk interval berikutnya: satu hari setelah current_end
                     $logbook_start_date = clone $current_end;
                     $logbook_start_date->modify('+1 day');
                 }
+
+                // buat document intern (surat jalan)
+                $data = [
+                    'title' => 'Contoh Dokumen Surat Jalan',
+                    'date'  => date('d-m-Y'),
+                ];
+
+                $pdf = Pdf::loadView('document_templates/surat_pengantar_template', $data);
+                $filename = 'surat_jalan_' . time() . '.pdf';
+
+                $path = storage_path('app/intern_documents/surat_jalan/' . $filename);
+                $pdf->save($path);
+                
+                $this->internDocumentService->addInternDocument([
+                    'student_id' => $newInternId,
+                    'internship_id' => $newInternship->id,
+                    'type' => 'surat jalan',
+                    'url' => $filename,
+                ]);
             }
         }
 

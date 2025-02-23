@@ -10,19 +10,39 @@ use App\Services\StudentService;
 use App\Services\IndustryService;
 use App\Services\InternshipService;
 use App\Http\Controllers\Controller;
-use App\Models\RegistrationDocument;
 use App\Services\GroupMemberService;
 use Illuminate\Support\Facades\Auth;
 use App\Services\RegistrationService;
+use App\Services\InternDocumentService;
 use App\Services\RegistrationDocumentService;
 
 class RegistrationStudentController extends Controller
 {
-    protected $industryService, $studentService, $internshipService, $advisorService, $batchService, $groupService, $groupMemberService, $registrationService, $registrationDocumentService;
+    protected
+        $industryService,
+        $studentService,
+        $internshipService,
+        $advisorService,
+        $batchService,
+        $groupService,
+        $groupMemberService,
+        $registrationService,
+        $registrationDocumentService,
+        $internDocumentService;
 
     // Constructor Injection
-    public function __construct(IndustryService $industryService, StudentService $studentService, InternshipService $internshipService, AdvisorService $advisorService, BatchService $batchService, GroupService $groupService, GroupMemberService $groupMemberService, RegistrationService $registrationService, RegistrationDocumentService $registrationDocumentService)
-    {
+    public function __construct(
+        IndustryService $industryService,
+        StudentService $studentService,
+        InternshipService $internshipService,
+        AdvisorService $advisorService,
+        BatchService $batchService,
+        GroupService $groupService,
+        GroupMemberService $groupMemberService,
+        RegistrationService $registrationService,
+        RegistrationDocumentService $registrationDocumentService,
+        InternDocumentService $internDocumentService
+    ) {
         $this->industryService = $industryService;
         $this->studentService = $studentService;
         $this->internshipService = $internshipService;
@@ -32,6 +52,7 @@ class RegistrationStudentController extends Controller
         $this->groupMemberService = $groupMemberService;
         $this->registrationService = $registrationService;
         $this->registrationDocumentService = $registrationDocumentService;
+        $this->internDocumentService = $internDocumentService;
     }
 
     public function index(Request $request)
@@ -41,15 +62,12 @@ class RegistrationStudentController extends Controller
         $activeBatch = $this->batchService->getBatchByStatus('active');
         $batch_id = $activeBatch != null ? $activeBatch->id : '';
 
-        $user_id = Auth::user()->id;
-        // $student_id = $this->studentService->getStudentIdByUserId($user_id);
         $student_id = session('user_bio')->id;
         $registration = $this->registrationService->getRegistrationByStudentId($batch_id, $student_id);
         $step = $registration != null ? $registration->step : '1';
         $registration_id = $registration != null ? $registration->id : '';
 
         $industryRequestData = $this->industryService->getUnconfirmedIndustry();
-        // dd($industryRequestData);
 
         $request->session()->put('registration_id', $registration_id);
 
@@ -57,6 +75,7 @@ class RegistrationStudentController extends Controller
             return view('pages.student.registration', [
                 'industryData' => $industryData,
                 'industryRequestData' => $industryRequestData,
+                'pages' => 'registration',
             ]);
         } else {
             $routeName = "student.registration.step{$step}";
@@ -73,17 +92,9 @@ class RegistrationStudentController extends Controller
             'email' => 'required|unique:industries,email|email',
             'phone_num' => 'required|unique:industries,phone_num|string|min:10|max:14',
         ]);
-        // dd($validatedData);
+
         $this->industryService->addIndustry($validatedData);
         return back();
-
-        // try {
-        //     $this->industryService->addIndustry($validatedData);
-        //     return redirect()->route('student.registration.step2')->with('success', 'Admin added successfully.');
-        // } catch (\Exception $e) {
-        //     // \Log::error($e->getMessage());
-        //     // return back()->withErrors(['error' => 'Failed to add admin.']);
-        // }
     }
 
     public function step2(Request $request)
@@ -92,13 +103,10 @@ class RegistrationStudentController extends Controller
             'internshipLocation' => 'required',
         ]);
         $request->session()->put('internshipLocation.registration', $validatedData['internshipLocation']);
-        // dd(session()->get('internshipLocation.registration'));
 
         $activeBatch = $this->batchService->getBatchByStatus('active');
-        $batch_id = $activeBatch != null ? $activeBatch : '';
+        $batch_id = $activeBatch != null ? $activeBatch->id : '';
 
-        $user_id = Auth::user()->id;
-        // $student_id = $this->studentService->getStudentIdByUserId($user_id);
         $student_id = session('user_bio')->id;
 
         $studentListData = $this->studentService->getNonRegisteredInternList($batch_id);
@@ -108,6 +116,7 @@ class RegistrationStudentController extends Controller
 
         return view('pages.student.registration', [
             'studentListData' => $studentListData,
+            'pages' => 'registration',
         ]);
     }
 
@@ -123,8 +132,6 @@ class RegistrationStudentController extends Controller
 
         $member_id = $validatedData['teamMember'];
         // add data user
-        $user_id = Auth::user()->id;
-        // $student_id = $this->studentService->getStudentIdByUserId($user_id);
         $student_id = session('user_bio')->id;
         $member_id[] = $student_id;
 
@@ -133,6 +140,7 @@ class RegistrationStudentController extends Controller
         return view('pages.student.registration', [
             'locationInternship' => $locationInternship,
             'teamMember' => $teamMember,
+            'pages' => 'registration',
         ]);
     }
 
@@ -144,7 +152,6 @@ class RegistrationStudentController extends Controller
             'start_date' => 'required',
             'end_date' => 'required',
         ]);
-        // dd($validatedData['student_id']);
 
         // create group
         // NAMA GROUP DARIMANA?
@@ -152,7 +159,6 @@ class RegistrationStudentController extends Controller
             'name' => 'Group Testing'
         ];
         $newGroup = $this->groupService->addGroup($groupData);
-        // dd($newGroup->id);
         $group_id = $newGroup->id;
 
         // add group member
@@ -186,7 +192,6 @@ class RegistrationStudentController extends Controller
             'registration_id' => $newRegistration->id,
             'type' => 'surat pengantar',
         ];
-
         $this->registrationDocumentService->addRegistrationDocument($suratPengantarData);
 
         // surat balasan
@@ -194,7 +199,6 @@ class RegistrationStudentController extends Controller
             'registration_id' => $newRegistration->id,
             'type' => 'surat balasan',
         ];
-
         $this->registrationDocumentService->addRegistrationDocument($suratBalasanData);
 
         // ucapan terima kasih
@@ -202,18 +206,16 @@ class RegistrationStudentController extends Controller
             'registration_id' => $newRegistration->id,
             'type' => 'ucapan terima kasih',
         ];
-
         $this->registrationDocumentService->addRegistrationDocument($ucapanTerimaKasihData);
 
-        // $registrationData = $this->registrationService->getRegistrationById('423');
         $registrationData = $this->registrationService->getRegistrationById($newRegistration->id);
-        // dd($registrationData);
 
         $this->registrationService->updateRegistrationStep($newRegistration->id, '4');
 
         return view('pages.student.registration', [
             'registrationData' => $registrationData,
             'teamMember' => $teamMember,
+            'pages' => 'registration',
         ]);
     }
 
@@ -225,6 +227,7 @@ class RegistrationStudentController extends Controller
         return view('pages.student.registration', [
             'registrationData' => $registrationData,
             'teamMember' => $teamMember,
+            'pages' => 'registration',
         ]);
     }
 
@@ -242,10 +245,15 @@ class RegistrationStudentController extends Controller
         $registration_id =  session()->get('registration_id');
         $registrationData = $this->registrationService->getRegistrationById($registration_id);
 
+        $student_id = session('user_bio')->id;
+        $surat_jalan = $this->internDocumentService->getInternDocumentByStudentId($student_id, 'surat jalan');
+        $registrationData->surat_jalan = $surat_jalan != null ? $surat_jalan->url : 'Belum Tersedia';
+
         $this->registrationService->updateRegistrationStep($registration_id, '5');
 
         return view('pages.student.registration', [
             'registrationData' => $registrationData,
+            'pages' => 'registration',
         ]);
     }
 
@@ -253,14 +261,26 @@ class RegistrationStudentController extends Controller
     {
         $registration_id =  session()->get('registration_id');
         $registrationData = $this->registrationService->getRegistrationById($registration_id);
+
+        $student_id = session('user_bio')->id;
+        $surat_jalan = $this->internDocumentService->getInternDocumentByStudentId($student_id, 'surat jalan');
+        // dd($surat_jalan);
+        $registrationData->surat_jalan = $surat_jalan != null ? $surat_jalan->url : 'Belum Tersedia';
+
+
         return view('pages.student.registration', [
             'registrationData' => $registrationData,
+            'pages' => 'registration',
         ]);
     }
 
     public function downloadFile($type, $filename)
     {
-        $path = storage_path('app/registration_document/' . $type . '/' . $filename);
+        if($type = 'surat_jalan'){
+            $path = storage_path('app/intern_documents/surat_jalan/' . $filename);
+        } else{
+            $path = storage_path('app/registration_document/' . $type . '/' . $filename);
+        }
 
         if (file_exists($path)) {
             return response()->download($path);

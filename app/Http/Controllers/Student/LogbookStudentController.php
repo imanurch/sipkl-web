@@ -53,6 +53,7 @@ class LogbookStudentController extends Controller
             // 'studentData' => $studentData,
             'data' => $data,
             // 'internshipListData' => $internshipListData,
+            'pages' => 'logbook',
         ]);
     }
 

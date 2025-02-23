@@ -43,6 +43,7 @@ class IndustryAdvisorController extends Controller
             'data' => $data,            
             'batchData' => $batchData,
             'filters' => $filters,
+            'pages' => 'industry',
         ]);
     }
 }

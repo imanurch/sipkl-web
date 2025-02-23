@@ -46,6 +46,7 @@ class DashboardAdvisorController extends Controller
             // 'surat_tugas' => $surat_tugas,
             'mentee' => $mentee,
             'industry' => $industry,
+            'pages' => 'dashboard',
         ]);
     }
 

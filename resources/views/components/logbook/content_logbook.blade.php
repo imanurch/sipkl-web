@@ -61,7 +61,7 @@
                 {{-- modal --}}
                 <div x-show="modalAction != null" class="form-modal">
                     <form method="POST" id="modalForm" class="form"
-                        :action="`{{ route('advisor.logbook.detail.confirm', ['logbookId' => '__ID__', 'status' => '__STATUS__']) }}`
+                        :action="`{{ auth()->user()->role == 'advisor' ? route('advisor.logbook.detail.confirm', ['logbookId' => '__ID__', 'status' => '__STATUS__']) : route('admin.logbook.detail.confirm', ['logbookId' => '__ID__', 'status' => '__STATUS__']) }}`
                         .replace('__ID__', currentId)
                             .replace('__STATUS__', modalAction)">
                         <div class="form-header">

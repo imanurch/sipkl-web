@@ -36,6 +36,7 @@ class LogbookAdminController extends Controller
         return view('pages.admin.logbook_detail', [
             'internData' => $internData,
             'logbookData' => $logbookData,
+            'pages' => 'logbook',
             // // 'completeOutput' => $completeOutput,
             // // 'incompleteOutput' => $incompleteOutput,
             // 'filters' => $filters,

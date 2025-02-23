@@ -9,25 +9,29 @@ use App\Services\StudentService;
 use App\Services\DepartmentService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
+use App\Services\RegistrationService;
 
 class StudentManagementController extends Controller
 {
     protected $studentService,
         $batchService,
         $departmentService,
-        $userService;
+        $userService,
+        $registrationService;
 
     // Constructor Injection
     public function __construct(
         StudentService $studentService,
         BatchService $batchService,
         DepartmentService $departmentService,
-        UserService $userService
+        UserService $userService,
+        RegistrationService $registrationService
     ) {
         $this->studentService = $studentService;
         $this->batchService = $batchService;
         $this->departmentService = $departmentService;
         $this->userService = $userService;
+        $this->registrationService = $registrationService;
     }
 
     public function index(Request $request)
@@ -51,6 +55,15 @@ class StudentManagementController extends Controller
         // table data
         $data = $this->studentService->getStudent($filters);
 
+        foreach ($data as $dt) {
+            $registration = $this->registrationService->getRegistrationByStudentId($batch_id, $dt->id);
+            if ($registration != null) {
+                $dt->status = $registration->status == '2' ? 'Belum Terdaftar' : 'Terdaftar';
+            } else {
+                $dt->status = 'Belum Terdaftar';
+            }
+        }
+
         // card data
         $registeredStudent = $this->studentService->getStudentByStatusCount($year, $batch_id, 'registered');
         $unregisteredStudent = $this->studentService->getStudentByStatusCount($year, $batch_id, 'unregistered');
@@ -63,6 +76,7 @@ class StudentManagementController extends Controller
             'yearData' => $yearData,
             'departmentData' => $departmentData,
             'filters' => $filters,
+            'pages' => 'studentManagement',
         ]);
     }
 

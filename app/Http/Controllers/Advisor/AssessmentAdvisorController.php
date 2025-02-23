@@ -96,6 +96,7 @@ class AssessmentAdvisorController extends Controller
             'filters' => $filters,
             'countAssessed' => $countAssessed,
             'countNotAssessed' => $countNotAssessed,
+            'pages' => 'assessment',
         ]);
     }
 

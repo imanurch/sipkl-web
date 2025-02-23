@@ -13,16 +13,18 @@
 
     @if ($isIntern == true)
         <div class="space-y-4">
-            <form action="{{ route('student.finalReport.store') }}" method="POST" enctype="multipart/form-data">
-                @csrf
-                <div class="flex space-x-3 place-items-center">
-                    <h6 class="w-28 text-xs-reguler">Unggah File</h6>
-                    <div>
-                        <input name="laporan_akhir" type="file" class="input">
+            @if ($data == null || $data->isAssessed == false)
+                <form action="{{ route('student.finalReport.store') }}" method="POST" enctype="multipart/form-data">
+                    @csrf
+                    <div class="flex space-x-3 place-items-center">
+                        <h6 class="w-28 text-xs-reguler">Unggah File</h6>
+                        <div>
+                            <input name="laporan_akhir" type="file" class="input">
+                        </div>
+                        <button type="submit" class="btn btn-xs btn-default-fill">Kirim File</button>
                     </div>
-                    <button type="submit" class="btn btn-xs btn-default-fill">Kirim File</button>
-                </div>
-            </form>
+                </form>
+            @endif
             @if ($data != null)
                 <div class="flex place-items-center space-x-2">
                     <span class="text-xs-reguler">Lihat File (Diunggah pada {{ $data->updated_at }}) :</span>
@@ -53,6 +55,14 @@
                 </div>
             @endif
         </div>
+    @else
+        <x-not_found_empty_state>
+            <x-slot name="title">Unggah Laporan Akhir tidak tersedia</x-slot>
+            <x-slot name="desc">Lakukan pendaftaran PKL terlebih dahulu ya!</x-slot>
+            <x-slot name="cta">
+                <a href="{{ route('student.registration') }}" class="btn btn-xs btn-default-fill">Daftar PKL</a>
+            </x-slot>
+        </x-not_found_empty_state>
     @endif
 
 @endsection

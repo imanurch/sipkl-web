@@ -61,6 +61,7 @@ class AdvisorManagementController extends Controller
             'batchData' => $batchData,
             'departmentData' => $departmentData,
             'filters' => $filters,
+            'pages' => 'advisorManagement',
         ]);
     }
 

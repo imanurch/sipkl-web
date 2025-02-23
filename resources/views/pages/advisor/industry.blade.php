@@ -54,4 +54,11 @@
         <x-slot name="pagination">{{ $data->links() }}</x-slot>
     </x-table.table>
 
+    {{-- empty state --}}
+    @if (count($data) == 0)
+    <x-not_found_empty_state>
+        <x-slot name="desc">Belum ada industri dari siswa bimbingan PKL</x-slot>
+    </x-not_found_empty_state>
+@endif
+
 @endsection

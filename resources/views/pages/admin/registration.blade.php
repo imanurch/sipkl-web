@@ -77,11 +77,11 @@
             <x-slot name="tHeader">
                 <th>NO</th>
                 <th>KELOMPOK</th>
+                <th>ANGGOTA</th>
                 <th>WAKTU</th>
                 <th>LOKASI PKL</th>
                 <th>FILE PENGANTAR</th>
                 <th>FILE BUKTI DITERIMA</th>
-                {{-- <th>DETAIL</th> --}}
                 <th>STATUS</th>
                 <th>KONFIRMASI</th>
                 <th>AKSI</th>
@@ -89,9 +89,16 @@
             <x-slot name="tBody">
                 @foreach ($data as $dt)
                     <tr>
-                        <td>{{ $dt->id }}</td>
+                        {{-- <td>{{ $dt->id }}</td> --}}
                         <td class="text-center">{{ $data->firstItem() + $loop->index }}</td>
                         <td>{{ $dt->group->name }}</td>
+                        <td>
+                            <ul>
+                                @foreach ($dt->group->groupMember as $member)
+                                    <li>{{ $loop->iteration }}. {{ $member->student->name ?? '' }}</li>
+                                @endforeach
+                            </ul>
+                        </td>
                         <td>{{ $dt->start_date }} s/d {{ $dt->end_date }}</td>
                         <td>{{ $dt->industry->name ?? '' }}</td>
                         @if ($dt->registrationDocument)
@@ -152,9 +159,10 @@
                                 @endif
                             @endforeach
                         @endif
-
+                        @php
+                            $dt->member = $dt->group->groupMember->pluck('student.name')->toArray();
+                        @endphp
                         <x-table.action_table edit="hidden" btnInput="hidden" :data="$dt"></x-table.action_table>
-                        {{-- <x-table.action_confirm_table></x-table.action_confirm_table> --}}
                     </tr>
                 @endforeach
             </x-slot>
@@ -172,18 +180,8 @@
                     </div>
                     <div class="input-group">
                         <label class="input-label" for="">Anggota Kelompok</label>
-                        <div class="input">
-                            <ul>
-                                {{-- <input x-for="(dt, index) in (modalAction != null ? dataId.group.groupMember : [])"
-                                    :key="index" :value="dt.student.name"> --}}
-
-                                {{-- @if ($dt ?? '')
-                                    @foreach ($dt->group->groupMember as $member)
-                                        <li>{{ $loop->iteration }}. {{ $member->student->name }}</li>
-                                    @endforeach
-                                @endif --}}
-                            </ul>
-                        </div>
+                        <input name="member" class="input" type="text" disabled
+                            :value="modalAction != null ? dataId.member : ''">
                     </div>
                     <div class="input-group">
                         <label class="input-label" for="">Waktu</label>
@@ -202,7 +200,8 @@
         {{-- modal --}}
         {{-- accept modal confirm --}}
         <div x-show="modalConfirm=='accept'" class="confirm-modal">
-            <div class="place-self-center bg-neutral-0 border rounded justify-center w-80 border-success-400">
+            <div @click.away="modalConfirm = null"
+                class="bg-neutral-0 border rounded justify-center w-80 border-success-400">
                 <h6 class="text-xs-reguler py-5 px-6 text-center max-w-72">Apakah Anda Yakin
                     Ingin <span class="text-xs-medium text-success-800">Menerima Registrasi PKL
                         Ini?</span>
@@ -218,7 +217,8 @@
 
         {{-- reject modal confirm --}}
         <div x-show="modalConfirm=='reject'" class="confirm-modal">
-            <div class="place-self-center bg-neutral-0 border rounded justify-center w-80 border-error-400">
+            <div @click.away="modalConfirm = null"
+                class="bg-neutral-0 border rounded justify-center w-80 border-error-400">
                 <h6 class="text-xs-reguler py-5 px-6 text-center max-w-72">Apakah Anda Yakin
                     Ingin <span class="text-xs-medium text-error-800">Menolak Registrasi PKL
                         Ini?</span>
@@ -232,6 +232,13 @@
             </div>
         </div>
     </div>
+
+    {{-- empty state --}}
+    @if (count($data) == 0)
+        <x-not_found_empty_state>
+            <x-slot name="desc">Belum ada registrasi PKL yang harus dikonfirmasi</x-slot>
+        </x-not_found_empty_state>
+    @endif
 
 @endsection
 

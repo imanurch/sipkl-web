@@ -54,6 +54,7 @@ class InternshipAdminController extends Controller
             'filters' => $filters,
             'batchData' => $batchData,
             'advisorListData' => $advisorListData,
+            'pages' => 'intern',
         ]);
     }
 

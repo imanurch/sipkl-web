@@ -39,6 +39,7 @@ class DashboardAdminController extends Controller
             'advisor' => $advisor,
             'industry' => $industry,
             'registration' => $registration,
+            'pages' => 'dashboard',
         ]);
     }
 }

@@ -160,16 +160,65 @@
         LAYOUT
     */
     .layout {
-        @apply flex p-5 space-x-5 bg-[#F4F6F7];
+        @apply flex;
     }
     .layout-sidebar {
-        /* @apply sticky h-96 */
+        @apply bg-neutral-50 border-e border-neutral-100;
     }
     .layout-content {
-        @apply w-full max-w-full overflow-x-hidden min-h-screen flex flex-col place-self-start space-y-4 py-7 px-9 bg-neutral-0 rounded;
+        @apply w-full min-h-screen flex flex-col place-self-start space-y-4 py-6 px-9;
     }
     .layout-card {
         @apply flex flex-wrap gap-2;
+    }
+
+    /* 
+        SIDEBAR 
+    */
+    .sidebar {
+        @apply flex flex-col space-y-4;
+    }
+    .sidebar-head {
+        @apply h-14 flex px-8 space-x-2 place-items-center border-b border-neutral-100 text-md-semibold;
+        img {
+            @apply size-6;
+        }
+    }
+    .sidebar-body {
+        @apply flex flex-col space-y-3 py-5 px-4;
+    }
+    .sidebar-label {
+        @apply w-44 py-3 px-2 text-xs-medium text-neutral-600;
+    }
+    .sidebar-menu {
+        @apply w-48 flex space-x-2 py-2 px-4 rounded-xs place-items-center text-sm-reguler text-neutral-500;
+        svg {
+            @apply size-5 stroke-neutral-600;
+        }
+    }
+    .sidebar-menu:hover{
+        @apply text-brand-600;
+        svg{
+            @apply stroke-brand-700;
+        }
+    }
+    .sidebar-menu-active{
+        @apply text-neutral-0 bg-brand-600;
+        svg{
+            @apply stroke-neutral-0;
+        }
+    }
+    .sidebar-menu-active:hover{
+        @apply text-neutral-0 bg-brand-600;
+        svg{
+            @apply stroke-neutral-0;
+        }
+    }
+    .user-menu {
+        @apply flex space-x-3 py-2 px-5 place-items-center text-xs-reguler text-neutral-400 hover:bg-neutral-50;
+        svg {
+            @apply size-4 stroke-neutral-600;
+        }
     }
 
     /* 
@@ -179,7 +228,7 @@
         @apply flex place-items-center space-x-2 text-xs-medium;
     }
     .tag-status-icon {
-        @apply rounded p-1;
+        @apply rounded-full p-1;
         svg {
             @apply size-3 stroke-neutral-0;
         }
@@ -214,19 +263,19 @@
 
     /* size */
     .btn-md {
-        @apply text-md-reguler hover:text-md-medium;
+        @apply text-md-reguler;
         svg {
             @apply size-5;
         }
     }
     .btn-sm {
-        @apply text-sm-reguler hover:text-sm-medium;
+        @apply text-sm-reguler;
         svg {
             @apply size-4;
         }
     }
     .btn-xs {
-        @apply text-xs-reguler hover:text-xs-medium;
+        @apply text-xs-reguler;
         svg {
             @apply size-3.5;
         }
@@ -304,7 +353,7 @@
         CARD
     */
     .card {
-        @apply border rounded border-neutral-200 flex space-x-3 py-3 px-4 place-items-center;
+        @apply border rounded border-neutral-100 flex space-x-3 py-3 px-4 place-items-center;
         svg {
             @apply size-5;
         }
@@ -323,13 +372,13 @@
         INPUT
     */
     .input-group {
-        @apply flex flex-col space-y-3;
+        @apply flex flex-col space-y-2;
     }
     .input-label {
         @apply text-xs-medium text-neutral-800;
     }
     .input {
-        @apply border border-neutral-200 rounded-sm py-2 px-5 text-xs-reguler text-neutral-800 placeholder:text-xs-reguler placeholder:text-neutral-300 focus:outline-none focus:border-brand-600 disabled:bg-neutral-50;
+        @apply border border-neutral-200 rounded py-2 px-5 text-xs-reguler text-neutral-800 placeholder:text-xs-reguler placeholder:text-neutral-300 focus:outline-none focus:border-brand-600 disabled:bg-neutral-50;
     }
     /* .input-disable {
         @apply bg-neutral-50;
@@ -351,7 +400,7 @@
         FORM
     */
     .form-modal {
-        @apply h-screen w-screen fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 overflow-y-auto bg-neutral-100 bg-opacity-40 backdrop-blur-sm;
+        @apply h-screen w-screen fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 overflow-y-auto bg-neutral-800 bg-opacity-50;
     }
     .form {
         /* @apply max-w-[60%] w-[30rem] my-10 place-self-center space-y-9 rounded border border-neutral-200 bg-neutral-0 fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2; */
@@ -390,43 +439,6 @@
     }
 
     /* 
-        SIDEBAR 
-    */
-    .sidebar {
-        @apply flex flex-col space-y-4;
-    }
-    .sidebar-head {
-        @apply flex space-x-2 justify-center py-5 place-items-center border-b border-neutral-200 text-lg-bold text-brand-500;
-        img {
-            @apply w-9;
-        }
-    }
-    .sidebar-body {
-        @apply flex flex-col space-y-3 py-5 px-4;
-    }
-    .sidebar-label {
-        @apply w-44 py-1 px-2 text-xs-medium text-neutral-600;
-    }
-    .sidebar-menu {
-        @apply w-48 flex space-x-2 py-2 px-4 rounded place-items-center text-sm-reguler text-neutral-400 hover:bg-neutral-0;
-        svg {
-            @apply size-5 stroke-neutral-600;
-        }
-    }
-    .sidebar-menu-active {
-        @apply bg-brand-500 text-neutral-0;
-        svg {
-            @apply stroke-neutral-0;
-        }
-    }
-    .menu-logout {
-        @apply flex justify-center space-x-3 py-2 px-5 border rounded place-items-center text-xs-reguler text-neutral-400;
-        svg {
-            @apply size-4 stroke-neutral-600;
-        }
-    }
-
-    /* 
         TABLE
     */
     .table {
@@ -458,6 +470,6 @@
 
     /* dialog box / confirm */
     .confirm-modal {
-        @apply h-screen w-screen fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-neutral-100 bg-opacity-40 backdrop-blur-sm;
+        @apply fixed inset-0 flex items-center justify-center bg-neutral-800 bg-opacity-50;
     }
 }
