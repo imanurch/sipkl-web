@@ -71,7 +71,8 @@
                                 <x-table.action_btn_table
                                     href="{{ route('admin.output.download.finalReport', ['filename' => $doc->url]) }}"
                                     name="Lihat"></x-table.action_btn_table>
-                            @else
+                                @break
+                            @elseif($loop->last)
                                 <td>Belum Tersedia</td>
                             @endif
                         @endforeach
