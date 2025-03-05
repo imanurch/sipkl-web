@@ -103,6 +103,7 @@ Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function
 
     // advisor management
     Route::get('advisorManagement', [AdvisorManagementController::class, 'index'])->name('advisorManagement');
+    Route::get('advisorManagement/downloadTemplate', [AdvisorManagementController::class, 'downloadTemplateFile'])->name('advisorManagement.downloadTemplateFile');
     Route::post('advisorManagement/import', [AdvisorManagementController::class, 'import'])->name('advisorManagement.import');
     Route::post('advisorManagement', [AdvisorManagementController::class, 'store'])->name('advisorManagement.store');
     Route::patch('advisorManagement/{id}', [AdvisorManagementController::class, 'update'])->name('advisorManagement.update');
@@ -110,6 +111,7 @@ Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function
 
     // student management
     Route::get('studentManagement', [StudentManagementController::class, 'index'])->name('studentManagement');
+    Route::get('studentManagement/downloadTemplate', [StudentManagementController::class, 'downloadTemplateFile'])->name('studentManagement.downloadTemplateFile');
     Route::post('studentManagement/import', [StudentManagementController::class, 'import'])->name('studentManagement.import');
     Route::post('studentManagement', [StudentManagementController::class, 'store'])->name('studentManagement.store');
     Route::patch('studentManagement/{id}', [StudentManagementController::class, 'update'])->name('studentManagement.update');
@@ -117,6 +119,7 @@ Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function
 
     // industry management
     Route::get('industryManagement', [IndustryManagementController::class, 'index'])->name('industryManagement');
+    Route::get('industryManagement/downloadTemplate', [IndustryManagementController::class, 'downloadTemplateFile'])->name('industryManagement.downloadTemplateFile');
     Route::post('industryManagement/import', [IndustryManagementController::class, 'import'])->name('industryManagement.import');
     Route::post('industryManagement', [IndustryManagementController::class, 'store'])->name('industryManagement.store');
     Route::patch('industryManagement/{id}', [IndustryManagementController::class, 'update'])->name('industryManagement.update');

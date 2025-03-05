@@ -209,7 +209,8 @@ class StudentManagementController extends Controller
 
         // Load file Excel
         $spreadsheet = IOFactory::load($file->getPathname());
-        $worksheet = $spreadsheet->getActiveSheet();
+        // $worksheet = $spreadsheet->getActiveSheet();
+        $worksheet = $spreadsheet->getSheetByName('Data');
         $rows = $worksheet->toArray();
 
         try {
@@ -272,5 +273,16 @@ class StudentManagementController extends Controller
             Toastr::addError('Impor data siswa gagal!');
         }
         return redirect()->back();
+    }
+
+    public function downloadTemplateFile()
+    {
+        $filePath = storage_path('app/public/files/template_import_student.xlsx');
+
+        if (file_exists($filePath)) {
+            return response()->download($filePath);
+        } else {
+            Toastr::addError('File tidak ditemukan');
+        }
     }
 }

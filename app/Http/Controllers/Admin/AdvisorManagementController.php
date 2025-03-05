@@ -186,7 +186,8 @@ class AdvisorManagementController extends Controller
 
         // Load file Excel
         $spreadsheet = IOFactory::load($file->getPathname());
-        $worksheet = $spreadsheet->getActiveSheet();
+        // $worksheet = $spreadsheet->getActiveSheet();
+        $worksheet = $spreadsheet->getSheetByName('Data');
         $rows = $worksheet->toArray();
 
         try {
@@ -233,8 +234,6 @@ class AdvisorManagementController extends Controller
                         'phone_num' => $row[6],
                     ];
 
-                    // dd($userData, $advisorData);
-
                     $this->advisorService->addAdvisor($advisorData);
                 }
             });
@@ -243,5 +242,16 @@ class AdvisorManagementController extends Controller
             Toastr::addError('Impor data guru gagal!');
         }
         return redirect()->back();
+    }
+
+    public function downloadTemplateFile()
+    {
+        $filePath = storage_path('app/public/files/template_import_advisor.xlsx');
+
+        if (file_exists($filePath)) {
+            return response()->download($filePath);
+        } else {
+            Toastr::addError('File tidak ditemukan');
+        }
     }
 }
