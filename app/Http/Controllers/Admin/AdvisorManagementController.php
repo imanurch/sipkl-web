@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use App\Services\DepartmentService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use Flasher\Toastr\Laravel\Facade\Toastr;
 
 class AdvisorManagementController extends Controller
@@ -171,6 +172,75 @@ class AdvisorManagementController extends Controller
             Toastr::addSuccess('Data guru pembimbing berhasil dihapus!');
         } catch (\Exception $e) {
             Toastr::addError('Data guru pembimbing gagal dihapus!');
+        }
+        return redirect()->back();
+    }
+
+    public function import(Request $request)
+    {
+        $validatedData = $request->validate([
+            'import_file' => 'required|mimes:xlsx,xml,xls',
+        ]);
+
+        $file = $request->file('import_file');
+
+        // Load file Excel
+        $spreadsheet = IOFactory::load($file->getPathname());
+        $worksheet = $spreadsheet->getActiveSheet();
+        $rows = $worksheet->toArray();
+
+        try {
+            DB::transaction(function () use ($rows, $request) {
+                foreach ($rows as $index => $row) {
+                    if ($index == 0) continue;
+
+                    $validatedData = $request->validate([
+                        'name' => $row[1],
+                        'nip' => $row[2],
+                        'department_id' => $row[3],
+                        'username' => $row[4],
+                        'email' => $row[5],
+                        'phone_num' => $row[6],
+                        'password' => $row[7],
+                    ], [
+                        'name' => 'required|string',
+                        'nip' => 'required|size:18',
+                        'department_id' => 'required',
+                        'username' => 'required|string',
+                        'email' => 'required|email|unique:users,email',
+                        'phone_num' => 'required|string|min:10|max:14|unique:advisors,phone_num',
+                        'password' => 'nullable|string|size:8',
+                    ]);
+
+                    $row[3] = $row[3] == 'K3R' ? '1' : ($row[3] == 'DPIB' ? '2' : ($row[3] == 'RPL' ? '3' : ''));
+                    $row[7] = Hash::make($row[7]);
+
+                    $userData = [
+                        'username' => $row[4],
+                        'email' => $row[5],
+                        'password' => $row[7],
+                        'role' => 'advisor',
+                    ];
+
+                    $newUser = $this->userService->addUser($userData);
+
+                    $advisorData = [
+                        'user_id' => $newUser->id ?? '',
+                        'name' => $row[1],
+                        'nip' => $row[2],
+                        'department_id' => $row[3],
+                        'username' => $row[4],
+                        'phone_num' => $row[6],
+                    ];
+
+                    // dd($userData, $advisorData);
+
+                    $this->advisorService->addAdvisor($advisorData);
+                }
+            });
+            Toastr::addSuccess('Impor data guru berhasil!');
+        } catch (\Exception $e) {
+            Toastr::addError('Impor data guru gagal!');
         }
         return redirect()->back();
     }

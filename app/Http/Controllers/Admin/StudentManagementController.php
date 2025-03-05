@@ -11,6 +11,7 @@ use App\Services\DepartmentService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use App\Services\RegistrationService;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use Flasher\Toastr\Laravel\Facade\Toastr;
 
 class StudentManagementController extends Controller
@@ -194,6 +195,81 @@ class StudentManagementController extends Controller
             Toastr::addSuccess('Data siswa berhasil dihapus!');
         } catch (\Exception $e) {
             Toastr::addError('Data siswa gagal dihapus!');
+        }
+        return redirect()->back();
+    }
+
+    public function import(Request $request)
+    {
+        $validatedData = $request->validate([
+            'import_file' => 'required|mimes:xlsx,xml,xls',
+        ]);
+
+        $file = $request->file('import_file');
+
+        // Load file Excel
+        $spreadsheet = IOFactory::load($file->getPathname());
+        $worksheet = $spreadsheet->getActiveSheet();
+        $rows = $worksheet->toArray();
+
+        try {
+            DB::transaction(function () use ($rows, $request) {
+                foreach ($rows as $index => $row) {
+                    if ($index == 0) continue;
+
+                    $validatedData = $request->validate([
+                        'name' => $row[1],
+                        'nisn' => $row[2],
+                        'gender' => $row[3],
+                        'department_id' => $row[4],
+                        'year' => $row[5],
+                        'username' => $row[6],
+                        'email' => $row[7],
+                        'phone_num' => $row[8],
+                        'password' => $row[9],
+                    ], [
+                        'name' => 'required|string',
+                        'nisn' => 'required|size:10|unique:students,nisn',
+                        'gender' => 'required',
+                        'department_id' => 'required',
+                        'year' => 'required',
+                        'username' => 'required',
+                        'email' => 'required|unique:users,email',
+                        'phone_num' => 'required|string|min:10|max:14|unique:students,phone_num,',
+                        'password' => 'required|string|size:8',
+                    ]);
+
+                    $row[3] = $row[3] == 'Laki-Laki' ? 'men' : 'women';
+                    $row[4] = $row[4] == 'K3R' ? '1' : ($row[4] == 'DPIB' ? '2' : ($row[4] == 'RPL' ? '3' : ''));
+                    $row[9] = Hash::make($row[9]);
+
+                    $userData = [
+                        'username' => $row[6],
+                        'email' => $row[7],
+                        'password' => $row[9],
+                        'role' => 'student',
+                    ];
+
+                    $newUser = $this->userService->addUser($userData);
+
+                    $studentData = [
+                        'user_id' => $newUser->id ?? '',
+                        'name' => $row[1],
+                        'nisn' => $row[2],
+                        'gender' => $row[3],
+                        'department_id' => $row[4],
+                        'year' => $row[5],
+                        'phone_num' => $row[8],
+                    ];
+
+                    // dd($userData, $studentData);
+
+                    $this->studentService->addStudent($studentData);
+                }
+            });
+            Toastr::addSuccess('Impor data siswa berhasil!');
+        } catch (\Exception $e) {
+            Toastr::addError('Impor data siswa gagal!');
         }
         return redirect()->back();
     }

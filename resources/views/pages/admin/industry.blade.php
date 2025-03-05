@@ -41,7 +41,7 @@
         </x-card>
     </div>
 
-    <div x-data="{ tabs: 'unconfirmed' }" class="space-y-4">
+    <div x-data="{ tabs: 'partner' }" class="space-y-4">
         {{-- tabs --}}
 
         <div class="flex w-full justify-between border-b border-neutral-100">
@@ -147,6 +147,7 @@
                 {{-- <x-slot name="tableTitle">Industri Mitra</x-slot> --}}
                 <x-slot name="filterActionForm">industryManagement</x-slot>
                 <x-slot name="btnAdd">
+                    <x-table.import></x-table.import>
                     <x-table.add_data></x-table.add_data>
                 </x-slot>
                 <x-slot name="filter">
@@ -196,8 +197,9 @@
                 {{-- pagination --}}
                 <x-slot name="pagination">{{ $partnerIndustryData->links() }}</x-slot>
             </x-table.table>
-            {{-- form --}}
-            <div x-show="modalAction != null" class="form-modal">
+
+            {{-- action form --}}
+            <div x-show="modalAction != null && modalAction !='isImport'" class="form-modal">
                 <x-form>
                     <x-slot name="formTitle">Data Industri</x-slot>
                     <x-slot name="formBody">
@@ -230,6 +232,31 @@
                 </x-form>
             </div>
 
+            {{-- import form --}}
+            <div x-show="modalAction=='isImport'" class="form-modal">
+                <x-form action="{{ route('admin.industryManagement.import') }}">
+                    <x-slot name="formTitle">Impor Data Industri</x-slot>
+                    <x-slot name="formBody">
+                        <div class="input-group">
+                            <label class="input-label" for="">Unggah File</label>
+                            <input class="input" type="file" name="import_file" id="" required>
+                        </div>
+                        <div class="flex place-items-center">
+                            <span class="text-xs-reguler">Template Impor Data :</span>
+                            <button class="btn btn-xs btn-default-clear">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                    viewBox="0 0 14 14" fill="none">
+                                    <path
+                                        d="M12.25 8.75V9.45C12.25 10.4301 12.25 10.9201 12.0593 11.2945C11.8915 11.6238 11.6238 11.8915 11.2945 12.0593C10.9201 12.25 10.4301 12.25 9.45 12.25H4.55C3.56991 12.25 3.07986 12.25 2.70552 12.0593C2.37623 11.8915 2.10852 11.6238 1.94074 11.2945C1.75 10.9201 1.75 10.4301 1.75 9.45V8.75M9.91667 5.83333L7 8.75M7 8.75L4.08333 5.83333M7 8.75V1.75"
+                                        stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" />
+                                </svg>
+                                <span>Unduh Template Impor</span>
+                            </button>
+                        </div>
+                    </x-slot>
+                </x-form>
+            </div>
+
             {{-- empty state --}}
             @if (count($partnerIndustryData) == 0)
                 <x-not_found_empty_state>
@@ -240,7 +267,6 @@
                 </x-not_found_empty_state>
             @endif
         </div>
-
 
         {{-- rejected --}}
         <div x-show="tabs=='rejected'">

@@ -5,8 +5,10 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Services\BatchService;
 use App\Services\IndustryService;
+use Illuminate\Support\Facades\DB;
 use App\Services\DepartmentService;
 use App\Http\Controllers\Controller;
+use PhpOffice\PhpSpreadsheet\IOFactory;
 use Flasher\Toastr\Laravel\Facade\Toastr;
 
 class IndustryManagementController extends Controller
@@ -118,6 +120,54 @@ class IndustryManagementController extends Controller
             Toastr::addSuccess('Data industri berhasil dihapus!');
         } catch (\Exception $e) {
             Toastr::addError('Data industri gagal dihapus!');
+        }
+        return redirect()->back();
+    }
+
+    public function import(Request $request)
+    {
+        $validatedData = $request->validate([
+            'import_file' => 'required|mimes:xlsx,xml,xls',
+        ]);
+
+        $file = $request->file('import_file');
+
+        // Load file Excel
+        $spreadsheet = IOFactory::load($file->getPathname());
+        $worksheet = $spreadsheet->getActiveSheet();
+        $rows = $worksheet->toArray();
+
+        try {
+            DB::transaction(function () use ($rows, $request) {
+                foreach ($rows as $index => $row) {
+                    if ($index == 0) continue;
+
+                    $validatedData = $request->validate([
+                        'name' => $row[1],
+                        'address' => $row[2],
+                        'email' => $row[3],
+                        'phone_num' => $row[4],
+                    ], [
+                        'name' => 'required|string',
+                        'address' => 'required|string',
+                        'email' => 'required|unique:industries,email|email',
+                        'phone_num' => 'required|unique:industries,phone_num|string|min:10|max:14',
+                    ]);
+
+                    $data = [
+                        'name' => $row[1],
+                        'address' => $row[2],
+                        'email' => $row[3],
+                        'phone_num' => $row[4],
+                        'status' => '1',
+                    ];
+
+                    $this->industryService->addIndustry($data);
+                }
+            });
+            Toastr::addSuccess('Impor data industri berhasil!');
+        } catch (\Exception $e) {
+            Toastr::addError('Impor data industri gagal!');
         }
         return redirect()->back();
     }

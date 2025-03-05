@@ -1,5 +1,5 @@
 {{-- <form class="form" method="POST" :action="`${window.location.pathname}${modalAction=='isEdit' ? `-update/${id}` : (modalAction=='isDelete' ? `-delete/${id}` : '.store')}`" > --}}
-<form class="form" method="POST" id="modalForm" @click.away="modalAction=null">
+<form class="form" method="POST" id="modalForm" @click.away="modalAction=null" action="{{ $action ?? '' }}" enctype="multipart/form-data">
     <div class="form-header">
         @csrf
         <template x-if="modalAction=='isEdit'">
