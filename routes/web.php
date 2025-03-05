@@ -87,6 +87,10 @@ Route::get('content', function () {
 
 // save for later
 
+Route::get('doc', function () {
+    return view('document_templates/surat_pengantar_template');
+});
+
 Route::get('sipkl', [AuthenticationController::class, 'index'])->name('sipkl');
 Route::post('sipkl/login', [AuthenticationController::class, 'login'])->name('sipkl.login');
 Route::get('sipkl/logout', [AuthenticationController::class, 'logout'])->name('sipkl.logout');

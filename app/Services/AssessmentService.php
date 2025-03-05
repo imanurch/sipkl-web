@@ -20,6 +20,35 @@ class AssessmentService
         return $this->assessmentRepository->getAssessment($filters);
     }
 
+    public function getNotAssessedCount()
+    {
+        return $this->assessmentRepository->countNotAssessed();
+    }
+
+    public function getAssessedCount($status)
+    {
+        $data = $this->assessmentRepository->getAssessed();
+
+        $countPass = 0;
+        $countNotPass = 0;
+        foreach ($data as $dt) {
+            $score = round((($dt->industry_score) + ($dt->advisor_score) + ($dt->final_test_score)) / 3, 2);
+
+            // cek kelulusan
+            if ($score >= 75) {
+                $countPass += 1;
+            } else {
+                $countNotPass += 1;
+            }
+        }
+
+        if ($status == 'pass') {
+            return $countPass;
+        } else {
+            return $countNotPass;
+        }
+    }
+
     public function getAssessmentByAdvisor($advisor_id, $filters = [])
     {
         return $this->assessmentRepository->getAssessmentByAdvisor($advisor_id, $filters);

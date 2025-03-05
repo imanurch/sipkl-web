@@ -35,3 +35,6 @@ yarn-error.log
 # migrations
 # factories
 # seeders
+routes/web.php
+app/Http/Controllers/Advisor/MonitoringAdvisorController.php
+resources/views/document_templates/surat_pengantar_template.blade.php

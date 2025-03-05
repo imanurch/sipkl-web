@@ -72,7 +72,8 @@ class MonitoringAdvisorController extends Controller
         $path = storage_path('app/monitoring_documents/' . $formattedString . '/' . $filename);
 
         if (file_exists($path)) {
-            return response()->download($path);
+            return response()->file($path);
+            // return response()->download($path);
         } else {
             Toastr::addError('File tidak ditemukan!');
             return redirect()->back();

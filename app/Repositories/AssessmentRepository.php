@@ -32,6 +32,21 @@ class AssessmentRepository
         )->paginate(5);
     }
 
+    public function countNotAssessed()
+    {
+        return Assessment::whereNull('industry_score')->orWhereNull('advisor_score')->orWhereNull('final_test_score')->count();
+    }
+
+    public function getAssessed()
+    {
+        return Assessment::whereNotNull('industry_score')->orWhereNotNull('advisor_score')->orWhereNotNull('final_test_score')->get();
+    }
+
+    public function countNotPass()
+    {
+        return Assessment::whereNull('industry_score')->orWhereNull('advisor_score')->orWhereNull('final_test_score')->count();
+    }
+
     public function getAssessmentByAdvisor($advisor_id, $filters = [])
     {
         // return Assessment::whereHas('internships', function ($query) use ($advisor_id) {

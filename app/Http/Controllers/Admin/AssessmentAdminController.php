@@ -47,9 +47,9 @@ class AssessmentAdminController extends Controller
         ];
 
         // card
-        $countNotAssessed = 0;
-        $countPass = 0;
-        $countNotPass = 0;
+        $countNotAssessed = $this->assessmentService->getNotAssessedCount();
+        $countPass = $this->assessmentService->getAssessedCount('pass');
+        $countNotPass = $this->assessmentService->getAssessedCount('notPass');
 
         // table data
         $data = $this->assessmentService->getAssessment($filters);
@@ -62,13 +62,9 @@ class AssessmentAdminController extends Controller
                 // cek kelulusan
                 if($dt->internship_score >= 75){
                     $dt->internship_status = 'Lulus';
-                    $countPass +=1;
                 } else{
                     $dt->internship_status = 'Tidak Lulus';
-                    $countNotPass +=1;
                 }
-            } else{
-                $countNotAssessed +=1;
             }
 
             // cek final report
@@ -85,7 +81,6 @@ class AssessmentAdminController extends Controller
             } else {
                 $dt->isCompleteOutput = 'Tidak Lengkap';
             }
-            // dd($dt->isCompleteOutput);
         }
 
         return view('pages.admin.assessment', [
