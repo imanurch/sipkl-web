@@ -4,14 +4,15 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use App\Services\AdminService;
+use App\Services\BatchService;
+use App\Services\AdvisorService;
 use App\Services\StudentService;
+use App\Services\IndustryService;
 use App\Services\InternshipService;
 use App\Http\Controllers\Controller;
-use App\Services\AdvisorService;
-use App\Services\BatchService;
-use App\Services\IndustryService;
-use App\Services\RegistrationService;
 use Illuminate\Support\Facades\Hash;
+use App\Services\RegistrationService;
+use Flasher\Toastr\Laravel\Facade\Toastr;
 
 class BatchManagementController extends Controller
 {
@@ -41,36 +42,34 @@ class BatchManagementController extends Controller
 
     public function store(Request $request)
     {
-
-        $validatedData = $request->validate([
-            'name' => 'required',
-            'year' => 'required',
-        ]);
-
         try {
+            $validatedData = $request->validate([
+                'name' => 'required',
+                'year' => 'required',
+            ]);
+
             $this->batchService->createBatch($validatedData);
-            return redirect()->route('batch')->with('success', 'batch added successfully.');
+            Toastr::addSuccess('Data batch berhasil ditambah!');
         } catch (\Exception $e) {
-            // \Log::error($e->getMessage());
-            return back()->withErrors(['error' => 'Failed to add batch.']);
+            Toastr::addError('Data batch gagal ditambah!');
         }
+        return redirect()->back();
     }
 
     public function update(Request $request, $id)
     {
-        // dd($request->all());
-        $validatedData = $request->validate([
-            'name' => 'required',
-            'year' => 'required',
-        ]);
-
         try {
+            $validatedData = $request->validate([
+                'name' => 'required',
+                'year' => 'required',
+            ]);
+
             $this->batchService->updateBatch($id, $validatedData);
-            return redirect()->route('batch')->with('success', 'batch added successfully.');
+            Toastr::addSuccess('Data batch berhasil diubah!');
         } catch (\Exception $e) {
-            // \Log::error($e->getMessage());
-            return back()->withErrors(['error' => 'Failed to add batch.']);
+            Toastr::addError('Data batch gagal diubah!');
         }
+        return redirect()->back();
     }
 
     public function setActiveBatch($id)
@@ -83,10 +82,10 @@ class BatchManagementController extends Controller
     {
         try {
             $this->batchService->deleteBatch($id);
-            return redirect()->route('batch')->with('success', 'batch deleted successfully.');
+            Toastr::addSuccess('Data batch berhasil dihapus!');
         } catch (\Exception $e) {
-            // \Log::error($e->getMessage());
-            return back()->withErrors(['error' => 'Failed to delete batch.']);
+            Toastr::addError('Data batch gagal dihapus!');
         }
+        return redirect()->back();
     }
 }

@@ -5,12 +5,13 @@ namespace App\Http\Controllers\Admin;
 use Log;
 use Illuminate\Http\Request;
 use App\Services\AdminService;
+use App\Services\BatchService;
+use App\Services\LogbookService;
 use App\Services\AssessmentService;
 use App\Http\Controllers\Controller;
-use App\Services\BatchService;
-use App\Services\InternDocumentService;
-use App\Services\LogbookService;
 use Illuminate\Support\Facades\Hash;
+use App\Services\InternDocumentService;
+use Flasher\Toastr\Laravel\Facade\Toastr;
 
 class AssessmentAdminController extends Controller
 {
@@ -100,19 +101,19 @@ class AssessmentAdminController extends Controller
     
     public function update(Request $request, $id)
     {
-        // dd($request->all());
-        // dd($id);
         $data = $request->except(['_token', '_method']);
-        // dd($request->all());
-        // dd($data);
-        $validatedData = $request->validate([
-            'industry_score' => 'nullable|numeric',
-            'advisor_score' => 'nullable|numeric',
-            'final_test_score' => 'nullable|numeric',
-        ]);
-        // dd($validatedData);
-        
-        $this->assessmentService->updateScoreAssessment($id, $validatedData);
-        return back();
+        try {
+            $validatedData = $request->validate([
+                'industry_score' => 'nullable|numeric',
+                'advisor_score' => 'nullable|numeric',
+                'final_test_score' => 'nullable|numeric',
+            ]);
+            
+            $this->assessmentService->updateScoreAssessment($id, $validatedData);
+            Toastr::addSuccess('Penilaian berhasil ditambahkan!');
+        } catch (\Exception $e) {
+            Toastr::addError('Penilaian gagal ditambahkan!');
+        }
+        return redirect()->back();
     }
 }

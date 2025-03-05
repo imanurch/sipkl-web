@@ -7,6 +7,7 @@ use App\Services\BatchService;
 use App\Services\IndustryService;
 use App\Services\DepartmentService;
 use App\Http\Controllers\Controller;
+use Flasher\Toastr\Laravel\Facade\Toastr;
 
 class IndustryManagementController extends Controller
 {
@@ -67,40 +68,41 @@ class IndustryManagementController extends Controller
     public function store(Request $request)
     {
         $data = $request->except(['_token']);
-        $validatedData = $request->validate([
-            'name' => 'required|string',
-            'address' => 'required|string',
-            'email' => 'required|unique:industries,email|email',
-            'phone_num' => 'required|unique:industries,phone_num|string|min:10|max:14',
-        ]);
-        $validatedData['status'] = '1';
-
         try {
+            $validatedData = $request->validate([
+                'name' => 'required|string',
+                'address' => 'required|string',
+                'email' => 'required|unique:industries,email|email',
+                'phone_num' => 'required|unique:industries,phone_num|string|min:10|max:14',
+            ]);
+            $validatedData['status'] = '1';
+
             $this->industryService->addIndustry($validatedData);
-            return redirect()->route('industryManagement')->with('success', 'Industry added successfully.');
+            Toastr::addSuccess('Data industri berhasil ditambah!');
         } catch (\Exception $e) {
-            // \Log::error($e->getMessage());
-            return back()->withErrors(['error' => 'Failed to add industry.']);
+            Toastr::addError('Data industri gagal ditambah!');
         }
+        return redirect()->back();
     }
 
     public function update(Request $request, $id)
     {
         $data = $request->except(['_token', '_method']);
-        $validatedData = $request->validate([
-            'name' => 'required|string',
-            'address' => 'required|string',
-            'email' => 'required|email|unique:industries,email,' . $id,
-            'phone_num' => 'required|string|min:10|max:14|unique:industries,phone_num,' . $id,
-        ]);
 
         try {
+            $validatedData = $request->validate([
+                'name' => 'required|string',
+                'address' => 'required|string',
+                'email' => 'required|email|unique:industries,email,' . $id,
+                'phone_num' => 'required|string|min:10|max:14|unique:industries,phone_num,' . $id,
+            ]);
+
             $this->industryService->updateIndustry($id, $validatedData);
-            return redirect()->route('industryManagement')->with('success', 'industry added successfully.');
+            Toastr::addSuccess('Data industri berhasil diubah!');
         } catch (\Exception $e) {
-            // \Log::error($e->getMessage());
-            return back()->withErrors(['error' => 'Failed to add industry.']);
+            Toastr::addError('Data industri gagal diubah!');
         }
+        return redirect()->back();
     }
 
     public function confirmStatusIndustry($industryId, $status)
@@ -113,10 +115,10 @@ class IndustryManagementController extends Controller
     {
         try {
             $this->industryService->deleteIndustry($id);
-            return redirect()->route('industryManagement')->with('success', 'industry deleted successfully.');
+            Toastr::addSuccess('Data industri berhasil dihapus!');
         } catch (\Exception $e) {
-            // \Log::error($e->getMessage());
-            return back()->withErrors(['error' => 'Failed to delete industry.']);
+            Toastr::addError('Data industri gagal dihapus!');
         }
+        return redirect()->back();
     }
 }

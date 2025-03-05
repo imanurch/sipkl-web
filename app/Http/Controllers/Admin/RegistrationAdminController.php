@@ -3,21 +3,23 @@
 namespace App\Http\Controllers\Admin;
 
 use DateTime;
+use App\Models\Logbook;
 use Illuminate\Http\Request;
 use App\Services\BatchService;
 use Barryvdh\DomPDF\Facade\Pdf;
+use App\Services\LogbookService;
 use App\Services\StudentService;
 use App\Services\IndustryService;
+use Illuminate\Support\Facades\DB;
 use App\Services\AssessmentService;
 use App\Services\DepartmentService;
 use App\Services\InternshipService;
 use App\Http\Controllers\Controller;
-use App\Models\Logbook;
 use App\Models\RegistrationDocument;
-use App\Services\InternDocumentService;
-use App\Services\LogbookService;
 use Illuminate\Support\Facades\Hash;
 use App\Services\RegistrationService;
+use App\Services\InternDocumentService;
+use Flasher\Toastr\Laravel\Facade\Toastr;
 use App\Services\RegistrationDocumentService;
 
 class RegistrationAdminController extends Controller
@@ -101,82 +103,87 @@ class RegistrationAdminController extends Controller
 
     public function confirmStatusRegistration($registrationId, $status)
     {
-        // dd($registrationId, $status);
-        $this->registrationService->updateStatusRegistration($registrationId, $status);
+        try {
+            DB::transaction(function () use ($registrationId, $status) {
+                $this->registrationService->updateStatusRegistration($registrationId, $status);
 
-        $registrationData = $this->registrationService->getRegistrationById($registrationId);
+                $registrationData = $this->registrationService->getRegistrationById($registrationId);
 
-        $data = [
-            'group_id' => $registrationData->group_id,
-            'industry_id' => $registrationData->industry_id,
-            'start_date' => $registrationData->start_date,
-            'end_date' => $registrationData->end_date,
-            'batch_id' => $registrationData->batch_id,
-        ];
-
-        if ($status == 'accept') {
-            // tambah registration to internship data
-            $newInternship = $this->internshipService->addInternship($data);
-            // dd($newInternship->group->name);
-
-            foreach ($newInternship->group->groupMember as $member) {
-                $newInternId = $member->student->id;
-
-                // buat tempat di assessment
-                $this->assessmentService->addAssessment([
-                    'student_id' => $newInternId,
-                    'internship_id' => $newInternship->id,
-                ]);
-
-                // buat tempat di logbook
-                $logbook_start_date = new DateTime($newInternship->start_date);
-                $logbook_end_date = new DateTime($newInternship->end_date);
-
-                while ($logbook_start_date <= $logbook_end_date) {
-                    $current_start = clone $logbook_start_date;
-
-                    $current_end = clone $logbook_start_date;
-                    $current_end->modify('+6 days');
-
-                    if ($current_end > $logbook_end_date) {
-                        $current_end = clone $logbook_end_date;
-                    }
-
-                    $logbook_data = [
-                        'student_id'    => $newInternId,
-                        'internship_id' => $newInternship->id,
-                        'start_date'    => $current_start->format('Y-m-d'),
-                        'end_date'      => $current_end->format('Y-m-d')
-                    ];
-
-                    $this->logbookService->addLogbook($logbook_data);
-
-                    $logbook_start_date = clone $current_end;
-                    $logbook_start_date->modify('+1 day');
-                }
-
-                // buat document intern (surat jalan)
                 $data = [
-                    'title' => 'Contoh Dokumen Surat Jalan',
-                    'date'  => date('d-m-Y'),
+                    'group_id' => $registrationData->group_id,
+                    'industry_id' => $registrationData->industry_id,
+                    'start_date' => $registrationData->start_date,
+                    'end_date' => $registrationData->end_date,
+                    'batch_id' => $registrationData->batch_id,
                 ];
 
-                $pdf = Pdf::loadView('document_templates/surat_pengantar_template', $data);
-                $filename = 'surat_jalan_' . time() . '.pdf';
+                if ($status == 'accept') {
+                    // tambah registration to internship data
+                    $newInternship = $this->internshipService->addInternship($data);
+                    // dd($newInternship->group->name);
 
-                $path = storage_path('app/intern_documents/surat_jalan/' . $filename);
-                $pdf->save($path);
-                
-                $this->internDocumentService->addInternDocument([
-                    'student_id' => $newInternId,
-                    'internship_id' => $newInternship->id,
-                    'type' => 'surat jalan',
-                    'url' => $filename,
-                ]);
-            }
+                    foreach ($newInternship->group->groupMember as $member) {
+                        $newInternId = $member->student->id;
+
+                        // buat tempat di assessment
+                        $this->assessmentService->addAssessment([
+                            'student_id' => $newInternId,
+                            'internship_id' => $newInternship->id,
+                        ]);
+
+                        // buat tempat di logbook
+                        $logbook_start_date = new DateTime($newInternship->start_date);
+                        $logbook_end_date = new DateTime($newInternship->end_date);
+
+                        while ($logbook_start_date <= $logbook_end_date) {
+                            $current_start = clone $logbook_start_date;
+
+                            $current_end = clone $logbook_start_date;
+                            $current_end->modify('+6 days');
+
+                            if ($current_end > $logbook_end_date) {
+                                $current_end = clone $logbook_end_date;
+                            }
+
+                            $logbook_data = [
+                                'student_id'    => $newInternId,
+                                'internship_id' => $newInternship->id,
+                                'start_date'    => $current_start->format('Y-m-d'),
+                                'end_date'      => $current_end->format('Y-m-d')
+                            ];
+
+                            $this->logbookService->addLogbook($logbook_data);
+
+                            $logbook_start_date = clone $current_end;
+                            $logbook_start_date->modify('+1 day');
+                        }
+
+                        // buat document intern (surat jalan)
+                        $data = [
+                            'title' => 'Contoh Dokumen Surat Jalan',
+                            'date'  => date('d-m-Y'),
+                        ];
+
+                        $pdf = Pdf::loadView('document_templates/surat_pengantar_template', $data);
+                        $filename = 'surat_jalan_' . time() . '.pdf';
+
+                        $path = storage_path('app/intern_documents/surat_jalan/' . $filename);
+                        $pdf->save($path);
+
+                        $this->internDocumentService->addInternDocument([
+                            'student_id' => $newInternId,
+                            'internship_id' => $newInternship->id,
+                            'type' => 'surat jalan',
+                            'url' => $filename,
+                        ]);
+                    }
+                }
+            });
+            Toastr::addSuccess('Registrasi berhasil dikonfirmasi!');
+        } catch (\Exception $e) {
+            Toastr::addError('Registrasi gagal dikonfirmasi!');
         }
-
-        return back()->withInput()->with('success', 'Operasi berhasil!');
+        return redirect()->back();
     }
 
     public function generateSuratPengantar($registration_id)
@@ -203,12 +210,16 @@ class RegistrationAdminController extends Controller
         // Pastikan folder 'registration_document/surat_pengantar' sudah ada
         $pdf->save($path);
         // dd($filename);
-        $this->registrationDocumentService->updateRegistrationDocument($registration_id, 'surat pengantar', $filename);
 
         // return response()->download($path);
 
-        return back();
-
+        try {
+            $this->registrationDocumentService->updateRegistrationDocument($registration_id, 'surat pengantar', $filename);
+            Toastr::addSuccess('Surat Pengantar berhasil dibuat. Silahkan refresh halaman!');
+        } catch (\Exception $e) {
+            Toastr::addError('Surat Pengantar gagal dibuat. Silahkan refresh halaman!');
+        }
+        return redirect()->back();
 
         // Cara untuk download
         // return $pdf->download('dokumen.pdf');
@@ -219,7 +230,12 @@ class RegistrationAdminController extends Controller
 
     public function destroy($id)
     {
-        $this->registrationService->deleteRegistration($id);
-        return back();
+        try {
+            $this->registrationService->deleteRegistration($id);
+            Toastr::addSuccess('Data admin berhasil dihapus!');
+        } catch (\Exception $e) {
+            Toastr::addError('Data admin gagal dihapus!');
+        }
+        return redirect()->back();
     }
 }

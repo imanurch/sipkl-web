@@ -12,6 +12,7 @@ use App\Services\InternshipService;
 use App\Services\MonitoringService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Flasher\Toastr\Laravel\Facade\Toastr;
 use App\Services\MonitoringDocumentService;
 
 class LogbookStudentController extends Controller
@@ -59,12 +60,16 @@ class LogbookStudentController extends Controller
 
     public function update(Request $request, $id)
     {
-        // dd($logbookId, $status, $request->all());
-        $validatedData = $request->validate([
-            'activities' => 'required',
-        ]);
-
-        $this->logbookService->updateLogbook($id, $validatedData);
-        return back();
+        try {
+            $validatedData = $request->validate([
+                'activities' => 'required',
+            ]);
+            
+            $this->logbookService->updateLogbook($id, $validatedData);
+            Toastr::addSuccess('Logbook berhasil disimpan!');
+        } catch (\Exception $e) {
+            Toastr::addError('Logbook gagal disimpan!');
+        }
+        return redirect()->back();
     }
 }

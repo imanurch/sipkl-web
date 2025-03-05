@@ -3,12 +3,14 @@
 namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
+use App\Services\UserService;
 use App\Services\BatchService;
 use App\Services\AdvisorService;
+use Illuminate\Support\Facades\DB;
 use App\Services\DepartmentService;
 use App\Http\Controllers\Controller;
-use App\Services\UserService;
 use Illuminate\Support\Facades\Hash;
+use Flasher\Toastr\Laravel\Facade\Toastr;
 
 class AdvisorManagementController extends Controller
 {
@@ -68,87 +70,108 @@ class AdvisorManagementController extends Controller
     public function store(Request $request)
     {
         if ($request->check_password !== $request->password) {
-            return back()->withErrors(['password' => 'Passwords do not match.']);
+            Toastr::addError('Password tidak konsisten!');
+            return redirect()->back();
         }
         $data = $request->except(['_token']);
-        $validatedData = $request->validate([
-            'name' => 'required|string',
-            'nip' => 'required|size:18',
-            'department_id' => 'required',
-            'username' => 'required|string',
-            'email' => 'required|unique:users,email|email',
-            'phone_num' => 'required|unique:advisors,phone_num|string|min:10|max:14',
-            'password' => 'required|string|size:8',
-        ]);
-        $validatedData['password'] = Hash::make($validatedData['password']);
-        $validatedData['department_id'] = $validatedData['department_id'] == 'K3R' ? '1' : ($validatedData['department_id'] == 'DPIB' ? '2' : ($validatedData['department_id'] == 'RPL' ? '3' : ''));
 
-        $newUser = $this->userService->addUser([
-            'username' => $validatedData['username'],
-            'email' => $validatedData['email'],
-            'password' => $validatedData['password'],
-            'role' => 'advisor',
-        ]);
-        $this->advisorService->addAdvisor([
-            'user_id' => $newUser->id,
-            'name' => $validatedData['name'],
-            'nip' => $validatedData['nip'],
-            'department_id' => $validatedData['department_id'],
-            'phone_num' => $validatedData['phone_num'],
-        ]);
+        try {
+            $validatedData = $request->validate([
+                'name' => 'required|string',
+                'nip' => 'required|size:18',
+                'department_id' => 'required',
+                'username' => 'required|string',
+                'email' => 'required|unique:users,email|email',
+                'phone_num' => 'required|unique:advisors,phone_num|string|min:10|max:14',
+                'password' => 'required|string|size:8',
+            ]);
+            $validatedData['password'] = Hash::make($validatedData['password']);
+            $validatedData['department_id'] = $validatedData['department_id'] == 'K3R' ? '1' : ($validatedData['department_id'] == 'DPIB' ? '2' : ($validatedData['department_id'] == 'RPL' ? '3' : ''));
 
-        return back();
+            DB::transaction(function () use ($validatedData) {
+                $newUser = $this->userService->addUser([
+                    'username' => $validatedData['username'],
+                    'email' => $validatedData['email'],
+                    'password' => $validatedData['password'],
+                    'role' => 'advisor',
+                ]);
+                $this->advisorService->addAdvisor([
+                    'user_id' => $newUser->id,
+                    'name' => $validatedData['name'],
+                    'nip' => $validatedData['nip'],
+                    'department_id' => $validatedData['department_id'],
+                    'phone_num' => $validatedData['phone_num'],
+                ]);
+            });
+            Toastr::addSuccess('Data guru pembimbing berhasil ditambah!');
+        } catch (\Exception $e) {
+            Toastr::addError('Data guru pembimbing gagal ditambah!');
+        }
+        return redirect()->back();
     }
 
     public function update(Request $request, $id)
     {
         $data = $request->except(['_token', '_method']);
 
-        $validatedData = $request->validate([
-            'user_id' => 'required',
-            'name' => 'required|string',
-            'nip' => 'required|size:18',
-            'department_id' => 'required',
-            'username' => 'required|string',
-            'email' => 'required|email|unique:users,email,' . $request->input('user_id'),
-            'phone_num' => 'required|string|min:10|max:14|unique:advisors,phone_num,' . $id,
-            'password' => 'nullable|string|size:8',
-        ]);
+        try {
+            $validatedData = $request->validate([
+                'user_id' => 'required',
+                'name' => 'required|string',
+                'nip' => 'required|size:18',
+                'department_id' => 'required',
+                'username' => 'required|string',
+                'email' => 'required|email|unique:users,email,' . $request->input('user_id'),
+                'phone_num' => 'required|string|min:10|max:14|unique:advisors,phone_num,' . $id,
+                'password' => 'nullable|string|size:8',
+            ]);
 
-        if (!empty($validatedData['password'])) {
-            if ($request->check_password !== $request->password) {
-                return back()->withErrors(['password' => 'Passwords do not match.']);
+            if (!empty($validatedData['password'])) {
+                if ($request->check_password !== $request->password) {
+                    Toastr::addError('Password tidak konsisten!');
+                    return redirect()->back();
+                }
+                $validatedData['password'] = Hash::make($validatedData['password']);
             }
-            $validatedData['password'] = Hash::make($validatedData['password']);
+
+            $validatedData['department_id'] = $validatedData['department_id'] == 'K3R' ? '1' : ($validatedData['department_id'] == 'DPIB' ? '2' : ($validatedData['department_id'] == 'RPL' ? '3' : ''));
+
+            DB::transaction(function () use ($id, $validatedData) {
+                $this->advisorService->updateAdvisor($id, [
+                    'name' => $validatedData['name'],
+                    'nip' => $validatedData['nip'],
+                    'department_id' => $validatedData['department_id'],
+                    'phone_num' => $validatedData['phone_num'],
+                ]);
+
+                $updateUserData = [
+                    'username' => $validatedData['username'],
+                    'email' => $validatedData['email'],
+                ];
+
+                if (isset($validatedData['password'])) {
+                    $updateUserData['password'] = $validatedData['password'];
+                }
+
+                $this->userService->updateUser($validatedData['user_id'], $updateUserData);
+            });
+            Toastr::addSuccess('Data guru pembimbing berhasil diubah!');
+        } catch (\Exception $e) {
+            Toastr::addError('Data guru pembimbing gagal diubah!');
         }
-
-        $validatedData['department_id'] = $validatedData['department_id'] == 'K3R' ? '1' : ($validatedData['department_id'] == 'DPIB' ? '2' : ($validatedData['department_id'] == 'RPL' ? '3' : ''));
-
-        $this->advisorService->updateAdvisor($id, [
-            'name' => $validatedData['name'],
-            'nip' => $validatedData['nip'],
-            'department_id' => $validatedData['department_id'],
-            'phone_num' => $validatedData['phone_num'],
-        ]);
-
-        $updateUserData = [
-            'username' => $validatedData['username'],
-            'email' => $validatedData['email'],
-        ];
-
-        if (isset($validatedData['password'])) {
-            $updateUserData['password'] = $validatedData['password'];
-        }
-
-        $this->userService->updateUser($validatedData['user_id'], $updateUserData);
-        return back();
+        return redirect()->back();
     }
 
     public function destroy($id)
     {
         $user_id = $this->advisorService->getAdvisorById($id)->user_id;
-        // dd($id, $user_id);
-        $this->userService->deleteUser($user_id);
-        return back();
+
+        try {
+            $this->userService->deleteUser($user_id);
+            Toastr::addSuccess('Data guru pembimbing berhasil dihapus!');
+        } catch (\Exception $e) {
+            Toastr::addError('Data guru pembimbing gagal dihapus!');
+        }
+        return redirect()->back();
     }
 }

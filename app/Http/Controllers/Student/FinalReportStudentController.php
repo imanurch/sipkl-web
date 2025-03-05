@@ -5,11 +5,13 @@ namespace App\Http\Controllers\Student;
 use Illuminate\Http\Request;
 use App\Services\BatchService;
 use App\Services\StudentService;
+use Illuminate\Support\Facades\DB;
 use App\Services\AssessmentService;
 use App\Services\InternshipService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Services\InternDocumentService;
+use Flasher\Toastr\Laravel\Facade\Toastr;
 
 class FinalReportStudentController extends Controller
 {
@@ -40,10 +42,10 @@ class FinalReportStudentController extends Controller
         $user_id = Auth::user()->id;
         // $student_id = $this->studentService->getStudentIdByUserId($user_id);
         $student_id = session('user_bio')->id;
-        
+
         $currentBatch = $this->batchService->getBatchByStatus('active');
         $batch_id = $currentBatch != null ? $currentBatch->id : '';
-        $isIntern = $this->internshipService->getInternshipByStudentId($batch_id,$student_id) != null ? true : false;
+        $isIntern = $this->internshipService->getInternshipByStudentId($batch_id, $student_id) != null ? true : false;
 
         $data = $this->internDocumentService->getInternDocumentByStudentId($student_id, 'laporan akhir');
         // dd($data);
@@ -61,32 +63,32 @@ class FinalReportStudentController extends Controller
 
     public function store(Request $request)
     {
-        $user_id = Auth::user()->id;
-        // $student_id = $this->studentService->getStudentIdByUserId($user_id);
         $student_id = session('user_bio')->id;
         $batch_id = $this->batchService->getBatchByStatus('active')->id;
         $internship_id = $this->internshipService->getInternshipByStudentId($batch_id, $student_id)->id;
-        // dd($internship_id);
 
-        $validatedData = $request->validate([
-            // 'student_id' => 'required',
-            // 'internship_id' => 'required',
-            'laporan_akhir' => 'required|mimes:pdf',
-        ]);
-        // dd($validatedData);
-        $path_file_balasan = $validatedData['laporan_akhir']->store('intern_documents/laporan_akhir');
-        $filename = basename($path_file_balasan);
+        try {
+            $validatedData = $request->validate([
+                'laporan_akhir' => 'required|mimes:pdf',
+            ]);
+            DB::transaction(function () use ($validatedData, $student_id, $internship_id) {
+                $path_file_balasan = $validatedData['laporan_akhir']->store('intern_documents/laporan_akhir');
+                $filename = basename($path_file_balasan);
 
-        $data = [
-            'student_id' => $student_id,
-            'internship_id' => $internship_id,
-            'type' => 'laporan akhir',
-            'url' => $filename,
-        ];
-        // dd($data);
+                $data = [
+                    'student_id' => $student_id,
+                    'internship_id' => $internship_id,
+                    'type' => 'laporan akhir',
+                    'url' => $filename,
+                ];
 
-        $this->internDocumentService->addInternDocument($data);
-        return back();
+                $this->internDocumentService->addInternDocument($data);
+            });
+            Toastr::addSuccess('Data admin berhasil dihapus!');
+        } catch (\Exception $e) {
+            Toastr::addError('Data admin gagal dihapus!');
+        }
+        return redirect()->back();
     }
 
     public function downloadLaporanAkhir($filename)
@@ -96,7 +98,8 @@ class FinalReportStudentController extends Controller
         if (file_exists($path)) {
             return response()->download($path);
         } else {
-            return response()->json(['message' => 'File tidak ditemukan'], 404);
+            Toastr::addError('File tidak ditemukan!');
+            return redirect()->back();
         }
     }
 }

@@ -7,10 +7,12 @@ use Illuminate\Http\Request;
 use App\Services\BatchService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\AdvisorService;
+use Illuminate\Support\Facades\DB;
 use App\Services\InternshipService;
 use App\Services\MonitoringService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Flasher\Toastr\Laravel\Facade\Toastr;
 use App\Services\MonitoringDocumentService;
 
 class MonitoringAdvisorController extends Controller
@@ -41,7 +43,7 @@ class MonitoringAdvisorController extends Controller
         // $user_id = Auth::user()->id;
         // $advisor_id = $this->advisorService->getAdvisorIdByUserId($user_id);
         $advisor_id = session('user_bio')->id;
-        
+
         $currentBatch = $this->batchService->getBatchByStatus('active');
         $batch_id = $currentBatch->id;
 
@@ -72,97 +74,114 @@ class MonitoringAdvisorController extends Controller
         if (file_exists($path)) {
             return response()->download($path);
         } else {
-            return response()->json(['message' => 'File tidak ditemukan'], 404);
+            Toastr::addError('File tidak ditemukan!');
+            return redirect()->back();
         }
     }
 
     public function store(Request $request)
     {
-        // dd($request->all());
         $data = $request->except(['_token']);
-        // dd($request->all());
-        $validatedData = $request->validate([
-            'internship_id' => 'required',
-            'type' => 'required',
-            'date' => 'required',
-            'note' => 'nullable|string',
-        ]);
 
-        $newMonitoring = $this->monitoringService->addMonitoring($validatedData);
+        try {
+            $validatedData = $request->validate([
+                'internship_id' => 'required',
+                'type' => 'required',
+                'date' => 'required',
+                'note' => 'nullable|string',
+            ]);
 
-        $dataDoc = [
-            'title' => 'Contoh Dokumen PDF',
-            'date'  => date('d-m-Y'),
-        ];
-        $pdf = Pdf::loadView('document_templates/surat_pengantar_template', $dataDoc);
+            DB::transaction(function () use ($validatedData) {
+                $newMonitoring = $this->monitoringService->addMonitoring($validatedData);
 
-        if ($newMonitoring->type == 'Pelepasan') {
-            // generate surat pengantar
-            $filename = 'surat_pengantar' . time() . '.pdf';
-            $path = storage_path('app/monitoring_documents/surat_pengantar/' . $filename);
-            $pdf->save($path);
+                $dataDoc = [
+                    'title' => 'Contoh Dokumen PDF',
+                    'date'  => date('d-m-Y'),
+                ];
+                $pdf = Pdf::loadView('document_templates/surat_pengantar_template', $dataDoc);
 
-            $monitoringDocumentData = [
-                'monitoring_id' => $newMonitoring->id,
-                'type' => 'surat pengantar',
-                'url' => $filename,
-            ];
+                if ($newMonitoring->type == 'Pelepasan') {
+                    // generate surat pengantar
+                    $filename = 'surat_pengantar' . time() . '.pdf';
+                    $path = storage_path('app/monitoring_documents/surat_pengantar/' . $filename);
+                    $pdf->save($path);
 
-            $this->monitoringDocumentService->addMonitoringDocument($monitoringDocumentData);
+                    $monitoringDocumentData = [
+                        'monitoring_id' => $newMonitoring->id,
+                        'type' => 'surat pengantar',
+                        'url' => $filename,
+                    ];
 
-            // generate doc lain
-        } elseif ($newMonitoring->type == 'Kunjungan') {
-            // generate surat pengantar
-            $filename = 'surat_tugas' . time() . '.pdf';
-            $path = storage_path('app/monitoring_documents/surat_tugas/' . $filename);
-            $pdf->save($path);
+                    $this->monitoringDocumentService->addMonitoringDocument($monitoringDocumentData);
 
-            $monitoringDocumentData = [
-                'monitoring_id' => $newMonitoring->id,
-                'type' => 'surat tugas',
-                'url' => $filename,
-            ];
+                    // generate doc lain
+                } elseif ($newMonitoring->type == 'Kunjungan') {
+                    // generate surat pengantar
+                    $filename = 'surat_tugas' . time() . '.pdf';
+                    $path = storage_path('app/monitoring_documents/surat_tugas/' . $filename);
+                    $pdf->save($path);
 
-            $this->monitoringDocumentService->addMonitoringDocument($monitoringDocumentData);
+                    $monitoringDocumentData = [
+                        'monitoring_id' => $newMonitoring->id,
+                        'type' => 'surat tugas',
+                        'url' => $filename,
+                    ];
 
-            // generate doc lain
-        } elseif ($newMonitoring->type == 'Penarikan') {
-            // generate surat pengantar
-            $filename = 'surat_penarikan' . time() . '.pdf';
-            $path = storage_path('app/monitoring_documents/surat_penarikan/' . $filename);
-            $pdf->save($path);
+                    $this->monitoringDocumentService->addMonitoringDocument($monitoringDocumentData);
 
-            $monitoringDocumentData = [
-                'monitoring_id' => $newMonitoring->id,
-                'type' => 'surat penarikan',
-                'url' => $filename,
-            ];
+                    // generate doc lain
+                } elseif ($newMonitoring->type == 'Penarikan') {
+                    // generate surat pengantar
+                    $filename = 'surat_penarikan' . time() . '.pdf';
+                    $path = storage_path('app/monitoring_documents/surat_penarikan/' . $filename);
+                    $pdf->save($path);
 
-            $this->monitoringDocumentService->addMonitoringDocument($monitoringDocumentData);
+                    $monitoringDocumentData = [
+                        'monitoring_id' => $newMonitoring->id,
+                        'type' => 'surat penarikan',
+                        'url' => $filename,
+                    ];
 
-            // generate doc lain
+                    $this->monitoringDocumentService->addMonitoringDocument($monitoringDocumentData);
+
+                    // generate doc lain
+                }
+            });
+            Toastr::addSuccess('Data monitoring berhasil ditambah!');
+        } catch (\Exception $e) {
+            Toastr::addError('Data monitoring gagal ditambah!');
         }
-
-        return back();
+        return redirect()->back();
     }
 
     public function update(Request $request, $id)
     {
         $data = $request->except(['_token', '_method']);
-        $validatedData = $request->validate([
-            'internship_id' => 'required',
-            'type' => 'required',
-            'date' => 'required',
-            'note' => 'nullable|string',
-        ]);
 
-        $this->monitoringService->updateMonitoring($id, $validatedData);
-        return back();
+        try {
+            $validatedData = $request->validate([
+                'internship_id' => 'required',
+                'type' => 'required',
+                'date' => 'required',
+                'note' => 'nullable|string',
+            ]);
+
+            $this->monitoringService->updateMonitoring($id, $validatedData);
+            Toastr::addSuccess('Data monitoring berhasil diubah!');
+        } catch (\Exception $e) {
+            Toastr::addError('Data monitoring gagal diubah!');
+        }
+        return redirect()->back();
     }
 
     public function destroy($id)
     {
-        $this->monitoringService->deleteMonitoring($id);
-        return back();
+        try {
+            $this->monitoringService->deleteMonitoring($id);
+            Toastr::addSuccess('Data monitoring berhasil dihapus!');
+        } catch (\Exception $e) {
+            Toastr::addError('Data monitoring gagal dihapus!');
+        }
+        return redirect()->back();
     }
 }

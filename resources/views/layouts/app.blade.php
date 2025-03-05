@@ -10,6 +10,8 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
+{{-- {!! Flasher\Laravel\LaravelFacade::render() !!} --}}
+{!! Flasher::render() !!}
 <body>
     <div x-data="{ sidebarSM: false }" class="layout relative">
         <div class="layout-sidebar sm:fixed sm:block h-screen"

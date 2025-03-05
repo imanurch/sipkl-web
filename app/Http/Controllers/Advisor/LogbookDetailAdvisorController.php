@@ -7,11 +7,12 @@ use Illuminate\Http\Request;
 use App\Services\BatchService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\LogbookService;
+use App\Services\StudentService;
 use App\Services\InternshipService;
 use App\Services\MonitoringService;
 use App\Http\Controllers\Controller;
+use Flasher\Toastr\Laravel\Facade\Toastr;
 use App\Services\MonitoringDocumentService;
-use App\Services\StudentService;
 
 class LogbookDetailAdvisorController extends Controller
 {
@@ -52,13 +53,17 @@ class LogbookDetailAdvisorController extends Controller
 
     public function statusConfirm(Request $request, $logbookId, $status)
     {
-        // dd($logbookId, $status, $request->all());
-        $data = [
-            'status' => $status == 'accept' ? '1' : '2',
-            'feedback' => $request->feedback,
-        ];
+        try {
+            $data = [
+                'status' => $status == 'accept' ? '1' : '2',
+                'feedback' => $request->feedback,
+            ];
 
-        $this->logbookService->updateLogbook($logbookId, $data);
-        return back();
+            $this->logbookService->updateLogbook($logbookId, $data);
+            Toastr::addSuccess('Logbook berhasil dikonfirmasi!');
+        } catch (\Exception $e) {
+            Toastr::addError('Logbook gagal dikonfirmasi!');
+        }
+        return redirect()->back();
     }
 }

@@ -2,18 +2,21 @@
 
 namespace App\Http\Controllers\Student;
 
+use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 use App\Services\BatchService;
 use App\Services\GroupService;
 use App\Services\AdvisorService;
 use App\Services\StudentService;
 use App\Services\IndustryService;
+use Illuminate\Support\Facades\DB;
 use App\Services\InternshipService;
 use App\Http\Controllers\Controller;
 use App\Services\GroupMemberService;
 use Illuminate\Support\Facades\Auth;
 use App\Services\RegistrationService;
 use App\Services\InternDocumentService;
+use Flasher\Toastr\Laravel\Facade\Toastr;
 use App\Services\RegistrationDocumentService;
 
 class RegistrationStudentController extends Controller
@@ -85,138 +88,161 @@ class RegistrationStudentController extends Controller
 
     public function newIndustryRequest(Request $request)
     {
-        // $data = $request->except(['_token']);
-        $validatedData = $request->validate([
-            'name' => 'required|string',
-            'address' => 'required|string',
-            'email' => 'required|unique:industries,email|email',
-            'phone_num' => 'required|unique:industries,phone_num|string|min:10|max:14',
-        ]);
+        try {
+            $validatedData = $request->validate([
+                'name' => 'required|string',
+                'address' => 'required|string',
+                'email' => 'required|unique:industries,email|email',
+                'phone_num' => 'required|unique:industries,phone_num|string|min:10|max:14',
+            ]);
 
-        $this->industryService->addIndustry($validatedData);
-        return back();
+            $this->industryService->addIndustry($validatedData);
+            Toastr::addSuccess('Data admin berhasil dihapus!');
+        } catch (\Exception $e) {
+            Toastr::addError('Data admin gagal dihapus!');
+        }
+        return redirect()->back();
     }
 
     public function step2(Request $request)
     {
-        $validatedData = $request->validate([
-            'internshipLocation' => 'required',
-        ]);
-        $request->session()->put('internshipLocation.registration', $validatedData['internshipLocation']);
+        try {
+            $validatedData = $request->validate([
+                'internshipLocation' => 'required',
+            ]);
+            $request->session()->put('internshipLocation.registration', $validatedData['internshipLocation']);
 
-        $activeBatch = $this->batchService->getBatchByStatus('active');
-        $batch_id = $activeBatch != null ? $activeBatch->id : '';
+            $activeBatch = $this->batchService->getBatchByStatus('active');
+            $batch_id = $activeBatch != null ? $activeBatch->id : '';
 
-        $student_id = session('user_bio')->id;
+            $student_id = session('user_bio')->id;
 
-        $studentListData = $this->studentService->getNonRegisteredInternList($batch_id);
-        $studentListData = $studentListData->reject(function ($student) use ($student_id) {
-            return $student->id == $student_id;
-        });
-
-        return view('pages.student.registration', [
-            'studentListData' => $studentListData,
-            'pages' => 'registration',
-        ]);
+            $studentListData = $this->studentService->getNonRegisteredInternList($batch_id);
+            $studentListData = $studentListData->reject(function ($student) use ($student_id) {
+                return $student->id == $student_id;
+            });
+            Toastr::addSuccess('Data lokasi berhasil disimpan!');
+            return view('pages.student.registration', [
+                'studentListData' => $studentListData,
+                'pages' => 'registration',
+            ]);
+        } catch (\Exception $e) {
+            Toastr::addError('Data lokasi gagal ditambahkan!');
+            return redirect()->back();
+        }
     }
 
     public function step3(Request $request)
     {
-        $validatedData = $request->validate([
-            'teamMember' => 'required',
-        ]);
 
-        $industryId = session()->get('internshipLocation.registration');
-        $locationInternship = $this->industryService->getIndustryById($industryId);
+        try {
+            $validatedData = $request->validate([
+                'teamMember' => 'required',
+            ]);
 
+            $industryId = session()->get('internshipLocation.registration');
+            $locationInternship = $this->industryService->getIndustryById($industryId);
 
-        $member_id = $validatedData['teamMember'];
-        // add data user
-        $student_id = session('user_bio')->id;
-        $member_id[] = $student_id;
+            $member_id = $validatedData['teamMember'];
+            // add data user
+            $student_id = session('user_bio')->id;
+            $member_id[] = $student_id;
 
-        $teamMember = $this->studentService->getStudentById($member_id);
-
-        return view('pages.student.registration', [
-            'locationInternship' => $locationInternship,
-            'teamMember' => $teamMember,
-            'pages' => 'registration',
-        ]);
+            $teamMember = $this->studentService->getStudentById($member_id);
+            Toastr::addSuccess('Data anggota berhasil disimpan!');
+            return view('pages.student.registration', [
+                'locationInternship' => $locationInternship,
+                'teamMember' => $teamMember,
+                'pages' => 'registration',
+            ]);
+        } catch (\Exception $e) {
+            Toastr::addError('Data anggota gagal ditambahkan!');
+            return redirect()->back();
+        }
     }
 
     public function step4(Request $request)
     {
-        $validatedData = $request->validate([
-            'industry_id' => 'required',
-            'student_id' => 'required',
-            'start_date' => 'required',
-            'end_date' => 'required',
-        ]);
+        try {
+            $validatedData = $request->validate([
+                'industry_id' => 'required',
+                'student_id' => 'required',
+                'start_date' => 'required',
+                'end_date' => 'required',
+            ]);
 
-        // create group
-        // NAMA GROUP DARIMANA?
-        $groupData = [
-            'name' => 'Group Testing'
-        ];
-        $newGroup = $this->groupService->addGroup($groupData);
-        $group_id = $newGroup->id;
-
-        // add group member
-        $teamMember = $validatedData['student_id'];
-        foreach ($teamMember as $dt) {
-            $memberData = [
-                'group_id' => $group_id,
-                'student_id' => $dt
+            // create group
+            // NAMA GROUP DARIMANA?
+            $groupData = [
+                'name' => 'Group Testing'
             ];
-            $this->groupMemberService->addMember($memberData);
+
+            DB::transaction(function () use ($validatedData, $groupData) {
+                $newGroup = $this->groupService->addGroup($groupData);
+                $group_id = $newGroup->id;
+
+                // add group member
+                $teamMember = $validatedData['student_id'];
+                foreach ($teamMember as $dt) {
+                    $memberData = [
+                        'group_id' => $group_id,
+                        'student_id' => $dt
+                    ];
+                    $this->groupMemberService->addMember($memberData);
+                }
+
+                // batch data
+                $currentBatch = $this->batchService->getBatchByStatus('active');
+                $batch_id = $currentBatch->id;
+
+                // create registration
+                $registrationData = [
+                    'group_id' => $group_id,
+                    'industry_id' => $validatedData['industry_id'],
+                    'start_date' => $validatedData['start_date'],
+                    'end_date' => $validatedData['end_date'],
+                    'batch_id' => $batch_id,
+                ];
+
+                $newRegistration = $this->registrationService->addRegistration($registrationData);
+
+                // create registration document
+                // surat pengantar
+                $suratPengantarData = [
+                    'registration_id' => $newRegistration->id,
+                    'type' => 'surat pengantar',
+                ];
+                $this->registrationDocumentService->addRegistrationDocument($suratPengantarData);
+
+                // surat balasan
+                $suratBalasanData = [
+                    'registration_id' => $newRegistration->id,
+                    'type' => 'surat balasan',
+                ];
+                $this->registrationDocumentService->addRegistrationDocument($suratBalasanData);
+
+                // ucapan terima kasih
+                $ucapanTerimaKasihData = [
+                    'registration_id' => $newRegistration->id,
+                    'type' => 'ucapan terima kasih',
+                ];
+                $this->registrationDocumentService->addRegistrationDocument($ucapanTerimaKasihData);
+
+                $registrationData = $this->registrationService->getRegistrationById($newRegistration->id);
+
+                $this->registrationService->updateRegistrationStep($newRegistration->id, '4');
+
+                Toastr::addSuccess('Data registrasi berhasil disimpan!');
+                return view('pages.student.registration', [
+                    'registrationData' => $registrationData,
+                    'teamMember' => $teamMember,
+                    'pages' => 'registration',
+                ]);
+            });
+        } catch (\Exception $e) {
+            Toastr::addError('Data registrasi gagal disimpan!');
+            return redirect()->back();
         }
-
-        // batch data
-        $currentBatch = $this->batchService->getBatchByStatus('active');
-        $batch_id = $currentBatch->id;
-
-        // create registration
-        $registrationData = [
-            'group_id' => $group_id,
-            'industry_id' => $validatedData['industry_id'],
-            'start_date' => $validatedData['start_date'],
-            'end_date' => $validatedData['end_date'],
-            'batch_id' => $batch_id,
-        ];
-
-        $newRegistration = $this->registrationService->addRegistration($registrationData);
-
-        // create registration document
-        // surat pengantar
-        $suratPengantarData = [
-            'registration_id' => $newRegistration->id,
-            'type' => 'surat pengantar',
-        ];
-        $this->registrationDocumentService->addRegistrationDocument($suratPengantarData);
-
-        // surat balasan
-        $suratBalasanData = [
-            'registration_id' => $newRegistration->id,
-            'type' => 'surat balasan',
-        ];
-        $this->registrationDocumentService->addRegistrationDocument($suratBalasanData);
-
-        // ucapan terima kasih
-        $ucapanTerimaKasihData = [
-            'registration_id' => $newRegistration->id,
-            'type' => 'ucapan terima kasih',
-        ];
-        $this->registrationDocumentService->addRegistrationDocument($ucapanTerimaKasihData);
-
-        $registrationData = $this->registrationService->getRegistrationById($newRegistration->id);
-
-        $this->registrationService->updateRegistrationStep($newRegistration->id, '4');
-
-        return view('pages.student.registration', [
-            'registrationData' => $registrationData,
-            'teamMember' => $teamMember,
-            'pages' => 'registration',
-        ]);
     }
 
     public function step4View()
@@ -233,28 +259,37 @@ class RegistrationStudentController extends Controller
 
     public function step5(Request $request)
     {
-        $validatedData = $request->validate([
-            'registration_id' => 'required',
-            'surat_balasan' => 'required|mimes:pdf',
-        ]);
-        $path_file_balasan = $validatedData['surat_balasan']->store('registration_document/surat_balasan');
-        $filename = basename($path_file_balasan);
 
-        $this->registrationDocumentService->updateRegistrationDocument($validatedData['registration_id'], 'surat balasan', $filename);
+        try {
+            $validatedData = $request->validate([
+                'registration_id' => 'required',
+                'surat_balasan' => 'required|mimes:pdf',
+            ]);
+            $path_file_balasan = $validatedData['surat_balasan']->store('registration_document/surat_balasan');
+            $filename = basename($path_file_balasan);
 
-        $registration_id =  session()->get('registration_id');
-        $registrationData = $this->registrationService->getRegistrationById($registration_id);
+            DB::transaction(function () use ($validatedData, $filename) {
+                $this->registrationDocumentService->updateRegistrationDocument($validatedData['registration_id'], 'surat balasan', $filename);
 
-        $student_id = session('user_bio')->id;
-        $surat_jalan = $this->internDocumentService->getInternDocumentByStudentId($student_id, 'surat jalan');
-        $registrationData->surat_jalan = $surat_jalan != null ? $surat_jalan->url : 'Belum Tersedia';
+                $registration_id =  session()->get('registration_id');
+                $registrationData = $this->registrationService->getRegistrationById($registration_id);
 
-        $this->registrationService->updateRegistrationStep($registration_id, '5');
+                $student_id = session('user_bio')->id;
+                $surat_jalan = $this->internDocumentService->getInternDocumentByStudentId($student_id, 'surat jalan');
+                $registrationData->surat_jalan = $surat_jalan != null ? $surat_jalan->url : 'Belum Tersedia';
 
-        return view('pages.student.registration', [
-            'registrationData' => $registrationData,
-            'pages' => 'registration',
-        ]);
+                $this->registrationService->updateRegistrationStep($registration_id, '5');
+
+                Toastr::addSuccess('File Bukti berhasil diunggah!');
+                return view('pages.student.registration', [
+                    'registrationData' => $registrationData,
+                    'pages' => 'registration',
+                ]);
+            });
+        } catch (\Exception $e) {
+            Toastr::addError('File Bukti gagal diunggah!');
+            return redirect()->back();
+        }
     }
 
     public function step5View()
@@ -267,7 +302,6 @@ class RegistrationStudentController extends Controller
         // dd($surat_jalan);
         $registrationData->surat_jalan = $surat_jalan != null ? $surat_jalan->url : 'Belum Tersedia';
 
-
         return view('pages.student.registration', [
             'registrationData' => $registrationData,
             'pages' => 'registration',
@@ -276,16 +310,17 @@ class RegistrationStudentController extends Controller
 
     public function downloadFile($type, $filename)
     {
-        if($type = 'surat_jalan'){
+        if ($type = 'surat_jalan') {
             $path = storage_path('app/intern_documents/surat_jalan/' . $filename);
-        } else{
+        } else {
             $path = storage_path('app/registration_document/' . $type . '/' . $filename);
         }
 
         if (file_exists($path)) {
             return response()->download($path);
         } else {
-            return response()->json(['message' => 'File tidak ditemukan'], 404);
+            Toastr::addError('File tidak ditemukan!');
+            return redirect()->back();
         }
     }
 }

@@ -4,13 +4,14 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use App\Services\BatchService;
+use App\Services\AdvisorService;
+use App\Services\StudentService;
 use App\Services\IndustryService;
 use App\Services\DepartmentService;
-use App\Http\Controllers\Controller;
-use App\Services\AdvisorService;
-use Illuminate\Support\Facades\Hash;
 use App\Services\internshipService;
-use App\Services\StudentService;
+use App\Http\Controllers\Controller;
+use Illuminate\Support\Facades\Hash;
+use Flasher\Toastr\Laravel\Facade\Toastr;
 
 class InternshipAdminController extends Controller
 {
@@ -31,7 +32,7 @@ class InternshipAdminController extends Controller
         $batchData = $this->batchService->getAllBatch('');
         $currentBatch = $this->batchService->getBatchByStatus('active');
         $batch_id = $request->batch ?? ($currentBatch->id ?? '');
-        
+
         // dd($batch_id);
         // table filters
         $filters = [
@@ -60,17 +61,27 @@ class InternshipAdminController extends Controller
 
     public function updateAdvisor(Request $request, $internship_id)
     {
-        // dd($request->all(), $internship_id);
-        $validatedData = $request->validate([
-            'advisor_id' => 'required'
-        ]);
-        $this->internshipService->updateInternshipAdvisor($internship_id, $validatedData['advisor_id']);
+        try {
+            $validatedData = $request->validate([
+                'advisor_id' => 'required'
+            ]);
+            $this->internshipService->updateInternshipAdvisor($internship_id, $validatedData['advisor_id']);
 
-        return back();
+            Toastr::addSuccess('Guru Pembimbing berhasil ditetapkan');
+        } catch (\Exception $e) {
+            Toastr::addError('Guru Pembimbing gagal ditetapkan!');
+        }
+        return redirect()->back();
     }
 
-    public function destroy($id){
-        $this->internshipService->deleteInternship($id);
-        return back();
+    public function destroy($id)
+    {
+        try {
+            $this->internshipService->deleteInternship($id);
+            Toastr::addSuccess('Data PKL berhasil dihapus!');
+        } catch (\Exception $e) {
+            Toastr::addError('Data PKL gagal dihapus!');
+        }
+        return redirect()->back();
     }
 }

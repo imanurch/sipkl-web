@@ -6,13 +6,14 @@ use Log;
 use Illuminate\Http\Request;
 use App\Services\AdminService;
 use App\Services\BatchService;
+use App\Services\AdvisorService;
 use App\Services\LogbookService;
 use App\Services\AssessmentService;
 use App\Http\Controllers\Controller;
-use App\Services\AdvisorService;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Hash;
 use App\Services\InternDocumentService;
+use Flasher\Toastr\Laravel\Facade\Toastr;
 
 class AssessmentAdvisorController extends Controller
 {
@@ -110,10 +111,14 @@ class AssessmentAdvisorController extends Controller
         $validatedData = $request->validate([
             'advisor_score' => 'required|numeric',
         ]);
-        // dd($validatedData);
 
-        $this->assessmentService->updateScoreAssessment($id, $validatedData);
-        return back();
+        try {
+            $this->assessmentService->updateScoreAssessment($id, $validatedData);
+            Toastr::addSuccess('Penilaian berhasil ditambahkan!');
+        } catch (\Exception $e) {
+            Toastr::addError('Penilaian gagal ditambahkan!');
+        }
+        return redirect()->back();
     }
 
     public function downloadLaporanAkhir($filename)
