@@ -19,6 +19,11 @@ class MonitoringService
         return $this->monitoringRepository->getMonitoringByAdvisorIdAndBatch($advisor_id, $batch_id, $filters);
     }
 
+    public function getById($id)
+    {
+        return $this->monitoringRepository->findById($id);
+    }
+
     public function addMonitoring($data)
     {
         return $this->monitoringRepository->createMonitoring($data);

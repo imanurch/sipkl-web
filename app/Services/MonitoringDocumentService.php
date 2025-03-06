@@ -19,15 +19,25 @@ class MonitoringDocumentService
     //     return $this->monitoringDocumentRepository->getMonitoringDocumentByAdvisorIdAndBatch($advisor_id, $batch_id, $filters);
     // }
 
+    public function getMonitoringByTypeAndMonitoringId($monitoring_id, $type)
+    {
+        return $this->monitoringDocumentRepository->getMonitoringByTypeAndMonitoringId($monitoring_id, $type);
+    }
+
     public function addMonitoringDocument($data)
     {
         return $this->monitoringDocumentRepository->createMonitoringDocument($data);
     }
 
-    // public function updateMonitoringDocument($id, $data)
-    // {
-    //     return $this->monitoringDocumentRepository->updateMonitoringDocument($id, $data);
-    // }
+    public function getByMonitoringIdAndType($monitoring_id, $type)
+    {
+        return $this->monitoringDocumentRepository->getByMonitoringIdAndType($monitoring_id, $type);
+    }
+
+    public function updateMonitoringDocument($id, $data)
+    {
+        return $this->monitoringDocumentRepository->updateMonitoringDocument($id, $data);
+    }
 
     // public function deleteMonitoringDocument($id)
     // {
