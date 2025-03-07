@@ -76,6 +76,7 @@ class RegistrationStudentController extends Controller
 
         if ($step == '1') {
             return view('pages.student.registration', [
+                'activeBatch' => $activeBatch,
                 'industryData' => $industryData,
                 'industryRequestData' => $industryRequestData,
                 'pages' => 'registration',

@@ -43,9 +43,10 @@ class LogbookStudentController extends Controller
         $student_id = session('user_bio')->id;
 
         $currentBatch = $this->batchService->getBatchByStatus('active');
+        $batch_id = $currentBatch != null ? $currentBatch->id : null;
         
         // $studentData = $this->studentService->getStudentById($studentId);
-        $data = $this->logbookService->getLogbookByStudentIdAndBatch($currentBatch->id, $student_id);
+        $data = $this->logbookService->getLogbookByStudentIdAndBatch($batch_id, $student_id);
         // $internshipData = $this->internshipService->getInternshipByInternshipId($internshipId);
         // $studentData->industry = $internshipData->industry->name;
         // dd($data);

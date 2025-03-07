@@ -64,11 +64,14 @@
             <div class="border-b border-neutral-50">
                 <div class="relative my-16 mx-12">
                     <div class="h-[1px] bg-neutral-50">
-                        <div class="h-[1px] bg-brand-800 {{ Route::is('student.registration.step2') ? 'w-[25%]' : (Route::is('student.registration.step3') ? 'w-[50%]' : (Route::is('student.registration.step4') ? 'w-[80%]' : (Route::is('student.registration.step5') ? 'w-[100%]' : 'w-0'))) }}"></div>
+                        <div
+                            class="h-[1px] bg-brand-800 {{ Route::is('student.registration.step2') ? 'w-[25%]' : (Route::is('student.registration.step3') ? 'w-[50%]' : (Route::is('student.registration.step4') ? 'w-[80%]' : (Route::is('student.registration.step5') ? 'w-[100%]' : 'w-0'))) }}">
+                        </div>
                     </div>
                     <div class="absolute translate-y-[-30%] top-0 start-[-5%] text-center space-y-3">
-                        <button class="bg-brand-800 text-neutral-0 py-2 px-4 rounded-full shadow-md">1</button>
-                        <h6 class="text-xs text-brand-600">Pilih Lokasi PKL</h6>
+                        <button
+                            class="text-neutral-0 py-2 px-4 rounded-full shadow-md {{ $activeBatch != null ? 'bg-brand-800' : 'bg-neutral-200' }}">1</button>
+                        <h6 class="text-xs {{ $activeBatch != null ? 'text-brand-600' : '' }}">Pilih Lokasi PKL</h6>
                     </div>
                     <div class="absolute translate-y-[-30%] top-0 start-[20%] text-center space-y-3">
                         <button
@@ -103,48 +106,56 @@
 
 
             {{-- form --}}
-            <div x-data="{ currentStep: 1 }">
-                {{-- step 1 --}}
-                @if (Route::is('student.registration'))
-                    <div x-show="currentStep===1">
-                        <x-registration_step.step1 :industryData="$industryData" :industryRequestData="$industryRequestData"></x-registration_step.step1>
-                    </div>
-                @endif
+            @if ($activeBatch != null)
+                <div x-data="{ currentStep: 1 }">
+                    {{-- step 1 --}}
+                    @if (Route::is('student.registration'))
+                        <div x-show="currentStep===1">
+                            <x-registration_step.step1 :industryData="$industryData" :industryRequestData="$industryRequestData"></x-registration_step.step1>
+                        </div>
+                    @endif
 
-                {{-- step pengajuan industry --}}
-                <div x-show="currentStep==='newIndustry'">
-                    <x-registration_step.newIndustry></x-registration_step.newIndustry>
+                    {{-- step pengajuan industry --}}
+                    <div x-show="currentStep==='newIndustry'">
+                        <x-registration_step.newIndustry></x-registration_step.newIndustry>
+                    </div>
+
+                    {{-- step 2 --}}
+                    @if (Route::is('student.registration.step2'))
+                        <div>
+                            <x-registration_step.step2 :studentListData="$studentListData"></x-registration_step.step2>
+                        </div>
+                    @endif
+
+                    {{-- step 3 --}}
+                    @if (Route::is('student.registration.step3'))
+                        <div>
+                            <x-registration_step.step3 :locationInternship="$locationInternship" :teamMember="$teamMember"></x-registration_step.step3>
+                        </div>
+                    @endif
+
+                    {{-- step 4 --}}
+                    @if (Route::is('student.registration.step4'))
+                        <div>
+                            <x-registration_step.step4 :registrationData="$registrationData"></x-registration_step.step4>
+                        </div>
+                    @endif
+
+                    {{-- step 5 --}}
+                    @if (Route::is('student.registration.step5'))
+                        <div>
+                            <x-registration_step.step5 :registrationData="$registrationData"></x-registration_step.step5>
+                        </div>
+                    @endif
+
                 </div>
-
-                {{-- step 2 --}}
-                @if (Route::is('student.registration.step2'))
-                    <div>
-                        <x-registration_step.step2 :studentListData="$studentListData"></x-registration_step.step2>
-                    </div>
-                @endif
-
-                {{-- step 3 --}}
-                @if (Route::is('student.registration.step3'))
-                    <div>
-                        <x-registration_step.step3 :locationInternship="$locationInternship" :teamMember="$teamMember"></x-registration_step.step3>
-                    </div>
-                @endif
-
-                {{-- step 4 --}}
-                @if (Route::is('student.registration.step4'))
-                    <div>
-                        <x-registration_step.step4 :registrationData="$registrationData"></x-registration_step.step4>
-                    </div>
-                @endif
-
-                {{-- step 5 --}}
-                @if (Route::is('student.registration.step5'))
-                    <div>
-                        <x-registration_step.step5 :registrationData="$registrationData"></x-registration_step.step5>
-                    </div>
-                @endif
-
-            </div>
+            @else
+                <x-not_found_empty_state>
+                    <x-slot name="title">Pendaftaran tidak tersedia</x-slot>
+                    <x-slot name="desc">Saat ini bukan periode pendaftaran PKL. Hubungi admin PKL untuk info lebih lanjut
+                        ya!</x-slot>
+                </x-not_found_empty_state>
+            @endif
         </div>
     </div>
 
