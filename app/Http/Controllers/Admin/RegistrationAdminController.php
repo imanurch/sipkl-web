@@ -72,6 +72,20 @@ class RegistrationAdminController extends Controller
 
         // table data
         $data = $this->registrationService->getRegistration($filters);
+        foreach ($data as $dt) {
+            if ($dt->RegistrationDocument) {
+                foreach ($dt->registrationDocument as $doc) {
+                    if ($doc->type == 'surat pengantar') {
+                        $dt->surat_pengantar = $doc->url != '' ? $doc->url : null;
+                    } else if ($doc->type == 'surat balasan') {
+                        $dt->surat_balasan = $doc->url != '' ? $doc->url : null;
+                    } else if ($doc->type == 'ucapan terima kasih') {
+                        $dt->ucapan_terima_kasih = $doc->url != '' ? $doc->url : null;
+                    }
+                }
+            }
+            $dt->status = $dt->status == '0' ? 'Belum Dikonfirmasi' : ($dt->status == '1' ? 'Diterima' : 'Ditolak');
+        }
         // dd($data);
 
         // card data
@@ -182,6 +196,101 @@ class RegistrationAdminController extends Controller
             Toastr::addSuccess('Registrasi berhasil dikonfirmasi!');
         } catch (\Exception $e) {
             Toastr::addError('Registrasi gagal dikonfirmasi!');
+        }
+        return redirect()->back();
+    }
+
+    public function updateStatusRegistration(Request $request, $registrationId)
+    {
+        // dd($request->status, $registrationId);
+        $newStatus = $request->status == 'accept' ? '1' : '2';
+        $registrationData = $this->registrationService->getRegistrationById($registrationId);
+        // dd($registrationData);
+        try {
+            DB::transaction(function () use ($registrationId, $registrationData, $newStatus) {
+                if ($registrationData->status != $newStatus) {
+                    // dd($newStatus);
+                    if ($newStatus == '1') {
+                        $this->registrationService->updateStatusRegistration($registrationId, 'accept');
+
+                        $data = [
+                            'group_id' => $registrationData->group_id,
+                            'industry_id' => $registrationData->industry_id,
+                            'start_date' => $registrationData->start_date,
+                            'end_date' => $registrationData->end_date,
+                            'batch_id' => $registrationData->batch_id,
+                        ];
+
+                        // tambah registration to internship data
+                        $newInternship = $this->internshipService->addInternship($data);
+                        // dd($newInternship->group->name);
+
+                        foreach ($newInternship->group->groupMember as $member) {
+                            $newInternId = $member->student->id;
+
+                            // buat tempat di assessment
+                            $this->assessmentService->addAssessment([
+                                'student_id' => $newInternId,
+                                'internship_id' => $newInternship->id,
+                            ]);
+
+                            // buat tempat di logbook
+                            $logbook_start_date = new DateTime($newInternship->start_date);
+                            $logbook_end_date = new DateTime($newInternship->end_date);
+
+                            while ($logbook_start_date <= $logbook_end_date) {
+                                $current_start = clone $logbook_start_date;
+
+                                $current_end = clone $logbook_start_date;
+                                $current_end->modify('+6 days');
+
+                                if ($current_end > $logbook_end_date) {
+                                    $current_end = clone $logbook_end_date;
+                                }
+
+                                $logbook_data = [
+                                    'student_id'    => $newInternId,
+                                    'internship_id' => $newInternship->id,
+                                    'start_date'    => $current_start->format('Y-m-d'),
+                                    'end_date'      => $current_end->format('Y-m-d')
+                                ];
+
+                                $this->logbookService->addLogbook($logbook_data);
+
+                                $logbook_start_date = clone $current_end;
+                                $logbook_start_date->modify('+1 day');
+                            }
+
+                            // buat document intern (surat jalan)
+                            $data = [
+                                'title' => 'Contoh Dokumen Surat Jalan',
+                                'date'  => date('d-m-Y'),
+                            ];
+
+                            $pdf = Pdf::loadView('document_templates/surat_pengantar_template', $data);
+                            $filename = 'surat_jalan_' . time() . '.pdf';
+
+                            $path = storage_path('app/intern_documents/surat_jalan/' . $filename);
+                            $pdf->save($path);
+
+                            $this->internDocumentService->addInternDocument([
+                                'student_id' => $newInternId,
+                                'internship_id' => $newInternship->id,
+                                'type' => 'surat jalan',
+                                'url' => $filename,
+                            ]);
+                        }
+                    } elseif ($newStatus == '2') {
+                        $this->registrationService->updateStatusRegistration($registrationId, 'reject');
+
+                        $internship_id = $this->internshipService->getInternshipByGroupId($registrationData->group_id)->id;
+                        $this->internshipService->deleteInternship($internship_id);
+                    }
+                }
+            });
+            Toastr::addSuccess('Status berhasil diubah!');
+        } catch (\Exception $e) {
+            Toastr::addError('Status gagal diubah!');
         }
         return redirect()->back();
     }

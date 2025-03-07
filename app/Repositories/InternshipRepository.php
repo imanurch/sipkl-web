@@ -129,6 +129,10 @@ class InternshipRepository
         return Internship::where('advisor_id', $advisor_id)->where('batch_id', $batch_id)->get();
     }
 
+    public function getInternshipByGroupId($group_id)
+    {
+        return Internship::where('group_id', $group_id)->first();
+    }
 
     public function findInternshipById($id)
     {

@@ -142,6 +142,7 @@ Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function
     Route::delete('registration/{id}', [RegistrationAdminController::class, 'destroy'])->name('registration.destroy');
     Route::get('registration/download/{type}/{filename}', [RegistrationAdminController::class, 'downloadFile'])->name('registration.download.file');
     Route::get('registration/confirmation/{registrationId}/{status}', [RegistrationAdminController::class, 'confirmStatusRegistration'])->name('registration.status.confirm');
+    Route::post('registration/confirmation/{registrationId}', [RegistrationAdminController::class, 'updateStatusRegistration'])->name('registration.update.status');
     Route::get('registration/generateDokumenPengantar/{registrationId}', [RegistrationAdminController::class, 'generateSuratPengantar'])->name('registration.generateSuratPengantar');
 
     // intern

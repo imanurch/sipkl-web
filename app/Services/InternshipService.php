@@ -64,6 +64,11 @@ class InternshipService
         return $this->internshipRepository->findInternshipById($internship_id);
     }
 
+    public function getInternshipByGroupId($group_id)
+    {
+        return $this->internshipRepository->getInternshipByGroupId($group_id);
+    }
+
     public function addInternship(array $data)
     {
         return $this->internshipRepository->createInternship($data);

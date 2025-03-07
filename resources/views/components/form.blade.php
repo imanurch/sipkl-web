@@ -5,6 +5,9 @@
         <template x-if="modalAction=='isEdit'">
             @method('PATCH')
         </template>
+        {{-- <template x-if="modalAction=='isEditStatus'">
+            @method('GET')
+        </template> --}}
         <template x-if="modalAction=='isDelete'">
             @method('DELETE')
         </template>
@@ -21,7 +24,7 @@
             <span x-text="modalAction=='isView' ? 'Kembali' : 'Batalkan'"></span>
         </button>
         <button x-show="modalAction!='isView'" type="submit" class="btn btn-success-fill btn-sm">
-            <span x-text="modalAction=='isAdd' ? 'Tambah' : (modalAction=='isEdit' ? 'Ubah' : (modalAction=='isDelete' ? 'Hapus' : (modalAction=='isImport' ? 'Impor' : '')))"></span>
+            <span x-text="modalAction=='isAdd' ? 'Tambah' : (modalAction=='isEdit' || modalAction=='isEditStatus' ? 'Ubah' : (modalAction=='isDelete' ? 'Hapus' : (modalAction=='isImport' ? 'Impor' : '')))"></span>
         </button>
     </div>
 </form>
