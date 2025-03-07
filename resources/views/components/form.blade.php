@@ -20,7 +20,7 @@
         {{ $formBody }}           
     </div>
     <div class="form-footer">
-        <button @click="modalAction=null" class="btn btn-sm" :class="modalAction=='isView' ? 'btn-success-fill' : 'btn-error-fill'">
+        <button @click.prevent="modalAction=null" class="btn btn-sm" :class="modalAction=='isView' ? 'btn-success-fill' : 'btn-error-fill'">
             <span x-text="modalAction=='isView' ? 'Kembali' : 'Batalkan'"></span>
         </button>
         <button x-show="modalAction!='isView'" type="submit" class="btn btn-success-fill btn-sm">
