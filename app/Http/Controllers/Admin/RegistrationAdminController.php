@@ -281,8 +281,10 @@ class RegistrationAdminController extends Controller
                             ]);
                         }
                     } elseif ($newStatus == '2') {
+                        // update status registration
                         $this->registrationService->updateStatusRegistration($registrationId, 'reject');
 
+                        // delete internship
                         $internship_id = $this->internshipService->getInternshipByGroupId($registrationData->group_id)->id;
                         $this->internshipService->deleteInternship($internship_id);
                     }
@@ -340,10 +342,20 @@ class RegistrationAdminController extends Controller
     public function destroy($id)
     {
         try {
-            $this->registrationService->deleteRegistration($id);
-            Toastr::addSuccess('Data admin berhasil dihapus!');
+            $registrationData = $this->registrationService->getRegistrationById($id);
+            DB::transaction(function () use ($registrationData, $id) {
+                // delete registration
+                $this->registrationService->deleteRegistration($id);
+                // delete internship
+                $internship = $this->internshipService->getInternshipByGroupId($registrationData->group_id);
+                if($internship != null){
+                    $internship_id = $internship->id;
+                    $this->internshipService->deleteInternship($internship_id);
+                }
+            });
+            Toastr::addSuccess('Data registrasi berhasil dihapus!');
         } catch (\Exception $e) {
-            Toastr::addError('Data admin gagal dihapus!');
+            Toastr::addError('Data registrasi gagal dihapus!');
         }
         return redirect()->back();
     }
