@@ -14,29 +14,29 @@
                 <div class="flex space-x-3 place-items-center">
                     <h6 class="text-xs-reguler w-32" for="">Nama Lengkap</h6>
                     <span>:</span>
-                    <input class="input w-full" type="text" value="{{ session('user_bio')->name ?? '' }}" disabled>
+                    <input class="input w-full" type="text" value="{{ $studentData->name ?? '' }}" disabled>
                 </div>
                 <div class="flex space-x-3 place-items-center">
                     <h6 class="text-xs-reguler w-32" for="">Jurusan</h6>
                     <span>:</span>
-                    <input class="input w-full" type="text" value="{{ session('user_bio')->department->name ?? '' }}"
+                    <input class="input w-full" type="text" value="{{ $studentData->department->name ?? '' }}"
                         disabled>
                 </div>
                 <div class="flex space-x-3 place-items-center">
                     <h6 class="text-xs-reguler w-32" for="">NISN</h6>
                     <span>:</span>
-                    <input class="input w-full" type="text" value="{{ session('user_bio')->nisn ?? '' }}" disabled>
+                    <input class="input w-full" type="text" value="{{ $studentData->nisn ?? '' }}" disabled>
                 </div>
                 <div class="flex space-x-3 place-items-center">
                     <h6 class="text-xs-reguler w-32" for="">Nomor Telepon</h6>
                     <span>:</span>
-                    <input class="input w-full" type="text" value="{{ session('user_bio')->phone_num ?? '' }}" disabled>
+                    <input class="input w-full" type="text" value="{{ $studentData->phone_num ?? '' }}" disabled>
                 </div>
                 <div class="flex space-x-3 place-items-center">
                     <h6 class="text-xs-reguler w-32" for="">Jenis Kelamin</h6>
                     <span>:</span>
                     <input class="input w-full" type="text"
-                        value="{{ session('user_bio')->gender == 'men' ? 'Laki-Laki' : 'Perempuan' }}" disabled>
+                        value="{{ $studentData->gender == 'men' ? 'Laki-Laki' : 'Perempuan' }}" disabled>
                 </div>
             </div>
         </div>

@@ -44,7 +44,7 @@ class DashboardStudentController extends Controller
         $currentBatch = $this->batchService->getBatchByStatus('active');
         $batch_id = $currentBatch != null ? $currentBatch->id : '';
 
-        // $studentData = $this->studentService->getStudentById($student_id);
+        $studentData = $this->studentService->getStudentById($student_id);
         $internshipData = $this->internshipService->getInternshipByStudentId($batch_id, $student_id);
         if ($internshipData != null) {
             $assessment = $this->assessmentService->getAssessmentByStudentIdAndInternshipId($student_id, $internshipData->id);
@@ -53,7 +53,7 @@ class DashboardStudentController extends Controller
         }
         // dd($internshipData);
         return view('pages.student.dashboard', [
-            // 'studentData' => $studentData,
+            'studentData' => $studentData,
             'internshipData' => $internshipData,
             'pages' => 'dashboard',
         ]);
