@@ -49,7 +49,7 @@ class DashboardStudentController extends Controller
         if ($internshipData != null) {
             $assessment = $this->assessmentService->getAssessmentByStudentIdAndInternshipId($student_id, $internshipData->id);
             $isAssessed = ($assessment->advisor_score != null && $assessment->industry_score != null && $assessment->final_test_score != null ? 'true' : false);
-            $internshipData->status = $isAssessed == true ? 'Selesai' : 'Sedang Berjalan';
+            $internshipData->status = $isAssessed == true ? 'Selesai' : 'Aktif';
         }
         // dd($internshipData);
         return view('pages.student.dashboard', [
