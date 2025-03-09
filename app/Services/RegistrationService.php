@@ -39,6 +39,11 @@ class RegistrationService
         return $this->registrationRepository->getRegistrationByStudentId($batch_id, $student_id);
     }
 
+    public function getAllHistoryRegistrationByStudentId($student_id)
+    {
+        return $this->registrationRepository->getAllHistoryRegistrationByStudentId($student_id);
+    }
+
     public function updateStatusRegistration($id, $status)
     {
         // dd($id, $status);

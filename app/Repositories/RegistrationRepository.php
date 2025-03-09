@@ -66,7 +66,14 @@ class RegistrationRepository
     {
         return Registration::whereHas('group.groupMember.student', function ($query) use ($student_id, $batch_id) {
             $query->where('id', $student_id);
-        })->with('industry:id,name,address')->where('batch_id', $batch_id)->first();
+        })->with('industry:id,name,address')->where('batch_id', $batch_id)->where('step', '!=' , '0')->first();
+    }
+
+    public function getAllHistoryRegistrationByStudentId($student_id)
+    {
+        return Registration::whereHas('group.groupMember.student', function ($query) use ($student_id) {
+            $query->where('id', $student_id);
+        })->with('industry:id,name,address')->paginate(5);
     }
 
     public function createRegistration(array $data)

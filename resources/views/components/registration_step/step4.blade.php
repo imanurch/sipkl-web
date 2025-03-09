@@ -74,17 +74,26 @@
                     @endforeach
                 </div>
             </div>
-            @foreach ($registrationData->registrationDocument as $dt)
-                @if ($dt->type == 'surat pengantar')
-                    @if ($dt->url != '')
-                        <div>
-                            <button type="submit" class="btn btn-xs btn-success-fill">
-                                <span>Selanjutnya</span>
-                            </button>
-                        </div>
+            <p class="text-xs">* Jika permohonan PKL ditolak oleh industri atau kamu ingin membuat pendaftaran baru,
+                klik button "Buat Pendaftaran Baru". Dengan membuat pendaftaran baru, maka pendaftaran ini akan otomatis ditolak </p>
+            <div class="flex space-x-2">
+                <div>
+                    <a href="{{ route('student.registration.newRegistration', ['lastRegistrationId' => $registrationData->id ]) }}" class="btn btn-xs btn-error-outline">
+                        <span>Buat Pendaftaran Baru</span>
+                    </a>
+                </div>
+                @foreach ($registrationData->registrationDocument as $dt)
+                    @if ($dt->type == 'surat pengantar')
+                        @if ($dt->url != '')
+                            <div>
+                                <button type="submit" class="btn btn-xs btn-success-fill">
+                                    <span>Selanjutnya</span>
+                                </button>
+                            </div>
+                        @endif
                     @endif
-                @endif
-            @endforeach
+                @endforeach
+            </div>
         </div>
     </form>
 </div>

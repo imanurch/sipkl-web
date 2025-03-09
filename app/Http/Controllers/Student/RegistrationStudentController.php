@@ -75,10 +75,12 @@ class RegistrationStudentController extends Controller
 
         $request->session()->put('registration_id', $registration_id);
 
+        // history
+        $historyData = $this->registrationService->getAllHistoryRegistrationByStudentId($student_id);
 
         if ($step == '1') {
             return view('pages.student.registration', [
-                // 'activeBatch' => $activeBatch,
+                'historyData' => $historyData,
                 'industryData' => $industryData,
                 'industryRequestData' => $industryRequestData,
                 'pages' => 'registration',
@@ -87,6 +89,21 @@ class RegistrationStudentController extends Controller
             $routeName = "student.registration.step{$step}";
             return redirect()->route($routeName);
         }
+    }
+
+    public function history(Request $request)
+    {
+        $student_id = session('user_bio')->id;
+
+        // history
+        $historyData = $this->registrationService->getAllHistoryRegistrationByStudentId($student_id);
+        foreach ($historyData as $dt) {
+            $dt->status = $dt->status == '0' ? 'Belum Dikonfirmasi' : ($dt->status == '1' ? 'Diterima' : 'Ditolak');
+        }
+        return view('pages.student.registration', [
+            'historyData' => $historyData,
+            'pages' => 'registration',
+        ]);
     }
 
     public function newIndustryRequest(Request $request)
@@ -244,8 +261,8 @@ class RegistrationStudentController extends Controller
             });
         } catch (\Exception $e) {
             Toastr::addError('Data registrasi gagal disimpan!');
-            return redirect()->back();
         }
+        return redirect()->back();
     }
 
     public function step4View()
@@ -325,5 +342,12 @@ class RegistrationStudentController extends Controller
             Toastr::addError('File tidak ditemukan!');
             return redirect()->back();
         }
+    }
+
+    public function repeatRegistration($lastRegistrationId){
+        $this->registrationService->updateStatusRegistration($lastRegistrationId, 'reject');
+        $this->registrationService->updateRegistrationStep($lastRegistrationId, '0');
+
+        return redirect()->route('student.registration');
     }
 }

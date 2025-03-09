@@ -210,6 +210,8 @@ Route::prefix('student')->name('student.')->middleware('role:student')->group(fu
     Route::post('registration/step5', [RegistrationStudentController::class, 'step5'])->name('registration.step5');
     Route::get('registration/step5', [RegistrationStudentController::class, 'step5View'])->name('registration.step5');
     Route::get('registration/download/{type}/{filename}', [RegistrationStudentController::class, 'downloadFile'])->name('registration.download.file');
+    Route::get('registration/history', [RegistrationStudentController::class, 'history'])->name('registration.history');
+    Route::get('registration/{lastRegistrationId}', [RegistrationStudentController::class, 'repeatRegistration'])->name('registration.newRegistration');
 
     // logbook
     Route::get('logbook', [LogbookStudentController::class, 'index'])->name('logbook');
