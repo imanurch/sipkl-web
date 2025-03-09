@@ -50,6 +50,7 @@
             <th>LOKASI PKL</th>
             <th>LOGBOOK</th>
             <th>LAPORAN AKHIR</th>
+            <th>STATUS</th>
         </x-slot>
         <x-slot name="tBody">
             @foreach ($data as $dt)
@@ -72,6 +73,7 @@
                                     href="{{ route('admin.output.download.finalReport', ['filename' => $doc->url]) }}"
                                     name="Lihat"></x-table.action_btn_table>
                                 @break
+
                             @elseif($loop->last)
                                 <td>Belum Tersedia</td>
                             @endif
@@ -79,6 +81,7 @@
                     @else
                         <td>Belum Tersedia</td>
                     @endif
+                    <x-table.status_table status="{{ $dt->status }}"></x-table.status_table>
                 </tr>
             @endforeach
         </x-slot>

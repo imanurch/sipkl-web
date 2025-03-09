@@ -36,13 +36,7 @@ class InternshipRepository
 
     public function getIntern($filters = [])
     {
-        // $query = Student::whereHas('groupMember.group.internship', function ($query) use ($filters) {
-        //     $query->where('batch_id', $filters['batch_id']);
-        // });
-
         $query = Student::with(
-            // 'groupMember',
-            // 'groupMember.group',
             'groupMember.group.internship',
             'groupMember.group.internship.advisor:id,name',
             'groupMember.group.internship.industry:id,name',
@@ -57,6 +51,18 @@ class InternshipRepository
         };
 
         return $query->paginate(5);
+    }
+
+    public function getAllIntern($batch_id)
+    {
+        return Student::with(
+            'groupMember.group.internship',
+            'groupMember.group.internship.advisor:id,name',
+            'groupMember.group.internship.industry:id,name',
+            'internDocument'
+        )->whereHas('groupMember.group.internship', function ($query) use ($batch_id) {
+            $query->where('batch_id', $batch_id);
+        })->get();
     }
 
     public function countIntern($batch_id)

@@ -29,6 +29,11 @@ class InternshipService
         return $this->internshipRepository->getIntern($filters);
     }
 
+    public function getAllIntern($batch_id)
+    {
+        return $this->internshipRepository->getAllIntern($batch_id);
+    }
+
     public function getInternCount($batch_id)
     {
         return $this->internshipRepository->countIntern($batch_id);

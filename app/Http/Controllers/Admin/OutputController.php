@@ -53,16 +53,32 @@ class OutputController extends Controller
 
         // // table data
         $data = $this->internshipService->getIntern($filters);
-        // $isCompleteLogbook = $this->logbookService->isCompleteLogbook($filters);
-        // $isSubmittedReport = $this->internshipService->getInternship($filters);
-        // $data = $this->internshipService->getIntern($filters);
-        // dd($data);
-        // $intern = $this->internshipService->getInternCount($batch_id);
+        foreach ($data as $dt) {
+            // cek final report
+            foreach ($dt->groupMember as $member) {
+                if ($member->group->internship) {           
+                    $isCompleteFinalReport = $this->internDocumentService->checkIsCompleteFinalReportByInternshipAndStudentId($member->group->internship->id, $dt->id);
+                    
+                    if ($isCompleteFinalReport == true) {
+                        // cek logbook
+                        $isCompleteLogbook = $this->logbookService->checkIsCompleteLogbookByInternshipAndStudentId($member->group->internship->id, $dt->id);
+                        if ($isCompleteLogbook == true) {
+                            $dt->status = 'Lengkap';
+                        } else {
+                            $dt->status = 'Tidak Lengkap';
+                        }
+                    } else {
+                        $dt->status = 'Tidak Lengkap';
+                    }
+                }
+            }
+        }
 
         // card
+        $allIntern = $this->internshipService->getAllIntern($batch_id);
         $completeOutputCount = 0;
         $incompleteOutputCount = 0;
-        foreach ($data as $dt) {
+        foreach ($allIntern as $dt) {
             // cek final report
             foreach ($dt->groupMember as $member) {
                 if ($member->group->internship) {
