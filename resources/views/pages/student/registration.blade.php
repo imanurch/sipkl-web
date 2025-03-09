@@ -70,8 +70,8 @@
                     </div>
                     <div class="absolute translate-y-[-30%] top-0 start-[-5%] text-center space-y-3">
                         <button
-                            class="text-neutral-0 py-2 px-4 rounded-full shadow-md {{ $activeBatch != null ? 'bg-brand-800' : 'bg-neutral-200' }}">1</button>
-                        <h6 class="text-xs {{ $activeBatch != null ? 'text-brand-600' : '' }}">Pilih Lokasi PKL</h6>
+                            class="text-neutral-0 py-2 px-4 rounded-full shadow-md {{ session('user_bio') != null || !Route::is('student.registration') ? 'bg-brand-800' : 'bg-neutral-200' }}">1</button>
+                        <h6 class="text-xs {{ session('batch_id') != null || !Route::is('student.registration') ? 'text-brand-600' : '' }}">Pilih Lokasi PKL</h6>
                     </div>
                     <div class="absolute translate-y-[-30%] top-0 start-[20%] text-center space-y-3">
                         <button
@@ -106,7 +106,7 @@
 
 
             {{-- form --}}
-            @if ($activeBatch != null)
+            @if (session('user_bio') != null)
                 <div x-data="{ currentStep: 1 }">
                     {{-- step 1 --}}
                     @if (Route::is('student.registration'))

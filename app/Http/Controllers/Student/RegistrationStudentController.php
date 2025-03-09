@@ -64,6 +64,7 @@ class RegistrationStudentController extends Controller
 
         $activeBatch = $this->batchService->getBatchByStatus('active');
         $batch_id = $activeBatch != null ? $activeBatch->id : '';
+        $request->session()->put('batch_id', $batch_id);
 
         $student_id = session('user_bio')->id;
         $registration = $this->registrationService->getRegistrationByStudentId($batch_id, $student_id);
@@ -74,9 +75,10 @@ class RegistrationStudentController extends Controller
 
         $request->session()->put('registration_id', $registration_id);
 
+
         if ($step == '1') {
             return view('pages.student.registration', [
-                'activeBatch' => $activeBatch,
+                // 'activeBatch' => $activeBatch,
                 'industryData' => $industryData,
                 'industryRequestData' => $industryRequestData,
                 'pages' => 'registration',

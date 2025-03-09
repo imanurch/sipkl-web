@@ -31,18 +31,27 @@ class DashboardAdvisorController extends Controller
         $batch_id = $currentBatch != null ? $currentBatch->id : '';
         // dd($advisor_id);
 
-        // $data = $this->advisorService->getAdvisorById($advisor_id);
+        $data = $this->advisorService->getAdvisorById($advisor_id);
+        $surat_tugas = $this->advisorService->getAdvisorDocumentByAdvisorIdAndBatchId($advisor_id, $batch_id);
+        $data->surat_tugas = $surat_tugas;
         // dd($data);
-        // $surat_tugas = $this->advisorService->getAdvisorDocumentByAdvisorIdAndBatchId($advisor_id, $batch_id);
-        // $data->surat_tugas = $surat_tugas;
 
         $mentee = $this->internshipService->getInternByAdvisorCount($batch_id, $advisor_id);
         $industry = $this->internshipService->getIndustryByAdvisorCount($batch_id, $advisor_id);
 
         // dd($surat_tugas);
+        // $surat_tugas = null;
+        // if (session('user_bio')->advisorDocument != null) {
+        //     // dd(session('user_bio'));
+        //     foreach (session('user_bio')->advisorDocument as $dt) {
+        //         if ($dt->batch_id == $batch_id) {
+        //             $surat_tugas = $dt->surat_tugas;
+        //         }
+        //     }
+        // }
 
         return view('pages.advisor.dashboard', [
-            // 'data' => $data,
+            'data' => $data,
             // 'surat_tugas' => $surat_tugas,
             'mentee' => $mentee,
             'industry' => $industry,

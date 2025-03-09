@@ -147,7 +147,10 @@
                         @endphp
 
                         {{-- confirm --}}
-                        @if ($dt->status == '0' && $dt->surat_balasan != null)
+                        {{-- {{ dd($dt->status == 'Belum Dikonfirmasi') }} --}}
+                        {{-- {{ dd($dt->surat_balasan != null) }} --}}
+                        {{-- {{ dd($dt->status == 'Belum Dikonfirmasi' && $dt->surat_balasan != null) }} --}}
+                        @if ($dt->status == 'Belum Dikonfirmasi' && $dt->surat_balasan != null)
                             <x-table.action_confirm_table :id="$dt->id"></x-table.action_confirm_table>
                         @elseif($dt->status != '0' && $dt->surat_balasan != null)
                             <td class="text-center">

@@ -21,9 +21,9 @@ class Advisor extends Model
     {
         return $this->belongsTo(Department::class, 'department_id');
     }
-    public function advisorDocument(): HasOne
+    public function advisorDocument(): HasMany
     {
-        return $this->hasOne(AdvisorDocument::class, 'id');
+        return $this->hasMany(AdvisorDocument::class, 'advisor_id', 'id');
     }
     public function internship(): HasMany
     {
