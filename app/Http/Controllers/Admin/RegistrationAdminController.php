@@ -190,6 +190,20 @@ class RegistrationAdminController extends Controller
                             'type' => 'surat jalan',
                             'url' => $filename,
                         ]);
+
+                        // buat ucapan terima kasih
+                        $data = [
+                            'title' => 'Contoh Dokumen Surat Terima kasih',
+                            'date'  => date('d-m-Y'),
+                        ];
+
+                        $pdf = Pdf::loadView('document_templates/surat_pengantar_template', $data);
+                        $filename = 'ucapan_terima_kasih_' . time() . '.pdf';
+
+                        $path = storage_path('app/registration_document/ucapan_terima_kasih/' . $filename);
+                        $pdf->save($path);
+
+                        $this->registrationDocumentService->updateRegistrationDocument($registrationId, 'ucapan terima kasih', $filename);
                     }
                 }
             });
@@ -279,6 +293,20 @@ class RegistrationAdminController extends Controller
                                 'type' => 'surat jalan',
                                 'url' => $filename,
                             ]);
+
+                            // buat ucapan terima kasih
+                            $data = [
+                                'title' => 'Contoh Dokumen Surat Terima kasih',
+                                'date'  => date('d-m-Y'),
+                            ];
+
+                            $pdf = Pdf::loadView('document_templates/surat_pengantar_template', $data);
+                            $filename = 'ucapan_terima_kasih_' . time() . '.pdf';
+
+                            $path = storage_path('app/registration_document/ucapan_terima_kasih/' . $filename);
+                            $pdf->save($path);
+
+                            $this->registrationDocumentService->updateRegistrationDocument($registrationId, 'ucapan terima kasih', $filename);
                         }
                     } elseif ($newStatus == '2') {
                         // update status registration
@@ -287,6 +315,9 @@ class RegistrationAdminController extends Controller
                         // delete internship
                         $internship_id = $this->internshipService->getInternshipByGroupId($registrationData->group_id)->id;
                         $this->internshipService->deleteInternship($internship_id);
+
+                        // delete ucapan terima kasih
+                        $this->registrationDocumentService->updateRegistrationDocument($registrationId, 'ucapan terima kasih', null);
                     }
                 }
             });
@@ -348,7 +379,7 @@ class RegistrationAdminController extends Controller
                 $this->registrationService->deleteRegistration($id);
                 // delete internship
                 $internship = $this->internshipService->getInternshipByGroupId($registrationData->group_id);
-                if($internship != null){
+                if ($internship != null) {
                     $internship_id = $internship->id;
                     $this->internshipService->deleteInternship($internship_id);
                 }

@@ -136,7 +136,7 @@
                             <x-table.action_btn_table name="Lihat File"
                                 href="{{ route('admin.registration.download.file', ['type' => 'ucapanTerimaKasih', 'filename' => $dt->ucapan_terima_kasih]) }}"></x-table.action_btn_table>
                         @else
-                            <td class="text-center">Fitur Belum Tersedia</td>
+                            <td class="text-center">File Belum Tersedia</td>
                         @endif
 
                         {{-- status --}}
