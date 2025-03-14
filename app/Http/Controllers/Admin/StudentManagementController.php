@@ -41,7 +41,9 @@ class StudentManagementController extends Controller
     {
         $currentBatch = $this->batchService->getBatchByStatus('active');
         $batch_id = $request->batch ?? ($currentBatch->id ?? '');
-        $year = $request->year ?? ($currentBatch->year ?? '');
+
+        $lastYear = $this->studentService->getLastYearStudent()->year;
+        $year = $request->year ?? ($currentBatch->year ?? $lastYear);
 
         // table filters
         $departmentData = $this->departmentService->getAllDepartment();
@@ -180,9 +182,9 @@ class StudentManagementController extends Controller
 
                 $this->userService->updateUser($validatedData['user_id'], $updateUserData);
             });
-            Toastr::addSuccess('Data siswa berhasil dihapus!');
+            Toastr::addSuccess('Data siswa berhasil diubah!');
         } catch (\Exception $e) {
-            Toastr::addError('Data siswa gagal dihapus!');
+            Toastr::addError('Data siswa gagal diubah!');
         }
         return redirect()->back();
     }

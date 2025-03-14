@@ -106,7 +106,7 @@
         </div>
     </div>
 
-    <div class="px-32 py-6 space-y-4 border border-brand-500 rounded">
+    {{-- <div class="px-32 py-6 space-y-4 border border-brand-500 rounded">
         @if ($registrationData->status == '1')
             <svg class="size-40" width="472" height="454" viewBox="0 0 472 454" fill="none"
                 xmlns="http://www.w3.org/2000/svg">
@@ -814,5 +814,5 @@
                 </defs>
             </svg>
         @endif
-    </div>
+    </div> --}}
 </div>

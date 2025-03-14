@@ -279,7 +279,6 @@ class RegistrationStudentController extends Controller
 
     public function step5(Request $request)
     {
-
         try {
             $validatedData = $request->validate([
                 'registration_id' => 'required',
@@ -301,10 +300,13 @@ class RegistrationStudentController extends Controller
                 $this->registrationService->updateRegistrationStep($registration_id, '5');
 
                 Toastr::addSuccess('File Bukti berhasil diunggah!');
+                // dd('tes');
+                // return view('pages.student.dashboard');
                 return view('pages.student.registration', [
                     'registrationData' => $registrationData,
                     'pages' => 'registration',
                 ]);
+                // return redirect()->route('student.registration.step5');
             });
         } catch (\Exception $e) {
             Toastr::addError('File Bukti gagal diunggah!');
@@ -344,7 +346,8 @@ class RegistrationStudentController extends Controller
         }
     }
 
-    public function repeatRegistration($lastRegistrationId){
+    public function repeatRegistration($lastRegistrationId)
+    {
         $this->registrationService->updateStatusRegistration($lastRegistrationId, 'reject');
         $this->registrationService->updateRegistrationStep($lastRegistrationId, '0');
 

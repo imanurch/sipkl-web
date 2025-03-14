@@ -42,7 +42,7 @@ class LogbookAdvisorController extends Controller
         $advisor_id = session('user_bio')->id;
 
         $currentBatch = $this->batchService->getBatchByStatus('active');
-        $batch_id = $currentBatch->id;
+        $batch_id = $currentBatch != null ? $currentBatch->id : '';
 
         $batchData = $this->batchService->getAllBatch('');
 

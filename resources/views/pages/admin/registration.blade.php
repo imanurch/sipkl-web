@@ -75,17 +75,17 @@
                 </div>
             </x-slot>
             <x-slot name="tHeader">
-                <th>NO</th>
-                <th>KELOMPOK</th>
-                <th>ANGGOTA</th>
-                <th>WAKTU</th>
-                <th>LOKASI PKL</th>
-                <th>FILE PENGANTAR</th>
-                <th>FILE BUKTI DITERIMA</th>
-                <th>FILE TERIMA KASIH</th>
-                <th>STATUS</th>
-                <th>KONFIRMASI</th>
-                <th>AKSI</th>
+                <th>No</th>
+                <th>Kelompok</th>
+                <th>Anggota</th>
+                <th>Waktu</th>
+                <th>Lokasi PKL</th>
+                <th>File Pengantar</th>
+                <th>File Bukti Diterima</th>
+                <th>File Terima Kasih</th>
+                <th>Status</th>
+                <th>Konfirmasi</th>
+                <th>Aksi</th>
             </x-slot>
             <x-slot name="tBody">
                 @foreach ($data as $dt)

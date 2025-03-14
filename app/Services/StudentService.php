@@ -54,6 +54,11 @@ class StudentService
         return $this->studentRepository->getStudentYear();
     }
 
+    public function getLastYearStudent()
+    {
+        return $this->studentRepository->getLastYearStudent();
+    }
+
     public function addStudent(array $data)
     {
         return $this->studentRepository->createStudent($data);

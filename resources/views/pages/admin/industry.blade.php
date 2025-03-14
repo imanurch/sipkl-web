@@ -43,27 +43,27 @@
 
     <div x-data="{ tabs: 'partner' }" class="space-y-4">
         {{-- tabs --}}
-
         <div class="flex w-full justify-between border-b border-neutral-100">
-            <div>
+            {{-- <div>
                 <h6 class="py-3 text-sm-medium">Data Industri</h6>
-            </div>
+            </div> --}}
             <div class="flex">
-                <button @click="tabs='unconfirmed';"
-                    class="text-sm-medium text-neutral-400 py-3 px-6 hover:text-neutral-700"
+                <button @click="tabs='unconfirmed';" class="text-sm-medium py-3 px-6"
                     :class="tabs == 'unconfirmed' ? 'text-brand-500 border-b border-brand-500 hover:text-brand-500' :
-                        ''">Pengajuan</button>
-                <button @click="tabs='partner';" class="text-sm-medium text-neutral-400 py-3 px-6 hover:text-neutral-700"
-                    :class="tabs == 'partner' ? 'text-brand-500 border-b border-brand-500 hover:text-brand-500' : ''">Partner</button>
-                <button @click="tabs='rejected';" class="text-sm-medium text-neutral-400 py-3 px-6 hover:text-neutral-700"
-                    :class="tabs == 'rejected' ? 'text-brand-500 border-b border-brand-500 hover:text-brand-500' : ''">Ditolak</button>
+                        'text-neutral-400 hover:text-neutral-700'">Pengajuan</button>
+                <button @click="tabs='partner';" class="text-sm-medium py-3 px-6"
+                    :class="tabs == 'partner' ? 'text-brand-500 border-b border-brand-500 hover:text-brand-500' :
+                        'text-neutral-400 hover:text-neutral-700'">Partner</button>
+                <button @click="tabs='rejected';" class="text-sm-medium py-3 px-6"
+                    :class="tabs == 'rejected' ? 'text-brand-500 border-b border-brand-500 hover:text-brand-500' :
+                        'text-neutral-400 hover:text-neutral-700'">Ditolak</button>
             </div>
         </div>
 
         {{-- unconfirmed --}}
         <div x-show="tabs=='unconfirmed'" x-data="{ modalConfirm: null, id: null }">
             <x-table.table>
-                {{-- <x-slot name="tableTitle">Pengajuan Industri Baru</x-slot> --}}
+                <x-slot name="tableTitle">Pengajuan Industri Baru</x-slot>
                 <x-slot name="filterActionForm">industryManagement</x-slot>
                 <x-slot name="filter">
                     <div class="flex w-full space-x-2">
@@ -75,19 +75,19 @@
                     </div>
                 </x-slot>
                 <x-slot name="tHeader">
-                    <th>NO</th>
-                    <th>NAMA</th>
-                    <th>ALAMAT</th>
-                    <th>EMAIL</th>
-                    <th>NO TELP</th>
-                    <th>AKSI</th>
+                    <th>No</th>
+                    <th>Nama</th>
+                    <th>Alamat</th>
+                    <th>Email</th>
+                    <th>No Telp</th>
+                    <th>Aksi</th>
                 </x-slot>
                 <x-slot name="tBody">
                     @foreach ($unconfirmedIndustryData as $dt)
                         <tr>
                             <td class="text-center">{{ $loop->iteration }}</td>
-                            <td>{{ $dt->name }}</td>
-                            <td class="min-w-64">{{ $dt->address }}</td>
+                            <td class="left whitespace-nowrap">{{ $dt->name }}</td>
+                            <td class="left min-w-64">{{ $dt->address }}</td>
                             <td>{{ $dt->email }}</td>
                             <td>{{ $dt->phone_num }}</td>
                             <x-table.action_confirm_table :id="$dt->id"></x-table.action_confirm_table>
@@ -144,7 +144,7 @@
         {{-- partner --}}
         <div x-show="tabs=='partner'" x-data="{ modalAction: null, option: false, selected: 'Pilih Opsi' }">
             <x-table.table>
-                {{-- <x-slot name="tableTitle">Industri Mitra</x-slot> --}}
+                <x-slot name="tableTitle">Industri Mitra</x-slot>
                 <x-slot name="filterActionForm">industryManagement</x-slot>
                 <x-slot name="btnAdd">
                     <x-table.import></x-table.import>
@@ -172,20 +172,20 @@
                     </div>
                 </x-slot>
                 <x-slot name="tHeader">
-                    <th>NO</th>
-                    <th>NAMA</th>
-                    <th>ALAMAT</th>
-                    <th>EMAIL</th>
-                    <th>NO TELP</th>
-                    <th>STATUS</th>
-                    <th>AKSI</th>
+                    <th>No</th>
+                    <th>Nama</th>
+                    <th>Alamat</th>
+                    <th>Email</th>
+                    <th>No Telp</th>
+                    <th>Status</th>
+                    <th>Aksi</th>
                 </x-slot>
                 <x-slot name="tBody">
                     @foreach ($partnerIndustryData as $dt)
                         <tr>
                             <td class="text-center">{{ $loop->iteration }}</td>
-                            <td>{{ $dt->name }}</td>
-                            <td class="min-w-64">{{ $dt->address }}</td>
+                            <td class="left whitespace-nowrap">{{ $dt->name }}</td>
+                            <td class="left min-w-64">{{ $dt->address }}</td>
                             <td>{{ $dt->email }}</td>
                             <td>{{ $dt->phone_num }}</td>
                             <x-table.status_table status="{{ $dt->status }}"></x-table.status_table>
@@ -243,7 +243,8 @@
                         </div>
                         <div class="flex place-items-center">
                             <span class="text-xs-reguler">Template Impor Data :</span>
-                            <a href="{{ route('admin.industryManagement.downloadTemplateFile') }}" class="btn btn-xs btn-default-clear">
+                            <a href="{{ route('admin.industryManagement.downloadTemplateFile') }}"
+                                class="btn btn-xs btn-default-clear">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
                                     viewBox="0 0 14 14" fill="none">
                                     <path
@@ -271,7 +272,7 @@
         {{-- rejected --}}
         <div x-show="tabs=='rejected'">
             <x-table.table>
-                {{-- <x-slot name="tableTitle">Riwayat Pengajuan Industri Ditolak</x-slot> --}}
+                <x-slot name="tableTitle">Riwayat Pengajuan Industri Ditolak</x-slot>
                 <x-slot name="filterActionForm">industryManagement</x-slot>
                 <x-slot name="filter">
                     <div class="flex w-full space-x-2">
@@ -294,8 +295,8 @@
                     @foreach ($rejectedIndustryData as $dt)
                         <tr>
                             <td class="text-center">{{ $loop->iteration }}</td>
-                            <td>{{ $dt->name }}</td>
-                            <td class="min-w-64">{{ $dt->address }}</td>
+                            <td class="left whitespace-nowrap">{{ $dt->name }}</td>
+                            <td class="left min-w-64">{{ $dt->address }}</td>
                             <td>{{ $dt->email }}</td>
                             <td>{{ $dt->phone_num }}</td>
                             <td class="text-center">

@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AccountController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\testingController;
 use App\Http\Controllers\Admin\OutputController;
@@ -14,6 +15,7 @@ use App\Http\Controllers\Advisor\InternAdvisorController;
 use App\Http\Controllers\Advisor\LogbookAdvisorController;
 use App\Http\Controllers\Student\LogbookStudentController;
 use App\Http\Controllers\Admin\AdvisorManagementController;
+use App\Http\Controllers\Admin\DocumentController;
 use App\Http\Controllers\Admin\RegistrationAdminController;
 use App\Http\Controllers\Admin\StudentManagementController;
 use App\Http\Controllers\Advisor\IndustryAdvisorController;
@@ -94,6 +96,7 @@ Route::get('doc', function () {
 Route::get('sipkl', [AuthenticationController::class, 'index'])->name('sipkl');
 Route::post('sipkl/login', [AuthenticationController::class, 'login'])->name('sipkl.login');
 Route::get('sipkl/logout', [AuthenticationController::class, 'logout'])->name('sipkl.logout');
+Route::get('sipkl/account', [AccountController::class, 'index'])->name('sipkl.account');
 
 Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
     // dashboard
@@ -163,7 +166,8 @@ Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function
     Route::patch('assessment/{id}', [AssessmentAdminController::class, 'update'])->name('assessment.update');
 
     // document
-    Route::get('document', [OutputController::class, 'index'])->name('document');
+    Route::get('document', [DocumentController::class, 'index'])->name('document');
+    Route::post('document/advisorDocumentSearch', [DocumentController::class, 'advisorDocumentSearch'])->name('document.advisorSearch');
 });
 
 Route::prefix('advisor')->name('advisor.')->middleware('role:advisor')->group(function () {

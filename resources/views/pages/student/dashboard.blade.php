@@ -19,8 +19,7 @@
                 <div class="flex space-x-3 place-items-center">
                     <h6 class="text-xs-reguler w-32" for="">Jurusan</h6>
                     <span>:</span>
-                    <input class="input w-full" type="text" value="{{ $studentData->department->name ?? '' }}"
-                        disabled>
+                    <input class="input w-full" type="text" value="{{ $studentData->department->name ?? '' }}" disabled>
                 </div>
                 <div class="flex space-x-3 place-items-center">
                     <h6 class="text-xs-reguler w-32" for="">NISN</h6>
@@ -58,7 +57,7 @@
                         <h6 class="text-xs-reguler w-32" for="">Guru Pembimbing</h6>
                         <span>:</span>
                         <input class="input w-full" type="text"
-                            value="{{ $internshipData->advisor ? $internshipData->advisor->name + '(No Telp:' + $internshipData->advisor->phone_num + ')' : 'Belum Tersedia' }}"
+                            value="{{ $internshipData->advisor ? $internshipData->advisor->name . '(No Telp:' . $internshipData->advisor->phone_num . ')' : 'Belum Tersedia' }}"
                             disabled>
                     </div>
                     <div class="flex space-x-3 place-items-center">

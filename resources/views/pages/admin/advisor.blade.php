@@ -62,24 +62,24 @@
             </x-slot>
             {{-- table --}}
             <x-slot name="tHeader">
-                <th>NO</th>
-                <th>NAMA</th>
+                <th>No</th>
+                <th>Nama</th>
                 <th>NIP</th>
-                <th>JURUSAN</th>
-                <th>USERNAME</th>
-                <th>EMAIL</th>
-                <th>NO TELP</th>
-                <th>STATUS</th>
-                <th>AKSI</th>
+                <th>Jurusan</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>No Telp</th>
+                <th>Status</th>
+                <th>Aksi</th>
             </x-slot>
             <x-slot name="tBody">
                 @foreach ($data as $dt)
                     <tr>
                         <td class="text-center">{{ $data->firstItem() + $loop->index }}</td>
-                        <td>{{ $dt->name }}</td>
+                        <td class="left whitespace-nowrap">{{ $dt->name }}</td>
                         <td>{{ $dt->nip }}</td>
                         <td>{{ $dt->department->name }}</td>
-                        <td>{{ $dt->user->username }}</td>
+                        <td class="left whitespace-nowrap">{{ $dt->user->username }}</td>
                         <td>{{ $dt->user->email }}</td>
                         <td>{{ $dt->phone_num }}</td>
                         <x-table.status_table status="{{ $dt->status }}"></x-table.status_table>
@@ -97,7 +97,7 @@
                 <x-slot name="formTitle">Data Guru Pembimbing</x-slot>
                 <x-slot name="formBody">
                     <input type="" name="user_id"
-                        :value="modalAction == 'isEdit' || modalAction=='isDelete' ? dataId.user_id : ''">
+                        :value="modalAction == 'isEdit' || modalAction=='isDelete' ? dataId.user_id : ''" hidden>
                     <div class="input-group">
                         <label class="input-label" for="">Nama</label>
                         <input name="name" class="input" type="text" placeholder="Masukkan Nama"

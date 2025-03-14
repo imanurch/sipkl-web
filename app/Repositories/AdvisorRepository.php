@@ -82,6 +82,11 @@ class AdvisorRepository
         return Advisor::with('advisorDocument')->where('user_id', $user_id)->first();
     }
 
+    public function getAdvisorByNIP($advisor_nip, $batch)
+    {
+        return Advisor::with('advisorDocument')->where('nip', $advisor_nip)->first();
+    }
+
     public function createAdvisor(array $data)
     {
         return Advisor::create($data);

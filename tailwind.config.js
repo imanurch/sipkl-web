@@ -4,7 +4,12 @@ module.exports = {
     theme: {
         extend: {},
         fontFamily: {
-            // sans: ["Inter"],
+            // primary: ["IBM Plex Sans", "sans-serif"],
+            // sans: ['Plus Jakarta Sans'],
+            sans: ["Inter","sans-serif"],
+            // sans: ['Roboto'],
+            // sans: ['Lato'],
+            // sans: ['Open Sans'],
         },
         colors: {
             neutral: {

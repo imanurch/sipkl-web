@@ -31,10 +31,10 @@ class AdvisorService
         return $this->advisorRepository->findAdvisorById($advisor_id);
     }
 
-    // public function getAdvisorIdByUserId($user_id)
-    // {
-    //     return $this->advisorRepository->getAdvisorIdByUserId($user_id)->id;
-    // }
+    public function getAdvisorByNIP($advisor_nip, $batch)
+    {
+        return $this->advisorRepository->getAdvisorByNIP($advisor_nip, $batch);
+    }
 
     public function getAdvisorByUserId($user_id)
     {

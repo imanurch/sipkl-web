@@ -8,13 +8,13 @@
         <x-card title="Terdaftar PKL" data="{{ $registeredStudent }}" class="bg-icon-success">
             <svg class="" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"
                 fill="none">
-                <path d="M16.6667 5L7.50001 14.1667L3.33334 10" stroke="white" stroke-width="3" stroke-linecap="round"
+                <path d="M16.6667 5L7.50001 14.1667L3.33334 10" stroke="" stroke-width="3" stroke-linecap="round"
                     stroke-linejoin="round" />
             </svg>
         </x-card>
         <x-card title="Tidak Terdaftar" data="{{ $unregisteredStudent }}" class="bg-icon-error">
             <svg xmlns="http://www.w3.org/2000/svg" width="25" height="24" viewBox="0 0 25 24" fill="none">
-                <path d="M17.5 7L7.5 17M7.5 7L17.5 17" stroke="white" stroke-width="3" stroke-linecap="round"
+                <path d="M17.5 7L7.5 17M7.5 7L17.5 17" stroke="" stroke-width="3" stroke-linecap="round"
                     stroke-linejoin="round" />
             </svg>
         </x-card>
@@ -75,26 +75,26 @@
                 </div>
             </x-slot>
             <x-slot name="tHeader">
-                <th>NO</th>
-                <th>NAMA</th>
+                <th>No</th>
+                <th>Nama</th>
                 <th>NISN</th>
-                <th>JENIS KELAMIN</th>
-                <th>JURUSAN</th>
-                <th>USERNAME</th>
-                <th>EMAIL</th>
-                <th>NO TELP</th>
-                <th>STATUS PKL</th>
-                <th>AKSI</th>
+                <th>JK</th>
+                <th>Jurusan</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>No Telp</th>
+                <th>Status PKL</th>
+                <th>Aksi</th>
             </x-slot>
             <x-slot name="tBody">
                 @foreach ($data as $dt)
                     <tr>
-                        <td class="text-center">{{ $data->firstItem() + $loop->index }}</td>
-                        <td>{{ $dt->name }}</td>
+                        <td>{{ $data->firstItem() + $loop->index }}</td>
+                        <td class="left whitespace-nowrap">{{ $dt->name }}</td>
                         <td>{{ $dt->nisn }}</td>
-                        <td>{{ $dt->gender == 'men' ? 'Laki-Laki' : 'Perempuan' }}</td>
+                        <td>{{ $dt->gender == 'men' ? 'L' : 'P' }}</td>
                         <td>{{ $dt->department->name }}</td>
-                        <td>{{ $dt->user->username }}</td>
+                        <td class="whitespace-nowrap">{{ $dt->user->username }}</td>
                         <td>{{ $dt->user->email }}</td>
                         <td>{{ $dt->phone_num }}</td>
                         {{-- <td>{{ $dt->status }}</td>        --}}
@@ -112,7 +112,7 @@
                 <x-slot name="formTitle">Data Siswa</x-slot>
                 <x-slot name="formBody">
                     <input type="text" name="user_id"
-                        :value="modalAction == 'isEdit' || modalAction=='isDelete' ? dataId.user_id : ''">
+                        :value="modalAction == 'isEdit' || modalAction=='isDelete' ? dataId.user_id : ''" hidden>
                     <div class="input-group">
                         <label class="input-label" for="">Nama</label>
                         <input name="name" class="input" type="text" placeholder="Masukkan Nama"

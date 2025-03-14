@@ -44,13 +44,13 @@
             </div>
         </x-slot>
         <x-slot name="tHeader">
-            <th>NO</th>
-            <th>NAMA</th>
-            <th>JURUSAN</th>
-            <th>LOKASI PKL</th>
-            <th>LOGBOOK</th>
-            <th>LAPORAN AKHIR</th>
-            <th>STATUS</th>
+            <th>No</th>
+            <th>Nama</th>
+            <th>Jurusan</th>
+            <th>Lokasi PKL</th>
+            <th>Logbook</th>
+            <th>Laporan Akhir</th>
+            <th>Status</th>
         </x-slot>
         <x-slot name="tBody">
             @foreach ($data as $dt)

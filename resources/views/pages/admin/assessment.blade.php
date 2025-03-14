@@ -55,14 +55,14 @@
             </x-slot>
             {{-- table --}}
             <x-slot name="tHeader">
-                <th>NO</th>
-                <th>NAMA</th>
-                <th>LOKASI PKL</th>
-                <th>LUARAN</th>
-                <th>NILAI AKHIR</th>
-                <th>STATUS</th>
-                <th>DETAIL</th>
-                <th>AKSI</th>
+                <th>No</th>
+                <th>Nama</th>
+                <th>Lokasi PKL</th>
+                <th>Luaran</th>
+                <th>Nilai Akhir</th>
+                <th>Status</th>
+                <th>Detail</th>
+                <th>Aksi</th>
             </x-slot>
             <x-slot name="tBody">
                 @foreach ($data as $dt)

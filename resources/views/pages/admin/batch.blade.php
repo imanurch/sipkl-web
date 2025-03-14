@@ -89,10 +89,10 @@
             </x-slot>
             {{-- table --}}
             <x-slot name="tHeader">
-                <th>NO</th>
-                <th>NAMA</th>
-                <th>TAHUN</th>
-                <th>AKSI</th>
+                <th>No</th>
+                <th>Nama</th>
+                <th>Tahun</th>
+                <th>Aksi</th>
             </x-slot>
             <x-slot name="tBody">
                 @foreach ($data as $dt)

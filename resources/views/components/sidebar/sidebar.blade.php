@@ -1,8 +1,8 @@
 <div class="sidebar">
     <div class="">
         <div class="sidebar-head">
-            <img src="{{ url('storage/images/logo.png') }}" alt=" ">
-            <p>SIPKL</p>
+            {{-- <img src="{{ url('storage/images/logo.png') }}" alt=" "> --}}
+            <p>SIPKL SMK N 1 PAJANGAN</p>
         </div>
         <div class="sidebar-body">
             <a href="{{ auth()->user()->role == 'admin' ? route('admin.dashboard') : (auth()->user()->role == 'advisor' ? route('advisor.dashboard') : route('student.dashboard')) }}"

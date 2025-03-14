@@ -1,4 +1,4 @@
-<div class="flex place-items-center border border-neutral-200 rounded py-5 px-8 justify-between">
+<div class="flex place-items-center border border-neutral-200 rounded py-4 px-6 justify-between">
     <div class="space-y-2">
         <div class="tag-status">
             <div

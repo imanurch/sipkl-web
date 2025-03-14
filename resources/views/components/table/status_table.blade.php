@@ -8,7 +8,7 @@
                     stroke-width="2" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
         </div>
-        <span>{{ $status }}</span>
+        <span class="whitespace-nowrap">{{ $status }}</span>
     </div>
 </td>
 

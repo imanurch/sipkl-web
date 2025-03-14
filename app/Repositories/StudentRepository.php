@@ -13,7 +13,7 @@ class StudentRepository
 
         // filter department
         if ($filters['department'] != null) {
-            $department_id = ($filters['department'] == 'K3R' ? '1' : ($filters['department'] == 'DPIB' ? '2' : '3'));
+            $department_id = ($filters['department'] == 'RPL' ? '1' : ($filters['department'] == 'DPIB' ? '2' : '3'));
             $query->where('department_id', $department_id);
         }
 
@@ -82,6 +82,10 @@ class StudentRepository
     public function getStudentYear()
     {
         return Student::select('year')->distinct()->get();
+    }
+
+    public function getLastYearStudent(){
+        return Student::select('year')->latest()->first();
     }
 
     public function findStudentById($id)

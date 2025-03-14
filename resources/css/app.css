@@ -1,12 +1,15 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@100;300;400;500;700;800&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@100;200;300;400;500;600;700;800;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Roboto:wght@100;300;400;500;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Lato:wght@100;300;400;700;900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Open+Sans:wght@300;400;600;700;800&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
-    html {
-        font-family: "Inter", sans-serif;
-        /* src: url(/fonts/Roboto.woff2) format('woff2'); */
-    }
 }
 
 @layer utilities {
@@ -179,7 +182,7 @@
         @apply flex flex-col space-y-4;
     }
     .sidebar-head {
-        @apply h-14 flex px-8 space-x-2 place-items-center border-b border-neutral-100 text-md-semibold;
+        @apply h-14 flex place-items-center justify-center border-b border-neutral-100 text-sm-semibold;
         img {
             @apply size-6;
         }
@@ -225,7 +228,7 @@
         STATUS
     */
     .tag-status {
-        @apply flex place-items-center space-x-2 text-xs-medium;
+        @apply flex place-items-center space-x-2 text-xs;
     }
     .tag-status-icon {
         @apply rounded-full p-1;
@@ -258,7 +261,7 @@
     */
     .btn {
         @apply leading-none inline-flex place-items-center space-x-3 py-2
-         px-5 rounded w-fit min-w-20 justify-center;
+         px-3 rounded w-fit justify-center;
     }
 
     /* size */
@@ -362,7 +365,7 @@
         @apply w-[6.5rem] break-words text-xs-medium text-neutral-300;
     }
     .card-data {
-        @apply text-xl-bold text-brand-900;
+        @apply text-xl-bold;
     }
     .card-icon {
         @apply rounded p-2 stroke-neutral-0;
@@ -378,7 +381,7 @@
         @apply text-xs-medium text-neutral-800;
     }
     .input {
-        @apply border border-neutral-200 rounded py-2 px-5 text-xs-reguler text-neutral-800 placeholder:text-xs-reguler placeholder:text-neutral-300 focus:outline-none focus:border-brand-600 disabled:bg-neutral-50;
+        @apply border border-neutral-200 rounded py-2 px-3 text-xs-reguler text-neutral-800 placeholder:text-xs-reguler placeholder:text-neutral-300 focus:outline-none focus:border-brand-600 disabled:bg-neutral-50;
     }
     /* .input-disable {
         @apply bg-neutral-50;
@@ -444,7 +447,7 @@
     .table {
         @apply w-full;
         th {
-            @apply border-b-0.5 border-neutral-200 space-x-2 py-5 px-6 text-xs-semibold text-neutral-400;
+            @apply border-b-0.5 border-neutral-100 space-x-2 py-3 px-6 text-xs-semibold text-neutral-700;
             svg {
                 @apply size-3;
             }
@@ -455,10 +458,14 @@
             }
         }
         td {
-            @apply space-x-2 py-5 px-6 text-xs-medium text-neutral-800;
+            @apply space-x-2 py-5 px-6 text-xs text-neutral-800 text-center;
             action-icon {
                 @apply size-5;
             }
+        }
+
+        .left{
+            @apply text-left !important;
         }
         
     }

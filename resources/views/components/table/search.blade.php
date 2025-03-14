@@ -1,4 +1,4 @@
-<div class="relative">
+<div class="relative w-full">
     <svg class="absolute top-2 left-2.5" width="18" height="18" viewBox="0 0 28 24" fill="none"
         xmlns="http://www.w3.org/2000/svg">
         <circle cx="11.5" cy="11.5" r="9.5" stroke="#667085" stroke-width="1.5" />
