@@ -5,9 +5,12 @@ namespace Database\Seeders;
 // use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use App\Models\User;
 use App\Models\Admin;
+use App\Models\Batch;
 use App\Models\Advisor;
-use App\Models\Department;
 use App\Models\Student;
+use App\Models\Industry;
+use App\Models\Department;
+use App\Models\SchoolProfile;
 use Illuminate\Support\Str;
 use Illuminate\Database\Seeder;
 use Illuminate\Database\Eloquent\Factories\Sequence;
@@ -89,6 +92,7 @@ class DatabaseSeeder extends Seeder
                     'user_id' => '3',
                     'name' => 'Ima Nur Chasanah',
                     'nisn' => '1234567899',
+                    'nis' => '1224',
                     'gender' => 'men',
                     'department_id' => '1',
                     'year' => '2024',
@@ -96,6 +100,43 @@ class DatabaseSeeder extends Seeder
                 ],
             ))
             ->create();
+
+        Industry::factory()
+            ->state(new Sequence(
+                [
+                    'name' => 'PT Maleo Edukasi',
+                    'address' => 'Tangerang',
+                    'email' => 'maleo@gmail.com',
+                    'phone_num' => '085123456789',
+                    'leader_name' => 'Dion Mulya',
+                ],
+            ))
+            ->create();
+
+        Batch::factory()
+            ->state(new Sequence(
+                [
+                    'name' => 'Batch 1',
+                    'year' => '2024',
+                    'status' => '1',
+                ],
+            ))
+            ->create();
+
+        SchoolProfile::factory()
+            ->state(new Sequence([
+                'name' => 'SMK Negeri 1 Pajangan',
+                'address' => 'Pajangan, Triwidadi, Pajangan, Bantul, DIY',
+                'email' => 'smknpajanganbantul@gmail.com',
+                'phone_num' => '08125967356',
+                'website' => 'www.smkn1pajangan.sch.id',
+                'principal_name' => 'Sutapa, S.Pd.',
+                'principal_nip' => '00000000000',
+                'principal_signature' => 'ttd',
+                'school_stamp' => 'stamp',
+                'internship_team_decree' => '400.3.8.10/260'
+            ]))->create();
+
 
 
         // \App\Models\User::factory(1)->create();

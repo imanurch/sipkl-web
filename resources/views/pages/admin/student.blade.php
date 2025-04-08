@@ -78,6 +78,7 @@
                 <th>No</th>
                 <th>Nama</th>
                 <th>NISN</th>
+                <th>NIS</th>
                 <th>JK</th>
                 <th>Jurusan</th>
                 <th>Username</th>
@@ -92,6 +93,7 @@
                         <td>{{ $data->firstItem() + $loop->index }}</td>
                         <td class="left whitespace-nowrap">{{ $dt->name }}</td>
                         <td>{{ $dt->nisn }}</td>
+                        <td>{{ $dt->nis }}</td>
                         <td>{{ $dt->gender == 'men' ? 'L' : 'P' }}</td>
                         <td>{{ $dt->department->name }}</td>
                         <td class="whitespace-nowrap">{{ $dt->user->username }}</td>
@@ -109,7 +111,7 @@
 
         <div x-show="modalAction != null && modalAction !='isImport'" class="form-modal">
             <x-form>
-                <x-slot name="formTitle">Data Siswa</x-slot>
+                <x-slot name="formTitle">Data Peserta Didik</x-slot>
                 <x-slot name="formBody">
                     <input type="text" name="user_id"
                         :value="modalAction == 'isEdit' || modalAction=='isDelete' ? dataId.user_id : ''" hidden>
@@ -124,6 +126,12 @@
                         <input name="nisn" class="input" type="text" placeholder="Masukkan NISN"
                             :disabled="modalAction == 'isDelete'"
                             :value="modalAction == 'isEdit' || modalAction=='isDelete' ? dataId.nisn : ''" required>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label" for="">NIS</label>
+                        <input name="nis" class="input" type="text" placeholder="Masukkan NIS"
+                            :disabled="modalAction == 'isDelete'"
+                            :value="modalAction == 'isEdit' || modalAction=='isDelete' ? dataId.nis : ''" required>
                     </div>
                     <div class="input-group">
                         <label class="input-label" for="">Jenis Kelamin</label>
@@ -203,13 +211,13 @@
                     </div>
                     <div class="input-group" :hidden="modalAction == 'isDelete'">
                         <label class="input-label" for="" :hidden="modalAction == 'isDelete'">Kata Sandi</label>
-                        <input name="password" class="input" type="text" placeholder="Masukkan Kata Sandi"
+                        <input name="password" class="input" type="password" placeholder="Masukkan Kata Sandi"
                             :hidden="modalAction == 'isDelete'">
                     </div>
                     <div class="input-group" :hidden="modalAction == 'isDelete'">
                         <label class="input-label" for="" :hidden="modalAction == 'isDelete'">Ulangi Kata
                             Sandi</label>
-                        <input name="check_password" class="input" type="text" placeholder="Ulangi Kata Sandi"
+                        <input name="check_password" class="input" type="password" placeholder="Ulangi Kata Sandi"
                             :hidden="modalAction == 'isDelete'">
                     </div>
                 </x-slot>
@@ -219,7 +227,7 @@
         {{-- import form --}}
         <div x-show="modalAction=='isImport'" class="form-modal">
             <x-form action="{{ route('admin.studentManagement.import') }}">
-                <x-slot name="formTitle">Impor Data Siswa</x-slot>
+                <x-slot name="formTitle">Impor Data Peserta Didik</x-slot>
                 <x-slot name="formBody">
                     <div class="input-group">
                         <label class="input-label" for="">Unggah File</label>
@@ -244,7 +252,7 @@
         {{-- empty state --}}
         @if (count($data) == 0)
             <x-not_found_empty_state>
-                <x-slot name="desc">Tambah data siswa terlebih dahulu ya!</x-slot>
+                <x-slot name="desc">Tambah data peserta didik terlebih dahulu ya!</x-slot>
                 <x-slot name="cta">
                     <button @click="modalAction='isAdd'" class="btn btn-xs btn-default-fill">Tambah Data</button>
                 </x-slot>

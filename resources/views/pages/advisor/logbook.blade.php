@@ -59,12 +59,12 @@
             </div>
         </x-slot>
         <x-slot name="tHeader">
-            <th>NO</th>
-            <th>NAMA</th>
-            <th>JURUSAN</th>
-            <th>INDUSTRI</th>
-            <th>STATUS</th>
-            <th>LOGBOOK</th>
+            <th>No</th>
+            <th>Nama</th>
+            <th>Jurusan</th>
+            <th>Industri</th>
+            <th>Status</th>
+            <th>Detail Logbook</th>
         </x-slot>
         <x-slot name="tBody">
             @foreach ($data as $dt)
@@ -76,9 +76,11 @@
                         @if ($member->group->internship)
                             <td>{{ $member->group->internship->industry->name }}</td>
                             <x-table.status_table status="{{ $dt->status }}"></x-table.status_table>
-                            <x-table.action_btn_table
+                            <td>
+                                <x-table.action_btn_table
                                 href="{{ route('advisor.logbook.detail', ['studentId' => $dt->id ?? '', 'internshipId' => $member->group->internship->id]) }}"
                                 name="Lihat"></x-table.action_btn_table>
+                            </td>
                         @endif
                     @endforeach
                 </tr>

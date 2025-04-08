@@ -15,9 +15,9 @@ return new class extends Migration
             $table->id();
             $table->foreignId('student_id')->constrained('students');
             $table->foreignId('internship_id')->constrained('internships')->cascadeOnDelete();
-            $table->integer('industry_score')->nullable();
-            $table->integer('advisor_score')->nullable();
-            $table->integer('final_test_score')->nullable();
+            // $table->integer('industry_score')->nullable();
+            // $table->integer('advisor_score')->nullable();
+            // $table->integer('final_test_score')->nullable();
             $table->timestamps();
         });
     }

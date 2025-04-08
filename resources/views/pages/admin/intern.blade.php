@@ -60,23 +60,37 @@
                         <td class="text-center">{{ $data->firstItem() + $loop->index }}</td>
                         <td>{{ $dt->group->name ?? '' }}</td>
                         <td>
-                            <ul>
+                            <ul class="text-left">
                                 @foreach ($dt->group->groupMember as $member)
-                                    <li>{{ $loop->iteration }}. {{ $member->student->name ?? '' }}</li>
+                                    @if ($loop->iteration == '4')
+                                        <li>dst</li>
+                                        @break
+
+                                    @else
+                                        <li class="whitespace-nowrap overflow-hidden text-ellipsis block max-w-40">
+                                            {{ $loop->iteration }}. {{ $member->student->name ?? '' }}</li>
+                                    @endif
                                 @endforeach
                             </ul>
                         </td>
-                        <td>{{ $dt->start_date ?? '' }} s/d {{ $dt->end_date ?? '' }}</td>
-                        @if ($dt->advisor)
-                            <td>{{ $dt->advisor->name }}</td>
-                        @else
-                            <td class="text-neutral-50">Belum Diatur</td>
-                        @endif
-                        <td>{{ $dt->industry->name ?? '' }}</td>
+                        <td class="whitespace-nowrap">{{ date('d-m-Y', strtotime($dt->start_date)) }} <br>s/d
+                            <br>{{ date('d-m-Y', strtotime($dt->end_date)) }}
+                        </td>
                         @php
                             $dt->member = $dt->group->groupMember->pluck('student.name')->toArray();
                         @endphp
-                        <x-table.action_table btnInput="hidden" :data="$dt"></x-table.action_table>
+                        <td>
+                            @if ($dt->advisor)
+                                {{ $dt->advisor->name }}
+                            @else
+                                <button
+                                    @click="setFormAction('isEdit', {{ $dt->id }});modalAction='isEdit';dataId={{ $dt->toJson() }};teamMember({{ $dt->group->groupMember->toJson() }})"
+                                    class="btn btn-xs btn-default-fill">Pilih Guru
+                                </button>
+                            @endif
+                        </td>
+                        <td>{{ $dt->industry->name ?? '' }}</td>
+                        <x-table.action_table :data="$dt"></x-table.action_table>
                     </tr>
                 @endforeach
             </x-slot>
@@ -94,9 +108,10 @@
                             :value="modalAction != null ? dataId.group.name : ''">
                     </div>
                     <div class="input-group">
-                        <label class="input-label" for="">Anggota</label>
-                        <input name="member" class="input" type="text" disabled
-                            :value="modalAction != null ? dataId.member : ''">
+                        <label class="input-label" for="">Anggota Kelompok</label>
+                        <div id="memberField" class="space-y-2">
+                            {{-- memberField --}}
+                        </div>
                     </div>
                     <div class="input-group">
                         <label class="input-label" for="">Waktu</label>
@@ -156,6 +171,22 @@
             } else if (modalAction === 'isDelete' && id) {
                 form.action = `{{ route('admin.intern.destroy', ':id') }}`.replace(':id', id);
             }
+        }
+    </script>
+
+    <script>
+        function teamMember(dataMember) {
+            const container = document.getElementById('memberField');
+            container.innerHTML = '';
+
+            dataMember.forEach(function(teamMember, index) {
+                const member = document.createElement('input');
+                member.value = teamMember.student.name + ' (NIS ' + teamMember.student.nis + ')';
+                member.disabled = true;
+                member.classList.add('input', 'w-full');
+
+                container.appendChild(member);
+            });
         }
     </script>
 

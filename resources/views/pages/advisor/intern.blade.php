@@ -33,13 +33,14 @@
         </x-slot>
         {{-- table --}}
         <x-slot name="tHeader">
-            <th>NO</th>
-            <th>NAMA</th>
-            <th>JURUSAN</th>
+            <th>No</th>
+            <th>Nama</th>
+            <th>Jurusan</th>
             <th>NISN</th>
-            <th>JENIS KELAMIN</th>
-            <th>NOMOR TELEPON</th>
-            <th>LOKASI PKL</th>
+            <th>NIS</th>
+            <th>Jenis Kelamin</th>
+            <th>No Telepon</th>
+            <th>Lokasi PKL</th>
         </x-slot>
         <x-slot name="tBody">
             @foreach ($data as $dt)
@@ -48,6 +49,7 @@
                     <td>{{ $dt->name }}</td>
                     <td>{{ $dt->department->name }}</td>
                     <td>{{ $dt->nisn }}</td>
+                    <td>{{ $dt->nis }}</td>
                     <td>{{ $dt->gender == 'men' ? 'Laki-Laki' : 'Perempuan' }}</td>
                     <td>{{ $dt->phone_num }}</td>
                     <td>

@@ -75,7 +75,7 @@
                                     stroke-linejoin="round" />
                             </svg>
                         </div>
-                        <div class="form-body">
+                        <div x-show="modalAction == 'revise'" class="form-body">
                             <div class="input-group">
                                 <label class="input-label" for="">Komentar (Opsional)</label>
                                 <textarea class="input" name="feedback" id=""></textarea>
@@ -83,7 +83,7 @@
                         </div>
                         <div class="form-footer"
                             :class="modalAction == 'accept' ? 'border-success-400' : 'border-error-400'">
-                            <button @click="modalAction=null" class="btn btn-xs"
+                            <button @click.prevent="modalAction=null" class="btn btn-xs"
                                 :class="modalAction == 'accept' ? 'btn-success-outline' : 'btn-error-outline'">Batalkan</button>
                             <button type="submit" class="btn btn-xs"
                                 :class="modalAction == 'accept' ? 'btn-success-fill' : 'btn-error-fill'"

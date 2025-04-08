@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Industry extends Model
 {
     use HasFactory;
-    protected $fillable = ['name', 'address', 'email', 'phone_num', 'status'];
+    protected $fillable = ['name', 'address', 'email', 'phone_num', 'leader_name', 'status'];
 
     public function registration(): HasMany
     {

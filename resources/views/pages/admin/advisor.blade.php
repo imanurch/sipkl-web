@@ -21,12 +21,83 @@
         </x-card>
     </div>
 
-    <div x-data="{ modalAction: null, option: false, selected: 'Pilih Opsi' }">
+    <div x-data="{ modalAction: null, option: false, selected: 'Pilih Opsi', exportModal:false }">
         <x-table.table>
             <x-slot name="tableTitle">Data Guru Pembimbing</x-slot>
             <x-slot name="filterActionForm">advisorManagement</x-slot>
             <x-slot name="btnAdd">
                 <x-table.import></x-table.import>
+                {{-- <a href="{{ route('admin.advisorManagement.export') }}" class="btn btn-default-fill btn-xs">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14"
+                        fill="none">
+                        <path d="M7.00002 2.91675V11.0834M2.91669 7.00008H11.0834" stroke-width="1.6" stroke-linecap="round"
+                            stroke-linejoin="round" />
+                    </svg>
+                    <span class="p-0 m-0">Ekspor</span>
+                </a> --}}
+                <div>
+                    <button @click="exportModal=true" class="btn btn-default-fill btn-xs">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14"
+                            fill="none">
+                            <path d="M7.00002 2.91675V11.0834M2.91669 7.00008H11.0834" stroke-width="1.6"
+                                stroke-linecap="round" stroke-linejoin="round" />
+                        </svg>
+                        <span class="p-0 m-0">Ekspor</span>
+                    </button>
+
+                    <div x-show="exportModal" class="form-modal">
+                        {{-- <div class="form-modal"> --}}
+                        <form class="form" action="{{ route('admin.advisorManagement.export') }}" method="POST"
+                            @click.away="generateDocumentModal=false">
+                            <div class="form-header">
+                                @csrf
+                                <h3>Ekspor Data Pembimbing</h3>
+                                <svg @click="exportModal=false,selected='Pilih Opsi'" class="cursor-pointer"
+                                    xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28"
+                                    fill="none">
+                                    <path d="M19.8333 8.16675L8.16663 19.8334M8.16663 8.16675L19.8333 19.8334"
+                                        stroke="#525A6A" stroke-width="1.03704" stroke-linecap="round"
+                                        stroke-linejoin="round" />
+                                </svg>
+                            </div>
+                            <div class="form-body">
+                                <div class="input-group">
+                                    <label class="input-label" for="">Pilih Data</label>
+                                    <div>
+                                        <button @click.prevent="option=!option" class="input input-select w-full"
+                                            :disabled="isDelete" required>
+                                            <span x-text="selected"
+                                                :class="selected == 'Pilih Opsi' ? 'text-neutral-300' : 'text-neutral-800'"></span>
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                                viewBox="0 0 20 20" fill="none">
+                                                <path d="M5 7.5L10 12.5L15 7.5" stroke="#667085" stroke-width="0.933333"
+                                                    stroke-linecap="round" stroke-linejoin="round" :hidden="isDelete" />
+                                            </svg>
+                                        </button>
+                                        <input type="hidden" name="data_type" x-model="selected">
+                                        <div x-show="option" @click.away="option=false" class="bg-neutral-0">
+                                            <ul class="border border-brand-600 rounded py-2 mt-2 max-h-32 overflow-auto">
+                                                <li @click.prevent="option=false;selected='Semua'"
+                                                    class="text-xs-reguler px-4 py-2 hover:bg-brand-600 hover:text-neutral-0 hover:text-xs-medium">
+                                                    Semua</li>
+                                                <li @click.prevent="option=false;selected='Pembimbing Aktif'"
+                                                    class="text-xs-reguler px-4 py-2 hover:bg-brand-600 hover:text-neutral-0 hover:text-xs-medium">
+                                                    Pembimbing Aktif</li>
+                                            </ul>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-footer">
+                                <button @click.prevent="exportModal=false" class="btn btn-sm"
+                                    :class="modalAction == 'isView' ? 'btn-success-fill' : 'btn-error-fill'">
+                                    <span>Batalkan</span>
+                                </button>
+                                <button type="submit" class="btn btn-success-fill btn-sm">Ekspor</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
                 <x-table.add_data></x-table.add_data>
             </x-slot>
             <x-slot name="filter">
@@ -118,8 +189,8 @@
                                 :disabled="modalAction == 'isDelete'" required>
                                 {{-- <span x-text="selected" :class="selected=='Pilih Opsi' ? 'text-neutral-300' : 'text-neutral-800'"></span> --}}
                                 <span x-text="selected" class="text-neutral-800"></span>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"
-                                    fill="none">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                    viewBox="0 0 20 20" fill="none">
                                     <path d="M5 7.5L10 12.5L15 7.5" stroke="#667085" stroke-width="0.933333"
                                         stroke-linecap="round" stroke-linejoin="round"
                                         :hidden="modalAction == 'isDelete'" />
@@ -157,13 +228,13 @@
                     </div>
                     <div class="input-group" :hidden="modalAction == 'isDelete'">
                         <label class="input-label" for="" :hidden="modalAction == 'isDelete'">Kata Sandi</label>
-                        <input name="password" class="input" type="text" placeholder="Masukkan Kata Sandi"
+                        <input name="password" class="input" type="password" placeholder="Masukkan Kata Sandi"
                             :hidden="modalAction == 'isDelete'">
                     </div>
                     <div class="input-group" :hidden="modalAction == 'isDelete'">
                         <label class="input-label" for="" :hidden="modalAction == 'isDelete'">Ulangi Kata
                             Sandi</label>
-                        <input name="check_password" class="input" type="text" placeholder="Ulangi Kata Sandi"
+                        <input name="check_password" class="input" type="password" placeholder="Ulangi Kata Sandi"
                             :hidden="modalAction == 'isDelete'">
                     </div>
                 </x-slot>
@@ -181,7 +252,8 @@
                     </div>
                     <div class="flex place-items-center">
                         <span class="text-xs-reguler">Template Impor Data :</span>
-                        <a href="{{ route('admin.advisorManagement.downloadTemplateFile') }}" class="btn btn-xs btn-default-clear">
+                        <a href="{{ route('admin.advisorManagement.downloadTemplateFile') }}"
+                            class="btn btn-xs btn-default-clear">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14"
                                 fill="none">
                                 <path

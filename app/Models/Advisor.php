@@ -21,10 +21,10 @@ class Advisor extends Model
     {
         return $this->belongsTo(Department::class, 'department_id');
     }
-    public function advisorDocument(): HasMany
-    {
-        return $this->hasMany(AdvisorDocument::class, 'advisor_id', 'id');
-    }
+    // public function advisorDocument(): HasMany
+    // {
+    //     return $this->hasMany(AdvisorDocument::class, 'advisor_id', 'id');
+    // }
     public function internship(): HasMany
     {
         return $this->hasMany(Internship::class, 'advisor_id', 'id');

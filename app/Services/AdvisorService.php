@@ -7,13 +7,12 @@ use App\Repositories\AdvisorRepository;
 
 class AdvisorService
 {
-    protected $advisorRepository, $advisorDocumentRepository;
+    protected $advisorRepository;
 
     // Constructor Injection
-    public function __construct(AdvisorRepository $advisorRepository, AdvisorDocumentRepository $advisorDocumentRepository)
+    public function __construct(AdvisorRepository $advisorRepository)
     {
         $this->advisorRepository = $advisorRepository;
-        $this->advisorDocumentRepository = $advisorDocumentRepository;
     }
 
     public function getAdvisor(array $filters = [])
@@ -24,6 +23,11 @@ class AdvisorService
     public function getAdvisorList()
     {
         return $this->advisorRepository->getAdvisorList();
+    }
+
+    public function getActiveAdvisorList($batch_id)
+    {
+        return $this->advisorRepository->getActiveAdvisorList($batch_id);
     }
 
     public function getAdvisorById($advisor_id)
@@ -41,10 +45,10 @@ class AdvisorService
         return $this->advisorRepository->getAdvisorByUserId($user_id);
     }
 
-    public function getAdvisorDocumentByAdvisorIdAndBatchId($advisor_id, $batch_id)
-    {
-        return $this->advisorDocumentRepository->getAdvisorDocumentByAdvisorIdAndBatchId($advisor_id, $batch_id);
-    }
+    // public function getAdvisorDocumentByAdvisorIdAndBatchId($advisor_id, $batch_id)
+    // {
+    //     return $this->advisorDocumentRepository->getAdvisorDocumentByAdvisorIdAndBatchId($advisor_id, $batch_id);
+    // }
 
     public function getAdvisorByStatusCount($batch_id, $status)
     {

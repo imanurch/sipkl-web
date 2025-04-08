@@ -10,6 +10,8 @@ use App\Services\DepartmentService;
 use App\Http\Controllers\Controller;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Flasher\Toastr\Laravel\Facade\Toastr;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class IndustryManagementController extends Controller
 {
@@ -25,6 +27,9 @@ class IndustryManagementController extends Controller
 
     public function index(Request $request)
     {
+        $activeTab = $request->query('tab', 'partner');
+        // dd($request->all());
+
         // batch data
         $current_batch = $this->batchService->getBatchByStatus('active');
         if ($current_batch != null) {
@@ -63,6 +68,7 @@ class IndustryManagementController extends Controller
             'partnerIndustry' => $partnerIndustry,
             'rejectedIndustry' => $rejectedIndustry,
             'filters' => $filters,
+            'activeTab' => $activeTab,
             'pages' => 'industryManagement',
         ]);
     }
@@ -76,6 +82,7 @@ class IndustryManagementController extends Controller
                 'address' => 'required|string',
                 'email' => 'required|unique:industries,email|email',
                 'phone_num' => 'required|unique:industries,phone_num|string|min:10|max:14',
+                'leader_name' => 'required|string',
             ]);
             $validatedData['status'] = '1';
 
@@ -97,6 +104,8 @@ class IndustryManagementController extends Controller
                 'address' => 'required|string',
                 'email' => 'required|email|unique:industries,email,' . $id,
                 'phone_num' => 'required|string|min:10|max:14|unique:industries,phone_num,' . $id,
+                'leader_name' => 'required|string',
+                'status' => 'nullable|string|min:10|max:14|unique:industries,phone_num,' . $id,
             ]);
 
             $this->industryService->updateIndustry($id, $validatedData);
@@ -104,12 +113,32 @@ class IndustryManagementController extends Controller
         } catch (\Exception $e) {
             Toastr::addError('Data industri gagal diubah!');
         }
-        return redirect()->back();
+        return back();
     }
 
     public function confirmStatusIndustry($industryId, $status)
     {
-        $this->industryService->updateIndustryRequestStatus($industryId, $status);
+        try {
+            $this->industryService->updateIndustryRequestStatus($industryId, $status);
+            Toastr::addSuccess('Pengajuan industri berhasil dikonfirmasi!');
+        } catch (\Exception $e) {
+            Toastr::addError('Pengajuan industri gagal dikonfirmasi!');
+        }
+        return back();
+    }
+
+    public function updateStatusIndustry($id, Request $request)
+    {
+        // dd($id, $request->all());
+        if($request->status == 'reject'){
+            return back();
+        }
+        try {
+            $this->industryService->updateIndustryRequestStatus($id, $request->status);
+            Toastr::addSuccess('Status industry berhasil diperbarui!');
+        } catch (\Exception $e) {
+            Toastr::addError('Status industri gagal diperbarui!');
+        }
         return back();
     }
 
@@ -148,11 +177,13 @@ class IndustryManagementController extends Controller
                         'address' => $row[2],
                         'email' => $row[3],
                         'phone_num' => $row[4],
+                        'leader_name' => $row[5],
                     ], [
                         'name' => 'required|string',
                         'address' => 'required|string',
                         'email' => 'required|unique:industries,email|email',
                         'phone_num' => 'required|unique:industries,phone_num|string|min:10|max:14',
+                        'leader_name' => 'required|string',
                     ]);
 
                     $data = [
@@ -160,6 +191,7 @@ class IndustryManagementController extends Controller
                         'address' => $row[2],
                         'email' => $row[3],
                         'phone_num' => $row[4],
+                        'leader_name' => $row[5],
                         'status' => '1',
                     ];
 
@@ -182,5 +214,46 @@ class IndustryManagementController extends Controller
         } else {
             Toastr::addError('File tidak ditemukan');
         }
+    }
+
+    public function export(Request $request)
+    {
+        // dd($request->all());
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->setCellValue('A1', 'NO');
+        $sheet->setCellValue('B1', 'NAMA');
+        $sheet->setCellValue('C1', 'ALAMAT');
+        $sheet->setCellValue('D1', 'EMAIL');
+        $sheet->setCellValue('E1', 'NOMOR TELEPON');
+        $sheet->setCellValue('F1', 'NAMA PIMPINAN');
+
+        $current_batch = $this->batchService->getBatchByStatus('active');
+        $batch_id = $current_batch != null ? $current_batch->id : $batch_id = '';
+
+        $data = $request->data_type == 'Semua' ? $this->industryService->getPartnerIndustryList() : $this->industryService->getActivePartnerIndustryList($batch_id);
+
+        $row = 2;
+        $num = 1;
+        foreach ($data as $dt) {
+            $sheet->setCellValue('A' . $row, $num);
+            $sheet->setCellValue('B' . $row, $dt->name);
+            $sheet->setCellValue('C' . $row, $dt->address);
+            $sheet->setCellValue('F' . $row, $dt->email);
+            $sheet->setCellValue('G' . $row, $dt->phone_num);
+            $sheet->setCellValue('D' . $row, $dt->leader_name);
+            $row++;
+            $num++;
+        }
+
+        $filename = "data_industry_export.xlsx";
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
     }
 }

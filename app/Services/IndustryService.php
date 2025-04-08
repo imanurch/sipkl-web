@@ -44,6 +44,11 @@ class IndustryService
         return $this->industryRepository->getPartnerIndustryList();
     }
 
+    public function getActivePartnerIndustryList($batch_id)
+    {
+        return $this->industryRepository->getActivePartnerIndustryList($batch_id);
+    }
+
     public function getIndustryById($industry_id)
     {
         return $this->industryRepository->findIndustryById($industry_id);

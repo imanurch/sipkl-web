@@ -13,7 +13,7 @@ class AdvisorRepository
 
         // filter department
         if ($filters['department'] != null) {
-            $department_id = ($filters['department'] == 'K3R' ? '1' : ($filters['department'] == 'DPIB' ? '2' : '3'));
+            $department_id = ($filters['department'] == 'RPL' ? '1' : ($filters['department'] == 'DPIB' ? '2' : '3'));
             $query->where('department_id', $department_id);
         }
 
@@ -34,7 +34,12 @@ class AdvisorRepository
         if ($filters['search'] != null) {
             $query->where(function ($subQuery) use ($filters) {
                 $subQuery->where('name', 'like', '%' . $filters['search'] . '%')
-                    ->orWhere('nip', 'like', '%' . $filters['search'] . '%');
+                    ->orWhere('nip', 'like', '%' . $filters['search'] . '%')
+                    ->orWhere('phone_num', 'like', '%' . $filters['search'] . '%')
+                    ->orWhereHas('user', function ($subSubQuery) use ($filters) {
+                        $subSubQuery->where('username', 'like', '%' . $filters['search'] . '%')
+                            ->orWhere('email', 'like', '%' . $filters['search'] . '%');
+                    });
             });
         }
 
@@ -61,9 +66,16 @@ class AdvisorRepository
         }
     }
 
+    public function getActiveAdvisorList($batch_id)
+    {
+        return Advisor::whereHas('internship', function ($query) use ($batch_id) {
+            $query->where('batch_id', $batch_id);
+        })->get();
+    }
+
     public function getAdvisorList()
     {
-        return Advisor::select('id', 'name', 'nip', 'department_id')->get();
+        return Advisor::get();
     }
 
     public function findAdvisorById($id)
@@ -79,12 +91,14 @@ class AdvisorRepository
     public function getAdvisorByUserId($user_id)
     {
         // dd(Advisor::where('user_id', $user_id)->first());
-        return Advisor::with('advisorDocument')->where('user_id', $user_id)->first();
+        // return Advisor::with('advisorDocument')->where('user_id', $user_id)->first();
+        return Advisor::where('user_id', $user_id)->first();
     }
 
     public function getAdvisorByNIP($advisor_nip, $batch)
     {
-        return Advisor::with('advisorDocument')->where('nip', $advisor_nip)->first();
+        // return Advisor::with('advisorDocument')->where('nip', $advisor_nip)->first();
+        return Advisor::where('nip', $advisor_nip)->first();
     }
 
     public function createAdvisor(array $data)

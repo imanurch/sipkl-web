@@ -24,9 +24,14 @@ class MonitoringDocumentService
         return $this->monitoringDocumentRepository->getMonitoringByTypeAndMonitoringId($monitoring_id, $type);
     }
 
-    public function addMonitoringDocument($data)
+    // public function addMonitoringDocument($data)
+    // {
+    //     return $this->monitoringDocumentRepository->createMonitoringDocument($data);
+    // }
+
+    public function updateOrCreateMonitoringDocument($data)
     {
-        return $this->monitoringDocumentRepository->createMonitoringDocument($data);
+        return $this->monitoringDocumentRepository->updateOrCreateMonitoringDocument($data);
     }
 
     public function getByMonitoringIdAndType($monitoring_id, $type)
@@ -39,8 +44,8 @@ class MonitoringDocumentService
         return $this->monitoringDocumentRepository->updateMonitoringDocument($id, $data);
     }
 
-    // public function deleteMonitoringDocument($id)
-    // {
-    //     return $this->monitoringDocumentRepository->deleteMonitoringDocument($id);
-    // }
+    public function deleteMonitoringDocument($monitoring_id)
+    {
+        return $this->monitoringDocumentRepository->deleteMonitoringDocument($monitoring_id);
+    }
 }

@@ -17,6 +17,7 @@ return new class extends Migration
             $table->string('address');
             $table->string('email')->unique();
             $table->string('phone_num')->unique();
+            $table->string('leader_name');
             // status 0 unconfirmed, 1 accepted, 2 rejected
             $table->enum('status', ['0', '1', '2'])->default('0');
             $table->timestamps();

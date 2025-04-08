@@ -38,7 +38,13 @@ class StudentRepository
         if ($filters['search'] != null) {
             $query->where(function ($subQuery) use ($filters) {
                 $subQuery->where('name', 'like', '%' . $filters['search'] . '%')
-                    ->orWhere('nisn', 'like', '%' . $filters['search'] . '%');
+                    ->orWhere('nisn', 'like', '%' . $filters['search'] . '%')
+                    ->orWhere('nis', 'like', '%' . $filters['search'] . '%')
+                    ->orWhere('phone_num', 'like', '%' . $filters['search'] . '%')
+                    ->orWhereHas('user', function ($subSubQuery) use ($filters) {
+                        $subSubQuery->where('username', 'like', '%' . $filters['search'] . '%')
+                            ->orWhere('email', 'like', '%' . $filters['search'] . '%');
+                    });
             });
         }
 
@@ -61,7 +67,7 @@ class StudentRepository
             $query->where('batch_id', $activeBatch_id);
         })->WhereDoesntHave('groupMember.group.registration', function ($query) {
             $query->where('status', ['0', '1']);
-        })->select('id', 'name', 'nisn')->get();
+        })->select('id', 'name', 'nis')->get();
     }
 
     public function countStudentByStatus($year, $batch_id, $status)
@@ -84,7 +90,8 @@ class StudentRepository
         return Student::select('year')->distinct()->get();
     }
 
-    public function getLastYearStudent(){
+    public function getLastYearStudent()
+    {
         return Student::select('year')->latest()->first();
     }
 

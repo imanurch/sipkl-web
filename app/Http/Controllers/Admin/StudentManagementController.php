@@ -96,6 +96,7 @@ class StudentManagementController extends Controller
             $validatedData = $request->validate([
                 'name' => 'required|string',
                 'nisn' => 'required|size:10|unique:students,nisn',
+                'nis' => 'required|size:4|unique:students,nis',
                 'gender' => 'required',
                 'department_id' => 'required',
                 'year' => 'required',
@@ -104,10 +105,13 @@ class StudentManagementController extends Controller
                 'phone_num' => 'required|string|min:10|max:14|unique:students,phone_num,',
                 'password' => 'required|string|size:8',
             ]);
+            // dd($validatedData);
 
             $validatedData['password'] = Hash::make($validatedData['password']);
             $validatedData['department_id'] = $validatedData['department_id'] == 'K3R' ? '1' : ($validatedData['department_id'] == 'DPIB' ? '2' : ($validatedData['department_id'] == 'RPL' ? '3' : ''));
             $validatedData['gender'] = $validatedData['gender'] == 'Laki-Laki' ? 'men' : 'women';
+
+            // dd($validatedData);
 
             DB::transaction(function () use ($validatedData) {
                 $newUser = $this->userService->addUser([
@@ -120,6 +124,7 @@ class StudentManagementController extends Controller
                     'user_id' => $newUser->id,
                     'name' => $validatedData['name'],
                     'nisn' => $validatedData['nisn'],
+                    'nis' => $validatedData['nis'],
                     'gender' => $validatedData['gender'],
                     'department_id' => $validatedData['department_id'],
                     'year' => $validatedData['year'],
@@ -142,11 +147,12 @@ class StudentManagementController extends Controller
                 'user_id' => 'required',
                 'name' => 'required|string',
                 'nisn' => 'required|size:10|unique:students,nisn,' . $id,
+                'nis' => 'required|size:4|unique:students,nis,' . $id,
                 'gender' => 'required',
                 'department_id' => 'required',
                 'year' => 'required',
                 'username' => 'required',
-                'email' => 'required|unique:users,email,' . $request->input('user_id'),
+                'email' => 'required|unique:users,email,' . $request->user_id,
                 'phone_num' => 'required|string|min:10|max:14|unique:students,phone_num,' . $id,
                 'password' => 'nullable|string|size:8',
             ]);
@@ -165,6 +171,7 @@ class StudentManagementController extends Controller
                 $this->studentService->updateStudent($id, [
                     'name' => $validatedData['name'],
                     'nisn' => $validatedData['nisn'],
+                    'nis' => $validatedData['nis'],
                     'gender' => $validatedData['gender'],
                     'department_id' => $validatedData['department_id'],
                     'year' => $validatedData['year'],
@@ -223,16 +230,18 @@ class StudentManagementController extends Controller
                     $validatedData = $request->validate([
                         'name' => $row[1],
                         'nisn' => $row[2],
-                        'gender' => $row[3],
-                        'department_id' => $row[4],
-                        'year' => $row[5],
-                        'username' => $row[6],
-                        'email' => $row[7],
-                        'phone_num' => $row[8],
-                        'password' => $row[9],
+                        'nis' => $row[3],
+                        'gender' => $row[4],
+                        'department_id' => $row[5],
+                        'year' => $row[6],
+                        'username' => $row[7],
+                        'email' => $row[8],
+                        'phone_num' => $row[9],
+                        'password' => $row[10],
                     ], [
                         'name' => 'required|string',
                         'nisn' => 'required|size:10|unique:students,nisn',
+                        'nis' => 'required|size:4|unique:students,nis',
                         'gender' => 'required',
                         'department_id' => 'required',
                         'year' => 'required',
@@ -242,14 +251,14 @@ class StudentManagementController extends Controller
                         'password' => 'required|string|size:8',
                     ]);
 
-                    $row[3] = $row[3] == 'Laki-Laki' ? 'men' : 'women';
-                    $row[4] = $row[4] == 'K3R' ? '1' : ($row[4] == 'DPIB' ? '2' : ($row[4] == 'RPL' ? '3' : ''));
-                    $row[9] = Hash::make($row[9]);
+                    $row[4] = $row[4] == 'Laki-Laki' ? 'men' : 'women';
+                    $row[5] = $row[5] == 'K3R' ? '1' : ($row[5] == 'DPIB' ? '2' : ($row[5] == 'RPL' ? '3' : ''));
+                    $row[10] = Hash::make($row[10]);
 
                     $userData = [
-                        'username' => $row[6],
-                        'email' => $row[7],
-                        'password' => $row[9],
+                        'username' => $row[7],
+                        'email' => $row[8],
+                        'password' => $row[10],
                         'role' => 'student',
                     ];
 
@@ -259,10 +268,11 @@ class StudentManagementController extends Controller
                         'user_id' => $newUser->id ?? '',
                         'name' => $row[1],
                         'nisn' => $row[2],
-                        'gender' => $row[3],
-                        'department_id' => $row[4],
-                        'year' => $row[5],
-                        'phone_num' => $row[8],
+                        'nis' => $row[3],
+                        'gender' => $row[4],
+                        'department_id' => $row[5],
+                        'year' => $row[6],
+                        'phone_num' => $row[9],
                     ];
 
                     // dd($userData, $studentData);
@@ -287,4 +297,46 @@ class StudentManagementController extends Controller
             Toastr::addError('File tidak ditemukan');
         }
     }
+
+    // public function export()
+    // {
+    //     $spreadsheet = new Spreadsheet();
+    //     $sheet = $spreadsheet->getActiveSheet();
+
+    //     $sheet->setCellValue('A1', 'NO');
+    //     $sheet->setCellValue('B1', 'NAMA');
+    //     $sheet->setCellValue('C1', 'NISN');
+    //     $sheet->setCellValue('C1', 'NIS');
+    //     $sheet->setCellValue('C1', 'JENIS KELAMIN');
+    //     $sheet->setCellValue('D1', 'JURUSAN');
+    //     $sheet->setCellValue('D1', 'TAHUN');
+    //     $sheet->setCellValue('E1', 'USERNAME');
+    //     $sheet->setCellValue('F1', 'EMAIL');
+    //     $sheet->setCellValue('G1', 'NOMOR TELEPON');
+
+    //     $data = $this->studentService->getStudent();
+
+    //     $row = 2;
+    //     $num = 1;
+    //     foreach ($data as $dt) {
+    //         $sheet->setCellValue('A' . $row, $num);
+    //         $sheet->setCellValue('B' . $row, $dt->name);
+    //         $sheet->setCellValue('C' . $row, $dt->nip);
+    //         $sheet->setCellValue('D' . $row, $dt->department->name);
+    //         $sheet->setCellValue('E' . $row, $dt->user->username);
+    //         $sheet->setCellValue('F' . $row, $dt->user->email);
+    //         $sheet->setCellValue('G' . $row, $dt->phone_num);
+    //         $row++;
+    //         $num++;
+    //     }
+
+    //     $filename = "data_advisor_export.xlsx";
+    //     header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    //     header('Content-Disposition: attachment;filename="' . $filename . '"');
+    //     header('Cache-Control: max-age=0');
+
+    //     $writer = new Xlsx($spreadsheet);
+    //     $writer->save('php://output');
+    //     exit;
+    // }
 }

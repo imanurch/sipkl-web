@@ -12,6 +12,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Flasher\Toastr\Laravel\Facade\Toastr;
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 
 class AdvisorManagementController extends Controller
 {
@@ -253,5 +255,47 @@ class AdvisorManagementController extends Controller
         } else {
             Toastr::addError('File tidak ditemukan');
         }
+    }
+
+    public function export(Request $request)
+    {
+        $spreadsheet = new Spreadsheet();
+        $sheet = $spreadsheet->getActiveSheet();
+
+        $sheet->setCellValue('A1', 'NO');
+        $sheet->setCellValue('B1', 'NAMA');
+        $sheet->setCellValue('C1', 'NIP');
+        $sheet->setCellValue('D1', 'JURUSAN');
+        $sheet->setCellValue('E1', 'USERNAME');
+        $sheet->setCellValue('F1', 'EMAIL');
+        $sheet->setCellValue('G1', 'NOMOR TELEPON');
+
+        $current_batch = $this->batchService->getBatchByStatus('active');
+        $batch_id = $current_batch != null ? $current_batch->id : $batch_id = '';
+
+        $data = $request->data_type == 'Semua' ? $this->advisorService->getAdvisorList() : $this->advisorService->getActiveAdvisorList($batch_id);
+
+        $row = 2;
+        $num = 1;
+        foreach ($data as $dt) {
+            $sheet->setCellValue('A' . $row, $num);
+            $sheet->setCellValue('B' . $row, $dt->name);
+            $sheet->setCellValue('C' . $row, $dt->nip);
+            $sheet->setCellValue('D' . $row, $dt->department->name);
+            $sheet->setCellValue('E' . $row, $dt->user->username);
+            $sheet->setCellValue('F' . $row, $dt->user->email);
+            $sheet->setCellValue('G' . $row, $dt->phone_num);
+            $row++;
+            $num++;
+        }
+
+        $filename = "data_advisor_export.xlsx";
+        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+        header('Content-Disposition: attachment;filename="' . $filename . '"');
+        header('Cache-Control: max-age=0');
+
+        $writer = new Xlsx($spreadsheet);
+        $writer->save('php://output');
+        exit;
     }
 }

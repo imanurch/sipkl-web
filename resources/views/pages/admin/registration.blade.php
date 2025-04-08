@@ -27,7 +27,7 @@
         </x-card>
     </div>
 
-    <div x-data="{ modalAction: null, modalConfirm: null, id: null, dataId: [], option: false, selected: 'Pilih Opsi', valueSelected: null }">
+    <div x-data="{ modalAction: null, modalConfirm: null, id: null, dataId: [], option: false, selected: 'Pilih Opsi', valueSelected: null, generateDocumentModal: false }">
         <x-table.table>
             <x-slot name="tableTitle">Pendaftaran PKL</x-slot>
             <x-slot name="filterActionForm">registration</x-slot>
@@ -35,43 +35,37 @@
                 <x-table.add_data></x-table.add_data>
             </x-slot> --}}
             <x-slot name="filter">
-                <div class="flex w-full space-x-2">
-                    <div class="space-y-1 w-full">
-                        <span class="text-xs text-neutral-400 w-32">Search</span>
-                        <x-table.search value="{{ $filters['search'] ?? '' }}"></x-table.search>
-                    </div>
+                <div class="space-y-1 w-full">
+                    <span class="text-xs text-neutral-400 w-32">Search</span>
+                    <x-table.search value="{{ $filters['search'] ?? '' }}"></x-table.search>
                 </div>
-                <div class="flex w-full space-x-2">
-                    <div class="space-y-1 w-full">
-                        <span class="text-xs text-neutral-400 w-32">Status Registrasi</span>
-                        <x-table.select_option_filter optionName="status"
-                            defaultSelected="{{ $filters['status'] != '' ? $filters['status'] : 'Semua Status' }}">
-                            <x-slot name="option">
-                                <li class="option-filter-toolbar-table"
-                                    @click="option=false;selected='Belum Dikonfirmasi';valueSelected='unconfirmed'">Belum
-                                    Dikonfirmasi</li>
-                                <li class="option-filter-toolbar-table"
-                                    @click="option=false;selected='Diterima';valueSelected='accepted'">Diterima</li>
-                                <li class="option-filter-toolbar-table"
-                                    @click="option=false;selected='Ditolak';valueSelected='rejected'">Ditolak</li>
-                            </x-slot>
-                        </x-table.select_option_filter>
-                    </div>
+                <div class="space-y-1 w-full">
+                    <span class="text-xs text-neutral-400 w-32">Status Registrasi</span>
+                    <x-table.select_option_filter optionName="status"
+                        defaultSelected="{{ $filters['status'] != '' ? $filters['status'] : 'Semua Status' }}">
+                        <x-slot name="option">
+                            <li class="option-filter-toolbar-table"
+                                @click="option=false;selected='Belum Dikonfirmasi';valueSelected='unconfirmed'">Belum
+                                Dikonfirmasi</li>
+                            <li class="option-filter-toolbar-table"
+                                @click="option=false;selected='Diterima';valueSelected='accepted'">Diterima</li>
+                            <li class="option-filter-toolbar-table"
+                                @click="option=false;selected='Ditolak';valueSelected='rejected'">Ditolak</li>
+                        </x-slot>
+                    </x-table.select_option_filter>
                 </div>
-                <div class="flex w-full space-x-2">
-                    <div class="space-y-1 w-full">
-                        <span class="text-xs text-neutral-400 w-32">Batch</span>
-                        <x-table.select_option_filter optionName="batch"
-                            defaultSelected="{{ $filters['batch_id'] != '' ? $filters['batch_id'] : 'Semua batch' }}">
-                            <x-slot name="option">
-                                @foreach ($batchData as $dt)
-                                    <li class="option-filter-toolbar-table"
-                                        @click="option=false;selected='{{ $dt->name }}';valueSelected='{{ $dt->id }}'">
-                                        {{ $dt->name }}</li>
-                                @endforeach
-                            </x-slot>
-                        </x-table.select_option_filter>
-                    </div>
+                <div class="space-y-1 w-full">
+                    <span class="text-xs text-neutral-400 w-32">Batch</span>
+                    <x-table.select_option_filter optionName="batch"
+                        defaultSelected="{{ $filters['batch_id'] != '' ? $filters['batch_id'] : 'Semua batch' }}">
+                        <x-slot name="option">
+                            @foreach ($batchData as $dt)
+                                <li class="option-filter-toolbar-table"
+                                    @click="option=false;selected='{{ $dt->name }}';valueSelected='{{ $dt->id }}'">
+                                    {{ $dt->name }}</li>
+                            @endforeach
+                        </x-slot>
+                    </x-table.select_option_filter>
                 </div>
             </x-slot>
             <x-slot name="tHeader">
@@ -80,37 +74,37 @@
                 <th>Anggota</th>
                 <th>Waktu</th>
                 <th>Lokasi PKL</th>
-                <th>File Pengantar</th>
+                <th>File Permohonan</th>
                 <th>File Bukti Diterima</th>
-                <th>File Terima Kasih</th>
                 <th>Status</th>
                 <th>Konfirmasi</th>
                 <th>Aksi</th>
             </x-slot>
             <x-slot name="tBody">
                 @foreach ($data as $dt)
-                    {{-- {{ dd($dt) }} --}}
                     <tr>
-                        {{-- <td>{{ $dt->id }}</td> --}}
                         <td class="text-center">{{ $data->firstItem() + $loop->index }}</td>
                         <td>{{ $dt->group->name }}</td>
                         <td>
-                            <ul>
+                            <ul class="text-left">
                                 @foreach ($dt->group->groupMember as $member)
-                                    <li>{{ $loop->iteration }}. {{ $member->student->name ?? '' }}</li>
+                                    <li class="whitespace-nowrap overflow-hidden text-ellipsis block max-w-40">
+                                        {{ $loop->iteration }}. {{ $member->student->name ?? '' }}</li>
                                 @endforeach
                             </ul>
                         </td>
-                        <td>{{ $dt->start_date }} s/d {{ $dt->end_date }}</td>
+                        <td class="whitespace-nowrap">{{ date('d-m-Y', strtotime($dt->start_date)) }} <br>s/d
+                            <br>{{ date('d-m-Y', strtotime($dt->end_date)) }}
+                        </td>
                         <td>{{ $dt->industry->name ?? '' }}</td>
 
-                        {{-- surat pengantar --}}
-                        @if ($dt->surat_pengantar != null)
-                            <x-table.action_btn_table name="Lihat File"
-                                href="{{ route('admin.registration.download.file', ['type' => 'suratPengantar', 'filename' => $dt->surat_pengantar]) }}"></x-table.action_btn_table>
-                        @else
-                            <td class="text-center">
-                                <a href="{{ route('admin.registration.generateSuratPengantar', ['registrationId' => $dt->id]) }}"
+                        {{-- surat permohonan --}}
+                        <td class="text-center">
+                            @if ($dt->surat_permohonan != null)
+                                <x-table.action_btn_table name="Lihat File"
+                                    href="{{ route('admin.registration.download.file', ['type' => 'suratPermohonan', 'filename' => $dt->surat_permohonan]) }}"></x-table.action_btn_table>
+                            @else
+                                <button @click.prevent="generateDocumentModal=true;dataId={{ $dt }}"
                                     class="btn btn-xs btn-success-fill min-w-max">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                         viewBox="0 0 18 18" fill="none">
@@ -118,44 +112,30 @@
                                             d="M7.87464 10.1251L15.7496 2.25013M7.97033 10.3712L9.94141 15.4397C10.1151 15.8862 10.2019 16.1094 10.327 16.1746C10.4354 16.2311 10.5646 16.2312 10.6731 16.1748C10.7983 16.1098 10.8854 15.8866 11.0596 15.4403L16.0023 2.77453C16.1595 2.37164 16.2381 2.1702 16.1951 2.04148C16.1578 1.92969 16.0701 1.84197 15.9583 1.80462C15.8296 1.76162 15.6281 1.84023 15.2252 1.99746L2.55943 6.94021C2.11313 7.11438 1.88997 7.20146 1.82494 7.32664C1.76857 7.43516 1.76864 7.56434 1.82515 7.67279C1.89033 7.7979 2.11358 7.88472 2.56009 8.05836L7.62859 10.0294C7.71923 10.0647 7.76455 10.0823 7.80271 10.1095C7.83653 10.1337 7.86611 10.1632 7.89024 10.1971C7.91746 10.2352 7.93508 10.2805 7.97033 10.3712Z"
                                             stroke="" stroke-linecap="round" stroke-linejoin="round" />
                                     </svg>
-                                    <span class="">Kirim File</span>
-                                </a>
-                            </td>
-                        @endif
+                                    <span class="">Generate Dokumen</span>
+                                </button>
+                            @endif
+                        </td>
 
                         {{-- surat balasan --}}
-                        @if ($dt->surat_balasan != null)
-                            <x-table.action_btn_table name="Lihat File"
-                                href="{{ route('admin.registration.download.file', ['type' => 'suratBalasan', 'filename' => $dt->surat_balasan]) }}"></x-table.action_btn_table>
-                        @else
-                            <td class="text-center">Belum Tersedia</td>
-                        @endif
-
-                        {{-- ucapan terima kasih --}}
-                        @if ($dt->ucapan_terima_kasih != null)
-                            <x-table.action_btn_table name="Lihat File"
-                                href="{{ route('admin.registration.download.file', ['type' => 'ucapanTerimaKasih', 'filename' => $dt->ucapan_terima_kasih]) }}"></x-table.action_btn_table>
-                        @else
-                            <td class="text-center">File Belum Tersedia</td>
-                        @endif
+                        <td class="text-center">
+                            @if ($dt->surat_balasan != null)
+                                <x-table.action_btn_table name="Lihat File"
+                                    href="{{ route('admin.registration.download.file', ['type' => 'suratBalasan', 'filename' => $dt->surat_balasan]) }}"></x-table.action_btn_table>
+                            @else
+                                Belum Tersedia
+                            @endif
+                        </td>
 
                         {{-- status --}}
                         <x-table.status_table :status="$dt->status"></x-table.status_table>
 
-                        @php
-                            $dt->member = $dt->group->groupMember->pluck('student.name')->toArray();
-                        @endphp
-
-                        {{-- confirm --}}
-                        {{-- {{ dd($dt->status == 'Belum Dikonfirmasi') }} --}}
-                        {{-- {{ dd($dt->surat_balasan != null) }} --}}
-                        {{-- {{ dd($dt->status == 'Belum Dikonfirmasi' && $dt->surat_balasan != null) }} --}}
                         @if ($dt->status == 'Belum Dikonfirmasi' && $dt->surat_balasan != null)
                             <x-table.action_confirm_table :id="$dt->id"></x-table.action_confirm_table>
                         @elseif($dt->status != '0' && $dt->surat_balasan != null)
                             <td class="text-center">
                                 <button
-                                    @click="setFormAction('isEditStatus', {{ $dt->id }});modalAction='isEditStatus';dataId={{ $dt->toJson() }}"
+                                    @click="setFormAction('isEditStatus', {{ $dt->id }});modalAction='isEditStatus';dataId={{ $dt->toJson() }};teamMember({{ $dt->group->groupMember->toJson() }})"
                                     class="btn btn-xs btn-warning-fill min-w-max">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
                                         viewBox="0 0 18 18" fill="none">
@@ -172,7 +152,8 @@
                         @endif
 
                         {{-- action --}}
-                        <x-table.action_table edit="hidden" btnInput="hidden" :data="$dt"></x-table.action_table>
+                        <x-table.action_table edit="hidden" :data="$dt"
+                            registrationTeamMember=true></x-table.action_table>
                     </tr>
                 @endforeach
             </x-slot>
@@ -192,8 +173,9 @@
                     </div>
                     <div class="input-group">
                         <label class="input-label" for="">Anggota Kelompok</label>
-                        <input name="member" class="input" type="text" disabled
-                            :value="modalAction != null ? dataId.member : ''">
+                        <div id="memberField" class="space-y-2">
+                            {{-- memberField --}}
+                        </div>
                     </div>
                     <div class="input-group">
                         <label class="input-label" for="">Waktu</label>
@@ -269,6 +251,43 @@
                 </div>
             </div>
         </div>
+
+        {{-- generate doc --}}
+        <div x-show="generateDocumentModal" class="form-modal">
+            {{-- <div class="form-modal"> --}}
+            <form class="form" action="{{ route('admin.registration.generateDocument') }}" method="POST"
+                @click.away="generateDocumentModal=false">
+                <div class="form-header">
+                    @csrf
+                    <h3>Generate Dokumen</h3>
+                    <svg @click="generateDocumentModal=false,selected='Pilih Opsi'" class="cursor-pointer"
+                        xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28"
+                        fill="none">
+                        <path d="M19.8333 8.16675L8.16663 19.8334M8.16663 8.16675L19.8333 19.8334" stroke="#525A6A"
+                            stroke-width="1.03704" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <div class="form-body">
+                    {{-- <div class="space-y-2 w-full"> --}}
+                    <input class="input h-full w-full" type="hidden" name="registration_id"
+                        :value="generateDocumentModal ? dataId.id : ''">
+                    {{-- <input class="input h-full w-full" type="" name="document_type"
+                        :value="generateDocumentModal ? document_type : ''"> --}}
+                    <div class="input-group">
+                        <label class="input-label" for="">Nomor Surat</label>
+                        <input class="input h-full w-full" name="letter_num" type="text"
+                            placeholder="Masukkan Nomor Surat" required>
+                    </div>
+                </div>
+                <div class="form-footer">
+                    <button @click.prevent="generateDocumentModal=false" class="btn btn-sm"
+                        :class="modalAction == 'isView' ? 'btn-success-fill' : 'btn-error-fill'">
+                        <span>Batalkan</span>
+                    </button>
+                    <button type="submit" class="btn btn-success-fill btn-sm">Generate</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     {{-- empty state --}}
@@ -278,34 +297,32 @@
         </x-not_found_empty_state>
     @endif
 
-@endsection
-
-{{-- script Modal Action --}}
-<script>
-    function setFormAction(modalAction, id = null) {
-        const form = document.getElementById('modalForm');
-        // const status = document.getElementById('status').value;
-        if (modalAction === 'isDelete' && id) {
-            form.action = `{{ route('admin.registration.destroy', ':id') }}`.replace(':id', id);
-        } else if (modalAction === 'isEditStatus' && id) {
-            form.action = `{{ route('admin.registration.update.status', ':id') }}`.replace(':id', id);
+    {{-- script Modal Action --}}
+    <script>
+        function setFormAction(modalAction, id = null) {
+            const form = document.getElementById('modalForm');
+            if (modalAction === 'isDelete' && id) {
+                form.action = `{{ route('admin.registration.destroy', ':id') }}`.replace(':id', id);
+            } else if (modalAction === 'isEditStatus' && id) {
+                form.action = `{{ route('admin.registration.update.status', ':id') }}`.replace(':id', id);
+            }
         }
-        // else if (modalAction === 'isEditStatus' && id) {
-        //     form.action = `{{ route('admin.registration.status.confirm', [':id', ':status']) }}`.replace(':id', id).replace(':status', status);
-        //     // route('admin.registration.status.confirm', ['registrationId' => 'id', 'status' => 'reject']) 
-        // }
-        // else if (modalAction === 'isEditStatus' && id) {
-        //     let status = document.getElementById("status").value;
+    </script>
 
-        //     // Laravel membuat URL dengan placeholder yang bisa diubah di JavaScript
-        //     let url = @json(route('admin.registration.status.confirm', ['registrationId' => '__id__', 'status' => '__status__']));
+    <script>
+        function teamMember(dataMember) {
+            const container = document.getElementById('memberField');
+            container.innerHTML = '';
 
-        //     // Gantikan placeholder dengan nilai sebenarnya
-        //     url = url.replace('__id__', id).replace('__status__', status);
+            dataMember.forEach(function(teamMember, index) {
+                const member = document.createElement('input');
+                member.value = teamMember.student.name + ' (NIS ' + teamMember.student.nis + ')';
+                member.disabled = true;
+                member.classList.add('input', 'w-full');
 
-        //     // Redirect ke URL yang telah diperbarui
-        //     window.location.href = url;
-        // }
- 
-    }
-</script>
+                container.appendChild(member);
+            });
+        }
+    </script>
+
+@endsection

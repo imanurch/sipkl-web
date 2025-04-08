@@ -6,6 +6,29 @@ use App\Models\Monitoring;
 
 class MonitoringRepository
 {
+    public function getMonitoring($batch_id, $filters = [])
+    {
+        $query = Monitoring::query();
+
+        // filter type
+        if ($filters['type'] != null) {
+            $query->where('type', $filters['type']);
+        }
+
+        // filter search
+        if ($filters['search'] != null) {
+            $query->whereHas('internship.advisor', function ($subQuery) use ($filters) {
+                $subQuery->where('name', 'like', '%' . $filters['search'] . '%');
+            })->orWhereHas('internship.industry', function ($subQuery) use ($filters) {
+                $subQuery->where('name', 'like', '%' . $filters['search'] . '%');
+            });
+        }
+
+        return $query->whereHas('internship', function ($query) use ($batch_id) {
+            $query->where('batch_id', $batch_id);
+        })->with('monitoringDocument')->get();
+    }
+
     public function getMonitoringByAdvisorIdAndBatch($advisor_id, $batch_id, $filters = [])
     {
         $query = Monitoring::query();

@@ -11,6 +11,11 @@ class UserRepository
         return User::create($data);
     }
 
+    public function getUserById($id)
+    {
+        return User::find($id);
+    }
+
     public function updateUser($id, array $data)
     {
         return User::where('id', $id)->update($data);

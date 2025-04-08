@@ -32,10 +32,33 @@ class AssessmentService
         $countPass = 0;
         $countNotPass = 0;
         foreach ($data as $dt) {
-            $score = round((($dt->industry_score) + ($dt->advisor_score) + ($dt->final_test_score)) / 3, 2);
 
-            // cek kelulusan
-            if ($score >= 75) {
+            $technical_score = 0;
+            $non_technical_score = 0;
+            $final_report_score = 0;
+
+            // technical
+            foreach ($dt->technical_assessment as $aspect_score) {
+                $technical_score += $aspect_score->score;
+            }
+            $technical_score_average = $technical_score / count($dt->technical_assessment);
+
+            // non technical
+            foreach ($dt->non_technical_assessment as $aspect_score) {
+                $non_technical_score += $aspect_score->score;
+            }
+            $non_technical_score_average = ($non_technical_score / count($dt->non_technical_assessment));
+
+            // final report
+            foreach ($dt->final_report_assessment as $aspect_score) {
+                $final_report_score += $aspect_score->score;
+            }
+            $final_report_score_average = $final_report_score / count($dt->final_report_assessment);
+
+            // final score
+            $internship_score = round((($technical_score_average + $non_technical_score_average + $final_report_score_average + $dt->test_assessment->score) / 4), 2);
+
+            if ($internship_score >= 75) {
                 $countPass += 1;
             } else {
                 $countNotPass += 1;
@@ -54,6 +77,58 @@ class AssessmentService
         return $this->assessmentRepository->getAssessmentByAdvisor($advisor_id, $filters);
     }
 
+    public function getNotAssessedCountByAdvisor($advisor_id)
+    {
+        return $this->assessmentRepository->countNotAssessedByAdvisor($advisor_id);
+    }
+
+    public function getAssessedCountByAdvisor($advisor_id, $status)
+    {
+        $data = $this->assessmentRepository->getAssessedByAdvisor($advisor_id);
+
+        $countPass = 0;
+        $countNotPass = 0;
+        foreach ($data as $dt) {
+
+            $technical_score = 0;
+            $non_technical_score = 0;
+            $final_report_score = 0;
+
+            // technical
+            foreach ($dt->technical_assessment as $aspect_score) {
+                $technical_score += $aspect_score->score;
+            }
+            $technical_score_average = $technical_score / count($dt->technical_assessment);
+
+            // non technical
+            foreach ($dt->non_technical_assessment as $aspect_score) {
+                $non_technical_score += $aspect_score->score;
+            }
+            $non_technical_score_average = ($non_technical_score / count($dt->non_technical_assessment));
+
+            // final report
+            foreach ($dt->final_report_assessment as $aspect_score) {
+                $final_report_score += $aspect_score->score;
+            }
+            $final_report_score_average = $final_report_score / count($dt->final_report_assessment);
+
+            // final score
+            $internship_score = round((($technical_score_average + $non_technical_score_average + $final_report_score_average + $dt->test_assessment->score) / 4), 2);
+
+            if ($internship_score >= 75) {
+                $countPass += 1;
+            } else {
+                $countNotPass += 1;
+            }
+        }
+
+        if ($status == 'pass') {
+            return $countPass;
+        } else {
+            return $countNotPass;
+        }
+    }
+
     public function getAssessmentByStudentIdAndInternshipId($student_id, $internship_id)
     {
         return $this->assessmentRepository->getAssessmentByStudentIdAndInternshipId($student_id, $internship_id);
@@ -64,8 +139,13 @@ class AssessmentService
         return $this->assessmentRepository->createAssessment($data);
     }
 
-    public function updateScoreAssessment($id, array $data)
+    // public function updateScoreAssessment($id, array $data)
+    // {
+    //     return $this->assessmentRepository->updateScoreAssessment($id, $data);
+    // }
+
+    public function getAssessmentByBatch($batch_id)
     {
-        return $this->assessmentRepository->updateScoreAssessment($id, $data);
+        return $this->assessmentRepository->getAssessmentByBatch($batch_id);
     }
 }

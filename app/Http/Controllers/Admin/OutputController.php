@@ -116,7 +116,8 @@ class OutputController extends Controller
 
         $path = storage_path('app/intern_documents/laporan_akhir/' . $filename);
         if (file_exists($path)) {
-            return response()->download($path);
+            // return response()->download($path);
+            return response()->file($path);
         } else {
             return response()->json(['message' => 'File tidak ditemukan'], 404);
         }

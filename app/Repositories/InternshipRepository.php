@@ -13,21 +13,23 @@ class InternshipRepository
     {
         $query = Internship::with(
             'group',
-            'group.groupMember.student:id,name,department_id',
+            'group.groupMember.student:id,name,nis,nisn,department_id',
             'group.groupMember.student.department:id,name',
             'industry:id,name',
             'advisor:id,name'
         );
 
-        // filter batch
-        // if ($filters['batch_id'] != null) {
-        //     $query->where('batch_id', $filters['batch_id']);
-        // };
-
         // filter search
+
         if ($filters['search'] != null) {
-            $query->whereHas('group', function ($query) use ($filters) {
-                $query->where('name', 'like', '%' . $filters['search'] . '%');
+            $query->whereHas('group', function ($subQuery) use ($filters) {
+                $subQuery->where('name', 'like', '%' . $filters['search'] . '%');
+            })->orWhereHas('industry', function ($subQuery) use ($filters) {
+                $subQuery->where('name', 'like', '%' . $filters['search'] . '%');
+            })->orWhereHas('advisor', function ($subQuery) use ($filters) {
+                $subQuery->where('name', 'like', '%' . $filters['search'] . '%');
+            })->orWhereHas('group.groupMember.student', function ($subQuery) use ($filters) {
+                $subQuery->where('name', 'like', '%' . $filters['search'] . '%');
             });
         };
 
@@ -48,6 +50,13 @@ class InternshipRepository
         // filter search
         if ($filters['search'] != null) {
             $query->where('name', 'like', '%' . $filters['search'] . '%');
+        };
+
+        if ($filters['search'] != null) {
+            $query->where('name', 'like', '%' . $filters['search'] . '%')
+                ->orWhereHas('groupMember.group.internship.industry', function ($subQuery) use ($filters) {
+                    $subQuery->where('name', 'like', '%' . $filters['search'] . '%');
+                });
         };
 
         return $query->paginate(5);
@@ -86,7 +95,11 @@ class InternshipRepository
         if ($filters['search'] != null) {
             $query->where(function ($subQuery) use ($filters) {
                 $subQuery->where('name', 'like', '%' . $filters['search'] . '%')
-                    ->orWhere('nisn', 'like', '%' . $filters['search'] . '%');
+                    ->orWhere('nisn', 'like', '%' . $filters['search'] . '%')
+                    ->orWhere('nis', 'like', '%' . $filters['search'] . '%')
+                    ->orWhere('phone_num', 'like', '%' . $filters['search'] . '%');
+            })->orWhereHas('groupMember.group.internship.industry', function ($query) use ($filters) {
+                $query->where('name', 'like', '%' . $filters['search'] . '%');
             });
         }
 
@@ -128,6 +141,11 @@ class InternshipRepository
         return Internship::whereHas('group.groupMember.student', function ($query) use ($student_id, $batch_id) {
             $query->where('id', $student_id);
         })->with('industry:id,name,address', 'advisor:id,name,phone_num')->where('batch_id', $batch_id)->first();
+    }
+
+    public function getAllInternshipList($batch_id)
+    {
+        return Internship::where('batch_id', $batch_id)->get();
     }
 
     public function getInternshipListByAdvisor($advisor_id, $batch_id)

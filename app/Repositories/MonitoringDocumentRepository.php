@@ -16,9 +16,21 @@ class MonitoringDocumentRepository
         return MonitoringDocument::where('monitoring_id', $monitoring_id)->where('type', $type)->first();
     }
 
-    public function createMonitoringDocument(array $data)
+    // public function createMonitoringDocument(array $data)
+    // {
+    //     return MonitoringDocument::create($data);
+    // }
+
+    public function updateOrCreateMonitoringDocument(array $data)
     {
-        return MonitoringDocument::create($data);
+        // return MonitoringDocument::create($data);
+        return MonitoringDocument::updateOrCreate(
+            [
+                'monitoring_id' => $data['monitoring_id'],
+                'type' => $data['type'],
+            ],
+            ['url' => $data['url']]
+        );
     }
 
     public function getByMonitoringIdAndType($monitoring_id, $type)
@@ -31,8 +43,8 @@ class MonitoringDocumentRepository
         return MonitoringDocument::where('id', $id)->update($data);
     }
 
-    public function deleteMonitoringDocument($id)
+    public function deleteMonitoringDocument($monitoring_id)
     {
-        return MonitoringDocument::where('id', $id)->delete();
+        return MonitoringDocument::where('monitoring_id', $monitoring_id)->delete();
     }
 }

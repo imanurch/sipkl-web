@@ -114,12 +114,13 @@ class RegistrationStudentController extends Controller
                 'address' => 'required|string',
                 'email' => 'required|unique:industries,email|email',
                 'phone_num' => 'required|unique:industries,phone_num|string|min:10|max:14',
+                'leader_name' => 'required|string',
             ]);
 
             $this->industryService->addIndustry($validatedData);
-            Toastr::addSuccess('Data admin berhasil dihapus!');
+            Toastr::addSuccess('Pengajuan industri berhasil disimpan!');
         } catch (\Exception $e) {
-            Toastr::addError('Data admin gagal dihapus!');
+            Toastr::addError('Pengajuan industri gagal disimpan');
         }
         return redirect()->back();
     }
@@ -147,7 +148,7 @@ class RegistrationStudentController extends Controller
                 'pages' => 'registration',
             ]);
         } catch (\Exception $e) {
-            Toastr::addError('Data lokasi gagal ditambahkan!');
+            Toastr::addError('Data lokasi gagal disimpan!');
             return redirect()->back();
         }
     }
@@ -176,7 +177,7 @@ class RegistrationStudentController extends Controller
                 'pages' => 'registration',
             ]);
         } catch (\Exception $e) {
-            Toastr::addError('Data anggota gagal ditambahkan!');
+            Toastr::addError('Data anggota gagal disimpan!');
             return redirect()->back();
         }
     }
@@ -227,12 +228,12 @@ class RegistrationStudentController extends Controller
                 $newRegistration = $this->registrationService->addRegistration($registrationData);
 
                 // create registration document
-                // surat pengantar
-                $suratPengantarData = [
+                // surat permohonan
+                $suratPermohonanData = [
                     'registration_id' => $newRegistration->id,
-                    'type' => 'surat pengantar',
+                    'type' => 'surat permohonan',
                 ];
-                $this->registrationDocumentService->addRegistrationDocument($suratPengantarData);
+                $this->registrationDocumentService->addRegistrationDocument($suratPermohonanData);
 
                 // surat balasan
                 $suratBalasanData = [
@@ -241,34 +242,26 @@ class RegistrationStudentController extends Controller
                 ];
                 $this->registrationDocumentService->addRegistrationDocument($suratBalasanData);
 
-                // ucapan terima kasih
-                $ucapanTerimaKasihData = [
-                    'registration_id' => $newRegistration->id,
-                    'type' => 'ucapan terima kasih',
-                ];
-                $this->registrationDocumentService->addRegistrationDocument($ucapanTerimaKasihData);
-
+                // update step
                 $registrationData = $this->registrationService->getRegistrationById($newRegistration->id);
-
                 $this->registrationService->updateRegistrationStep($newRegistration->id, '4');
-
-                Toastr::addSuccess('Data registrasi berhasil disimpan!');
-                return view('pages.student.registration', [
-                    'registrationData' => $registrationData,
-                    'teamMember' => $teamMember,
-                    'pages' => 'registration',
-                ]);
             });
+            Toastr::addSuccess('Data registrasi berhasil disimpan!');
+            return redirect()->route('student.registration');
         } catch (\Exception $e) {
             Toastr::addError('Data registrasi gagal disimpan!');
         }
-        return redirect()->back();
     }
 
     public function step4View()
     {
         $registration_id =  session()->get('registration_id');
         $registrationData = $this->registrationService->getRegistrationById($registration_id);
+        $step = $registrationData->step;
+        if ($step != '4') {
+            return back();
+        }
+
         $teamMember = '';
         return view('pages.student.registration', [
             'registrationData' => $registrationData,
@@ -282,8 +275,9 @@ class RegistrationStudentController extends Controller
         try {
             $validatedData = $request->validate([
                 'registration_id' => 'required',
-                'surat_balasan' => 'required|mimes:pdf',
+                'surat_balasan' => 'required',
             ]);
+            // dd('halo');
             $path_file_balasan = $validatedData['surat_balasan']->store('registration_document/surat_balasan');
             $filename = basename($path_file_balasan);
 
@@ -298,16 +292,9 @@ class RegistrationStudentController extends Controller
                 $registrationData->surat_jalan = $surat_jalan != null ? $surat_jalan->url : 'Belum Tersedia';
 
                 $this->registrationService->updateRegistrationStep($registration_id, '5');
-
-                Toastr::addSuccess('File Bukti berhasil diunggah!');
-                // dd('tes');
-                // return view('pages.student.dashboard');
-                return view('pages.student.registration', [
-                    'registrationData' => $registrationData,
-                    'pages' => 'registration',
-                ]);
-                // return redirect()->route('student.registration.step5');
             });
+            Toastr::addSuccess('File Bukti berhasil diunggah!');
+            return redirect()->route('student.registration');
         } catch (\Exception $e) {
             Toastr::addError('File Bukti gagal diunggah!');
             return redirect()->back();
@@ -318,6 +305,10 @@ class RegistrationStudentController extends Controller
     {
         $registration_id =  session()->get('registration_id');
         $registrationData = $this->registrationService->getRegistrationById($registration_id);
+        $step = $registrationData->step;
+        if ($step != '5') {
+            return redirect()->back();
+        }
 
         $student_id = session('user_bio')->id;
         $surat_jalan = $this->internDocumentService->getInternDocumentByStudentId($student_id, 'surat jalan');
@@ -332,11 +323,7 @@ class RegistrationStudentController extends Controller
 
     public function downloadFile($type, $filename)
     {
-        if ($type = 'surat_jalan') {
-            $path = storage_path('app/intern_documents/surat_jalan/' . $filename);
-        } else {
-            $path = storage_path('app/registration_document/' . $type . '/' . $filename);
-        }
+        $path = ($type == 'surat_permohonan' ? storage_path('app/registration_document/surat_permohonan/' . $filename) : ($type == 'surat_balasan' ? storage_path('app/registration_document/surat_balasan/' . $filename) : $path = storage_path('app/intern_documents/surat_jalan/' . $filename)));
 
         if (file_exists($path)) {
             return response()->download($path);

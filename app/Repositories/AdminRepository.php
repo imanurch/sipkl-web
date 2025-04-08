@@ -12,8 +12,12 @@ class AdminRepository
 
         // filter search
         if ($searchFilter != null) {
-            $query->where('username', 'like', '%' . $searchFilter . '%')
-                ->orWhere('email', 'like', '%' . $searchFilter . '%');
+            $query->where('name', 'like', '%' . $searchFilter . '%')
+                ->orWhere('phone_num', 'like', '%' . $searchFilter . '%')
+                ->orWhereHas('user', function ($subQuery) use ($searchFilter) {
+                    $subQuery->where('username', 'like', '%' . $searchFilter . '%')
+                        ->orWhere('email', 'like', '%' . $searchFilter . '%');
+                });
         };
 
         return $query->paginate(5);

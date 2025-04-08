@@ -33,11 +33,11 @@
         </x-slot>
         {{-- table --}}
         <x-slot name="tHeader">
-            <th>NO</th>
-            <th>NAMA</th>
-            <th>ALAMAT</th>
-            <th>EMAIL</th>
-            <th>NO TELP</th>
+            <th>No</th>
+            <th>Nama</th>
+            <th>Alamat</th>
+            <th>Email</th>
+            <th>No Telepon</th>
         </x-slot>
         <x-slot name="tBody">
             @foreach ($data as $dt)

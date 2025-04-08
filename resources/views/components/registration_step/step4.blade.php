@@ -1,5 +1,6 @@
 <div class="space-y-4">
     <h6 class="text-xs-medium">Lengkapi Hasil Pendaftaran</h6>
+    {{-- <form action="{{ route('student.registration.step5') }}" method="POST" enctype="multipart/form-data"> --}}
     <form action="{{ route('student.registration.step5') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="space-y-4">
@@ -32,12 +33,12 @@
                     <span>{{ $registrationData->end_date }}</span>
                 </div>
                 <div class="flex space-x-3 text-xs-reguler place-items-center">
-                    <h6 class="w-56">Surat Pengantar PKL</h6>
+                    <h6 class="w-56">Surat Permohonan PKL</h6>
                     <span>:</span>
                     @foreach ($registrationData->registrationDocument as $dt)
-                        @if ($dt->type == 'surat pengantar')
+                        @if ($dt->type == 'surat permohonan')
                             @if ($dt->url != '')
-                                <a href="{{ route('student.registration.download.file', ['type' => 'surat_pengantar', 'filename' => $dt->url]) }}"
+                                <a href="{{ route('student.registration.download.file', ['type' => 'surat_permohonan', 'filename' => $dt->url]) }}"
                                     class="btn btn-xs btn-default-fill">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
                                         viewBox="0 0 14 14" fill="none">
@@ -61,7 +62,7 @@
                     <h6 class="w-56">Surat Balasan Industri (Bukti Diterima)</h6>
                     <span>:</span>
                     @foreach ($registrationData->registrationDocument as $dt)
-                        @if ($dt->type == 'surat pengantar')
+                        @if ($dt->type == 'surat permohonan')
                             @if ($dt->url != '')
                                 <input class="text-sm" type="file" name="surat_balasan">
                                 @break
@@ -75,15 +76,17 @@
                 </div>
             </div>
             <p class="text-xs">* Jika permohonan PKL ditolak oleh industri atau kamu ingin membuat pendaftaran baru,
-                klik button "Buat Pendaftaran Baru". Dengan membuat pendaftaran baru, maka pendaftaran ini akan otomatis ditolak </p>
+                klik button "Buat Pendaftaran Baru". Dengan membuat pendaftaran baru, maka pendaftaran ini akan otomatis
+                ditolak </p>
             <div class="flex space-x-2">
                 <div>
-                    <a href="{{ route('student.registration.newRegistration', ['lastRegistrationId' => $registrationData->id ]) }}" class="btn btn-xs btn-error-outline">
+                    <a href="{{ route('student.registration.newRegistration', ['lastRegistrationId' => $registrationData->id]) }}"
+                        class="btn btn-xs btn-error-outline">
                         <span>Buat Pendaftaran Baru</span>
                     </a>
                 </div>
                 @foreach ($registrationData->registrationDocument as $dt)
-                    @if ($dt->type == 'surat pengantar')
+                    @if ($dt->type == 'surat permohonan')
                         @if ($dt->url != '')
                             <div>
                                 <button type="submit" class="btn btn-xs btn-success-fill">

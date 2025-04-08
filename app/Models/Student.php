@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 class Student extends Model
 {
     use HasFactory;
-    protected $fillable = ['user_id', 'name', 'nisn', 'gender', 'department_id', 'year', 'phone_num'];
+    protected $fillable = ['user_id', 'name', 'nisn', 'nis', 'gender', 'department_id', 'year', 'phone_num'];
 
     public function user(): BelongsTo
     {

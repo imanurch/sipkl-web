@@ -3,11 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
+use App\Services\BatchService;
+use App\Services\AdvisorService;
+use App\Services\IndustryService;
 use App\Services\InternshipService;
 use App\Http\Controllers\Controller;
-use App\Services\AdvisorService;
-use App\Services\BatchService;
-use App\Services\IndustryService;
+use Illuminate\Support\Facades\Auth;
 use App\Services\RegistrationService;
 
 class DashboardAdminController extends Controller

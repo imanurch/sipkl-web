@@ -73,8 +73,8 @@
                         </div>
                         <div x-show="modalAction == 'isEdit'" class="input-group">
                             <label class="input-label" for="">Komentar Guru Pembimbing</label>
-                            <textarea class="input" name="feedback" id="" rows="8"
-                                :value="modalAction != 'isAdd' ? dataId.feedback : ''"></textarea>
+                            <textarea class="input resize-none" id="" rows="8"
+                                :value="modalAction != 'isAdd' ? dataId.feedback : ''" disabled></textarea>
                         </div>
                     </div>
                     <div class="form-footer">

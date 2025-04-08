@@ -25,6 +25,7 @@ class AdminManagementController extends Controller
     {
         // table filters
         $searchFilter =  $request->searchKeyword ?? '';
+        // dd($searchFilter);
 
         // table data
         $data = $this->adminService->getAdmin($searchFilter);
@@ -94,17 +95,16 @@ class AdminManagementController extends Controller
                 }
                 $validatedData['password'] = Hash::make($validatedData['password']);
             }
+            
+            DB::transaction(function () use ($validatedData, $id) {
+                $this->adminService->updateAdmin($id, [
+                    'name' => $validatedData['name'],
+                    'phone_num' => $validatedData['phone_num'],
+                ]);
 
-            $this->adminService->updateAdmin($id, [
-                'name' => $validatedData['name'],
-                'phone_num' => $validatedData['phone_num'],
-            ]);
-
-            DB::transaction(function () use ($validatedData) {
                 $updateUserData = [
                     'username' => $validatedData['username'],
                     'email' => $validatedData['email'],
-                    'password' => $validatedData['password'],
                 ];
                 if (isset($validatedData['password'])) {
                     $updateUserData['password'] = $validatedData['password'];

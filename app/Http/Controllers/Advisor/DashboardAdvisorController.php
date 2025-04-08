@@ -32,8 +32,6 @@ class DashboardAdvisorController extends Controller
         // dd($advisor_id);
 
         $data = $this->advisorService->getAdvisorById($advisor_id);
-        $surat_tugas = $this->advisorService->getAdvisorDocumentByAdvisorIdAndBatchId($advisor_id, $batch_id);
-        $data->surat_tugas = $surat_tugas;
         // dd($data);
 
         $mentee = $this->internshipService->getInternByAdvisorCount($batch_id, $advisor_id);

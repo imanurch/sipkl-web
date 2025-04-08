@@ -48,12 +48,24 @@ class FinalReportStudentController extends Controller
         $isIntern = $this->internshipService->getInternshipByStudentId($batch_id, $student_id) != null ? true : false;
 
         $data = $this->internDocumentService->getInternDocumentByStudentId($student_id, 'laporan akhir');
-        // dd($data);
+
         if ($data != null) {
-            $assessment = $this->assessmentService->getAssessmentByStudentIdAndInternshipId($student_id, $data->internship_id);
-            $data->isAssessed = ($assessment->advisor_score != null ? true : false);
+            $final_report_assessment = $this->assessmentService->getAssessmentByStudentIdAndInternshipId($student_id, $data->internship_id)->final_report_assessment;
+
+            if ($final_report_assessment != null) {
+                foreach ($final_report_assessment as $dt) {
+                    if ($dt->score == null && $dt->score != 0) {
+                        $data->isAssessed = false;
+                        break;
+                    } else {
+                        $data->isAssessed = true;
+                    }
+                }
+            } else {
+                $data->isAssessed = false;
+            }
         }
-        // dd($data);
+
         return view('pages.student.final_report', [
             'data' => $data,
             'isIntern' => $isIntern,
@@ -84,9 +96,9 @@ class FinalReportStudentController extends Controller
 
                 $this->internDocumentService->addInternDocument($data);
             });
-            Toastr::addSuccess('Data admin berhasil dihapus!');
+            Toastr::addSuccess('Laporan Akhir berhasil diunggah!');
         } catch (\Exception $e) {
-            Toastr::addError('Data admin gagal dihapus!');
+            Toastr::addError('Laporan Akhir gagal diunggah!');
         }
         return redirect()->back();
     }

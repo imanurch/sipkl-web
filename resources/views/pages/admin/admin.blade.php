@@ -5,19 +5,11 @@
 @section('content')
 
     <div x-data="{ modalAction: null }">
-        <x-table.table>
+        <x-table.table classFilter="hidden">
             <x-slot name="tableTitle">Data Administrator</x-slot>
             <x-slot name="filterActionForm">adminManagement</x-slot>
             <x-slot name="btnAdd">
                 <x-table.add_data></x-table.add_data>
-            </x-slot>
-            <x-slot name="filter">
-                <div class="flex w-full space-x-2">
-                    <div class="space-y-1 w-full">
-                        <span class="text-xs text-neutral-400 w-32">Search</span>
-                        <x-table.search value="{{ $filters['search'] ?? '' }}"></x-table.search>
-                    </div>
-                </div>
             </x-slot>
             {{-- table --}}
             <x-slot name="tHeader">
@@ -49,8 +41,8 @@
             <x-form>
                 <x-slot name="formTitle">Data Administrator</x-slot>
                 <x-slot name="formBody">
-                    <input name="user_id"
-                        :value="modalAction == 'isEdit' || modalAction=='isDelete' ? dataId.user_id : ''" hidden>
+                    <input name="user_id" :value="modalAction == 'isEdit' || modalAction=='isDelete' ? dataId.user_id : ''"
+                        hidden>
                     <div class="input-group">
                         <label class="input-label" for="">Nama</label>
                         <input name="name" class="input" type="text" placeholder="Masukkan Nama"
@@ -61,7 +53,8 @@
                         <label class="input-label" for="">Username</label>
                         <input name="username" class="input" type="text" placeholder="Masukkan Username"
                             :disabled="modalAction == 'isDelete'"
-                            :value="modalAction == 'isEdit' || modalAction=='isDelete' ? dataId.user.username : ''" required>
+                            :value="modalAction == 'isEdit' || modalAction=='isDelete' ? dataId.user.username : ''"
+                            required>
                     </div>
                     <div class="input-group">
                         <label class="input-label" for="">Email</label>
@@ -75,16 +68,13 @@
                             :disabled="modalAction == 'isDelete'"
                             :value="modalAction == 'isEdit' || modalAction=='isDelete' ? dataId.phone_num : ''" required>
                     </div>
-                    <div class="input-group">
-                        <label class="input-label" for="" :hidden="modalAction == 'isDelete'">Kata Sandi</label>
-                        <input name="password" class="input" type="text" placeholder="Masukkan Kata Sandi"
-                            :hidden="modalAction == 'isDelete'">
+                    <div x-show="modalAction != 'isDelete'" class="input-group">
+                        <label class="input-label" for="">Kata Sandi</label>
+                        <input name="password" class="input" type="password" placeholder="Masukkan Kata Sandi">
                     </div>
-                    <div class="input-group">
-                        <label class="input-label" for="" :hidden="modalAction == 'isDelete'">Ulangi Kata
-                            Sandi</label>
-                        <input name="check_password" class="input" type="text" placeholder="Ulangi Kata Sandi"
-                            :hidden="modalAction == 'isDelete'">
+                    <div x-show="modalAction != 'isDelete'" class="input-group">
+                        <label class="input-label" for="">Ulangi Kata Sandi</label>
+                        <input name="check_password" class="input" type="password" placeholder="Ulangi Kata Sandi">
                     </div>
                 </x-slot>
             </x-form>

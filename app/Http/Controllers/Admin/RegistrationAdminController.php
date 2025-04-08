@@ -21,6 +21,8 @@ use App\Services\RegistrationService;
 use App\Services\InternDocumentService;
 use Flasher\Toastr\Laravel\Facade\Toastr;
 use App\Services\RegistrationDocumentService;
+use App\Services\SignatureService;
+use App\Services\SchoolProfileService;
 
 class RegistrationAdminController extends Controller
 {
@@ -32,7 +34,9 @@ class RegistrationAdminController extends Controller
         $assessmentService,
         $studentService,
         $logbookService,
-        $internDocumentService;
+        $internDocumentService,
+        $signatureService,
+        $schoolProfileService;
 
     // Constructor Injection
     public function __construct(
@@ -44,6 +48,8 @@ class RegistrationAdminController extends Controller
         StudentService $studentService,
         LogbookService $logbookService,
         InternDocumentService $internDocumentService,
+        SignatureService $signatureService,
+        SchoolProfileService $schoolProfileService
     ) {
         $this->registrationService = $registrationService;
         $this->registrationDocumentService = $registrationDocumentService;
@@ -53,6 +59,8 @@ class RegistrationAdminController extends Controller
         $this->studentService = $studentService;
         $this->logbookService = $logbookService;
         $this->internDocumentService = $internDocumentService;
+        $this->signatureService = $signatureService;
+        $this->schoolProfileService = $schoolProfileService;
     }
 
     public function index(Request $request)
@@ -68,25 +76,21 @@ class RegistrationAdminController extends Controller
             'status' => $request->status ?? '',
             'batch_id' => $request->batch ?? $batch_id,
         ];
-        // dd($filters);
 
         // table data
         $data = $this->registrationService->getRegistration($filters);
         foreach ($data as $dt) {
             if ($dt->RegistrationDocument) {
                 foreach ($dt->registrationDocument as $doc) {
-                    if ($doc->type == 'surat pengantar') {
-                        $dt->surat_pengantar = $doc->url != '' ? $doc->url : null;
+                    if ($doc->type == 'surat permohonan') {
+                        $dt->surat_permohonan = $doc->url != '' ? $doc->url : null;
                     } else if ($doc->type == 'surat balasan') {
                         $dt->surat_balasan = $doc->url != '' ? $doc->url : null;
-                    } else if ($doc->type == 'ucapan terima kasih') {
-                        $dt->ucapan_terima_kasih = $doc->url != '' ? $doc->url : null;
                     }
                 }
             }
             $dt->status = $dt->status == '0' ? 'Belum Dikonfirmasi' : ($dt->status == '1' ? 'Diterima' : 'Ditolak');
         }
-        // dd($data);
 
         // card data
         $unconfirmedRegistration = $this->registrationService->getRegistrationByStatusCount('unconfirmed', $batch_id);
@@ -106,10 +110,11 @@ class RegistrationAdminController extends Controller
 
     public function downloadFile($type, $filename)
     {
-        $path = ($type == 'suratPengantar' ? storage_path('app/registration_document/surat_pengantar/' . $filename) : $path = storage_path('app/registration_document/surat_balasan/' . $filename));
+        $path = ($type == 'suratPermohonan' ? storage_path('app/registration_document/surat_permohonan/' . $filename) : $path = storage_path('app/registration_document/surat_balasan/' . $filename));
 
         if (file_exists($path)) {
-            return response()->download($path);
+            // return response()->download($path);
+            return response()->file($path);
         } else {
             return response()->json(['message' => 'File tidak ditemukan'], 404);
         }
@@ -134,10 +139,10 @@ class RegistrationAdminController extends Controller
                 if ($status == 'accept') {
                     // tambah registration to internship data
                     $newInternship = $this->internshipService->addInternship($data);
-                    // dd($newInternship->group->name);
 
                     foreach ($newInternship->group->groupMember as $member) {
-                        $newInternId = $member->student->id;
+                        $newIntern = $member->student;
+                        $newInternId = $newIntern->id;
 
                         // buat tempat di assessment
                         $this->assessmentService->addAssessment([
@@ -172,38 +177,38 @@ class RegistrationAdminController extends Controller
                             $logbook_start_date->modify('+1 day');
                         }
 
-                        // buat document intern (surat jalan)
-                        $data = [
-                            'title' => 'Contoh Dokumen Surat Jalan',
-                            'date'  => date('d-m-Y'),
-                        ];
+                        // // buat document intern (surat jalan)
+                        // // $principal_data = $this->signatureService->getPrincipalSignature();
+                        // $school_profile = $this->schoolProfileService->getSchoolProfile();
+                        // $data = [
+                        //     'principal_name' => $school_profile->principal_name,
+                        //     'principal_nip' => $school_profile->principal_nip,
+                        //     'principal_signature'  => $school_profile->principal_signature,
+                        //     'intern_name' => $newIntern->name,
+                        //     'intern_nis' => $newIntern->nis,
+                        //     // 'batch' => $principal_data->nip,
+                        //     'internship_start_date' => $newInternship->start_date,
+                        //     'internship_end_date' => $newInternship->end_date,
+                        //     'industry_name' => $newInternship->industry->name,
+                        //     'industry_address' => $newInternship->industry->address,
+                        //     // 'intern_transport' => $principal_data->nip,
+                        //     'create_date'  => date('d-m-Y'),
+                        // ];
 
-                        $pdf = Pdf::loadView('document_templates/surat_pengantar_template', $data);
-                        $filename = 'surat_jalan_' . time() . '.pdf';
+                        // $pdf = Pdf::loadView('document_templates/surat_jalan', $data);
+                        // $filename = 'surat_jalan_' . time() . '.pdf';
 
-                        $path = storage_path('app/intern_documents/surat_jalan/' . $filename);
-                        $pdf->save($path);
+                        // $path = storage_path('app/intern_documents/surat_jalan/' . $filename);
+                        // $pdf->save($path);
 
-                        $this->internDocumentService->addInternDocument([
-                            'student_id' => $newInternId,
-                            'internship_id' => $newInternship->id,
-                            'type' => 'surat jalan',
-                            'url' => $filename,
-                        ]);
+                        // // return $pdf->stream('dokumen.pdf');
 
-                        // buat ucapan terima kasih
-                        $data = [
-                            'title' => 'Contoh Dokumen Surat Terima kasih',
-                            'date'  => date('d-m-Y'),
-                        ];
-
-                        $pdf = Pdf::loadView('document_templates/surat_pengantar_template', $data);
-                        $filename = 'ucapan_terima_kasih_' . time() . '.pdf';
-
-                        $path = storage_path('app/registration_document/ucapan_terima_kasih/' . $filename);
-                        $pdf->save($path);
-
-                        $this->registrationDocumentService->updateRegistrationDocument($registrationId, 'ucapan terima kasih', $filename);
+                        // $this->internDocumentService->addInternDocument([
+                        //     'student_id' => $newInternId,
+                        //     'internship_id' => $newInternship->id,
+                        //     'type' => 'surat jalan',
+                        //     'url' => $filename,
+                        // ]);
                     }
                 }
             });
@@ -237,7 +242,6 @@ class RegistrationAdminController extends Controller
 
                         // tambah registration to internship data
                         $newInternship = $this->internshipService->addInternship($data);
-                        // dd($newInternship->group->name);
 
                         foreach ($newInternship->group->groupMember as $member) {
                             $newInternId = $member->student->id;
@@ -275,38 +279,24 @@ class RegistrationAdminController extends Controller
                                 $logbook_start_date->modify('+1 day');
                             }
 
-                            // buat document intern (surat jalan)
-                            $data = [
-                                'title' => 'Contoh Dokumen Surat Jalan',
-                                'date'  => date('d-m-Y'),
-                            ];
+                            // // buat document intern (surat jalan)
+                            // $data = [
+                            //     'title' => 'Contoh Dokumen Surat Jalan',
+                            //     'date'  => date('d-m-Y'),
+                            // ];
 
-                            $pdf = Pdf::loadView('document_templates/surat_pengantar_template', $data);
-                            $filename = 'surat_jalan_' . time() . '.pdf';
+                            // $pdf = Pdf::loadView('document_templates/surat_pengantar_template', $data);
+                            // $filename = 'surat_jalan_' . time() . '.pdf';
 
-                            $path = storage_path('app/intern_documents/surat_jalan/' . $filename);
-                            $pdf->save($path);
+                            // $path = storage_path('app/intern_documents/surat_jalan/' . $filename);
+                            // $pdf->save($path);
 
-                            $this->internDocumentService->addInternDocument([
-                                'student_id' => $newInternId,
-                                'internship_id' => $newInternship->id,
-                                'type' => 'surat jalan',
-                                'url' => $filename,
-                            ]);
-
-                            // buat ucapan terima kasih
-                            $data = [
-                                'title' => 'Contoh Dokumen Surat Terima kasih',
-                                'date'  => date('d-m-Y'),
-                            ];
-
-                            $pdf = Pdf::loadView('document_templates/surat_pengantar_template', $data);
-                            $filename = 'ucapan_terima_kasih_' . time() . '.pdf';
-
-                            $path = storage_path('app/registration_document/ucapan_terima_kasih/' . $filename);
-                            $pdf->save($path);
-
-                            $this->registrationDocumentService->updateRegistrationDocument($registrationId, 'ucapan terima kasih', $filename);
+                            // $this->internDocumentService->addInternDocument([
+                            //     'student_id' => $newInternId,
+                            //     'internship_id' => $newInternship->id,
+                            //     'type' => 'surat jalan',
+                            //     'url' => $filename,
+                            // ]);
                         }
                     } elseif ($newStatus == '2') {
                         // update status registration
@@ -315,9 +305,6 @@ class RegistrationAdminController extends Controller
                         // delete internship
                         $internship_id = $this->internshipService->getInternshipByGroupId($registrationData->group_id)->id;
                         $this->internshipService->deleteInternship($internship_id);
-
-                        // delete ucapan terima kasih
-                        $this->registrationDocumentService->updateRegistrationDocument($registrationId, 'ucapan terima kasih', null);
                     }
                 }
             });
@@ -328,46 +315,44 @@ class RegistrationAdminController extends Controller
         return redirect()->back();
     }
 
-    public function generateSuratPengantar($registration_id)
+    // public function generateSuratPermohonan($registration_id)
+    public function generateDocument(Request $request)
     {
-        // Data yang akan dikirim ke view
+        // dd($request->all());
+        $registration_data = $this->registrationService->getRegistrationById($request->registration_id);
+        $school_profile = $this->schoolProfileService->getSchoolProfile();
+
         $data = [
-            'title' => 'Contoh Dokumen PDF',
-            'date'  => date('d-m-Y'),
+            'school_phone_num'  => $school_profile->phone_num,
+            'school_website'  => $school_profile->website,
+            'school_email'  => $school_profile->email,
+            'create_date' => date('d F Y'),
+            'letter_num'  => $request->letter_num,
+            'industry_name'  => $registration_data->industry->name,
+            'industry_address'  => $registration_data->industry->address,
+            'academic_year'  => $registration_data->batch->year . '/' . $registration_data->batch->year + 1,
+            'internship_start_month'  => date('F', strtotime($registration_data->start_date)),
+            'internship_end_month'  => date('F', strtotime($registration_data->end_date)),
+            'internship_year'  => $registration_data->batch->year,
+            'principal_name'  => $school_profile->principal_name,
+            'principal_nip'  => $school_profile->principal_nip,
+            'principal_signature'  => $school_profile->principal_signature,
+            'intern_group_data' => $registration_data->group->groupMember,
         ];
 
-        // Memuat view dan mengkonversinya menjadi PDF
-        $pdf = Pdf::loadView('document_templates/surat_pengantar_template', $data);
+        $pdf = Pdf::loadView('document_templates/surat_permohonan_pkl', $data);
+        $filename = 'surat_permohonan_' . time() . '.pdf';
+        $path = storage_path('app/registration_document/surat_permohonan/' . $filename);
 
-        // $path_file_pengantar = $pdf->store('registration_document/surat_pengantar');
-        // $filename = basename($path_file_pengantar);
-        // dd($filename);
-
-        // Buat nama file dinamis, misalnya dengan timestamp
-        $filename = 'surat_pengantar_' . time() . '.pdf';
-
-        // Tentukan path lengkap untuk menyimpan file di storage/app
-        $path = storage_path('app/registration_document/surat_pengantar/' . $filename);
-
-        // Pastikan folder 'registration_document/surat_pengantar' sudah ada
         $pdf->save($path);
-        // dd($filename);
-
-        // return response()->download($path);
 
         try {
-            $this->registrationDocumentService->updateRegistrationDocument($registration_id, 'surat pengantar', $filename);
-            Toastr::addSuccess('Surat Pengantar berhasil dibuat. Silahkan refresh halaman!');
+            $this->registrationDocumentService->updateRegistrationDocument($request->registration_id, 'surat permohonan', $filename);
+            Toastr::addSuccess('Surat Permohonan berhasil dibuat. Silahkan refresh halaman!');
         } catch (\Exception $e) {
-            Toastr::addError('Surat Pengantar gagal dibuat. Silahkan refresh halaman!');
+            Toastr::addError('Surat Permohonan gagal dibuat. Silahkan refresh halaman!');
         }
         return redirect()->back();
-
-        // Cara untuk download
-        // return $pdf->download('dokumen.pdf');
-
-        // Atau, untuk menampilkan PDF di browser:
-        // return $pdf->stream('dokumen.pdf');
     }
 
     public function destroy($id)

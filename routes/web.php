@@ -1,9 +1,10 @@
 <?php
 
-use App\Http\Controllers\AccountController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\testingController;
+use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Admin\OutputController;
+use App\Http\Controllers\GenerateTestingController;
+use App\Http\Controllers\Admin\AccountAdminController;
 use App\Http\Controllers\Admin\LogbookAdminController;
 use App\Http\Controllers\Auth\AuthenticationController;
 use App\Http\Controllers\Admin\DashboardAdminController;
@@ -11,14 +12,16 @@ use App\Http\Controllers\Admin\AdminManagementController;
 use App\Http\Controllers\Admin\AssessmentAdminController;
 use App\Http\Controllers\Admin\BatchManagementController;
 use App\Http\Controllers\Admin\InternshipAdminController;
+use App\Http\Controllers\Admin\MonitoringAdminController;
 use App\Http\Controllers\Advisor\InternAdvisorController;
+use App\Http\Controllers\Advisor\AccountAdvisorController;
 use App\Http\Controllers\Advisor\LogbookAdvisorController;
 use App\Http\Controllers\Student\LogbookStudentController;
 use App\Http\Controllers\Admin\AdvisorManagementController;
-use App\Http\Controllers\Admin\DocumentController;
 use App\Http\Controllers\Admin\RegistrationAdminController;
 use App\Http\Controllers\Admin\StudentManagementController;
 use App\Http\Controllers\Advisor\IndustryAdvisorController;
+use App\Http\Controllers\Admin\AdministrationDataController;
 use App\Http\Controllers\Admin\IndustryManagementController;
 use App\Http\Controllers\Advisor\DashboardAdvisorController;
 use App\Http\Controllers\Student\DashboardStudentController;
@@ -27,6 +30,7 @@ use App\Http\Controllers\Advisor\MonitoringAdvisorController;
 use App\Http\Controllers\Student\FinalReportStudentController;
 use App\Http\Controllers\Student\RegistrationStudentController;
 use App\Http\Controllers\Advisor\LogbookDetailAdvisorController;
+use App\Http\Controllers\Student\AccountStudentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -51,46 +55,14 @@ Route::get('content', function () {
 //     return view('pages.admin.home');
 // });
 
-// Route::get('test', [testingController::class, 'index']);
-// Route::get('sipkl-beranda', [testingController::class, 'dashboard']);
-// Route::get('sipkl-manajemen-admin', [testingController::class, 'admin']);
-// Route::get('sipkl-manajemen-siswa', [testingController::class, 'student']);
-// Route::get('sipkl-manajemen-guru', [testingController::class, 'advisor']);
-// Route::get('sipkl-manajemen-industri', [testingController::class, 'industry']);
-// Route::get('sipkl-registrasi', [testingController::class, 'registration']);
-// Route::get('sipkl-intern', [testingController::class, 'intern']);
-// Route::get('sipkl-output', [testingController::class, 'output']);
-// Route::get('sipkl-assessment', [testingController::class, 'assessment']);
-// Route::get('sipkl-document', [testingController::class, 'document']);
-// // Route::get('sipkl-manajemen-siswa/{id}', [testingController::class, 'student']);
-// // Route::get('testAPI', [testingController::class, 'test']);
 
-// Route::get('sipkladv-beranda', [testingController::class, 'dashboardAdv']);
-// Route::get('sipkladv-intern', [testingController::class, 'internAdv']);
-// Route::get('sipkladv-industry', [testingController::class, 'industryAdv']);
-// Route::get('sipkladv-monitoring', [testingController::class, 'monitoringAdv']);
-// Route::get('sipkladv-logbook', [testingController::class, 'logbookAdv']);
-// Route::get('sipkladv-logbook-id', [testingController::class, 'logbookIdAdv']);
-// Route::get('sipkladv-assessment', [testingController::class, 'assessmentAdv']);
+Route::get('testing', [GenerateTestingController::class, 'index'])->name('testing');
+Route::get('testing/generate', [GenerateTestingController::class, 'create'])->name('testing.generate');
 
-// Route::get('sipklstud-beranda', [testingController::class, 'dashboardStud']);
-// Route::get('sipklstud-registrasi', [testingController::class, 'registrasiStud']);
-// Route::get('sipklstud-logbook', [testingController::class, 'logbookStud']);
-// Route::get('sipklstud-report', [testingController::class, 'reportStud']);
-
-
-// // draft
-// Route::get('admin', [AdminManagementController::class, 'index']);
-// Route::post('admin-store', [AdminManagementController::class, 'store']);
-// Route::patch('admin-update/{id}', [AdminManagementController::class, 'update']);
-// Route::delete('admin-delete/{id}', [AdminManagementController::class, 'destroy']);
-
-// Route::get('advisor', [AdvisorManagementController::class, 'index']);
-
-// save for later
 
 Route::get('doc', function () {
-    return view('document_templates/surat_pengantar_template');
+    // return view('document_templates/surat_pengantar_template');
+    return view('document_templates/surat_tugas');
 });
 
 Route::get('sipkl', [AuthenticationController::class, 'index'])->name('sipkl');
@@ -112,6 +84,7 @@ Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function
     Route::get('advisorManagement', [AdvisorManagementController::class, 'index'])->name('advisorManagement');
     Route::get('advisorManagement/downloadTemplate', [AdvisorManagementController::class, 'downloadTemplateFile'])->name('advisorManagement.downloadTemplateFile');
     Route::post('advisorManagement/import', [AdvisorManagementController::class, 'import'])->name('advisorManagement.import');
+    Route::post('advisorManagement/export', [AdvisorManagementController::class, 'export'])->name('advisorManagement.export');
     Route::post('advisorManagement', [AdvisorManagementController::class, 'store'])->name('advisorManagement.store');
     Route::patch('advisorManagement/{id}', [AdvisorManagementController::class, 'update'])->name('advisorManagement.update');
     Route::delete('advisorManagement/{id}', [AdvisorManagementController::class, 'destroy'])->name('advisorManagement.destroy');
@@ -128,10 +101,12 @@ Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function
     Route::get('industryManagement', [IndustryManagementController::class, 'index'])->name('industryManagement');
     Route::get('industryManagement/downloadTemplate', [IndustryManagementController::class, 'downloadTemplateFile'])->name('industryManagement.downloadTemplateFile');
     Route::post('industryManagement/import', [IndustryManagementController::class, 'import'])->name('industryManagement.import');
+    Route::post('industryManagement/export', [IndustryManagementController::class, 'export'])->name('industryManagement.export');
     Route::post('industryManagement', [IndustryManagementController::class, 'store'])->name('industryManagement.store');
     Route::patch('industryManagement/{id}', [IndustryManagementController::class, 'update'])->name('industryManagement.update');
     Route::delete('industryManagement/{id}', [IndustryManagementController::class, 'destroy'])->name('industryManagement.destroy');
     Route::get('industryRequest/confirmation/{industryId}/{status}', [IndustryManagementController::class, 'confirmStatusIndustry'])->name('industryRequest.status.confirm');
+    Route::patch('industryManagement/updateStatusRejectedIndustry/{id}', [IndustryManagementController::class, 'updateStatusIndustry'])->name('industryManagement.updateStatusRejectedIndustry');
 
     // batch management
     Route::get('batchManagement', [BatchManagementController::class, 'index'])->name('batchManagement');
@@ -146,7 +121,8 @@ Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function
     Route::get('registration/download/{type}/{filename}', [RegistrationAdminController::class, 'downloadFile'])->name('registration.download.file');
     Route::get('registration/confirmation/{registrationId}/{status}', [RegistrationAdminController::class, 'confirmStatusRegistration'])->name('registration.status.confirm');
     Route::post('registration/confirmation/{registrationId}', [RegistrationAdminController::class, 'updateStatusRegistration'])->name('registration.update.status');
-    Route::get('registration/generateDokumenPengantar/{registrationId}', [RegistrationAdminController::class, 'generateSuratPengantar'])->name('registration.generateSuratPengantar');
+    // Route::get('registration/generateDokumenPermohonan/{registrationId}', [RegistrationAdminController::class, 'generateSuratPermohonan'])->name('registration.generateSuratPermohonan');
+    Route::post('registration/generateDokumen', [RegistrationAdminController::class, 'generateDocument'])->name('registration.generateDocument');
 
     // intern
     Route::get('intern', [InternshipAdminController::class, 'index'])->name('intern');
@@ -161,13 +137,29 @@ Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function
     Route::get('logbook/detail/{studentId}/{internshipId}', [LogbookDetailAdvisorController::class, 'index'])->name('logbook.detail');
     Route::patch('logbook/detail/confirm/{logbookId}/{status}', [LogbookDetailAdvisorController::class, 'statusConfirm'])->name('logbook.detail.confirm');
 
+    // monitoring
+    Route::get('monitoring', [MonitoringAdminController::class, 'index'])->name('monitoring');
+    Route::post('monitoring', [MonitoringAdminController::class, 'store'])->name('monitoring.store');
+    Route::patch('monitoring/{id}', [MonitoringAdminController::class, 'update'])->name('monitoring.update');
+    Route::delete('monitoring/{id}', [MonitoringAdminController::class, 'destroy'])->name('monitoring.destroy');
+    Route::post('monitoring/generateSurat', [MonitoringAdminController::class, 'generateSurat'])->name('monitoring.generateSurat');
+    Route::get('monitoring/download/{type}/{filename}', [MonitoringAdminController::class, 'downloadFile'])->name('monitoring.downloadFile');
+
     // assessment
     Route::get('assessment', [AssessmentAdminController::class, 'index'])->name('assessment');
     Route::patch('assessment/{id}', [AssessmentAdminController::class, 'update'])->name('assessment.update');
+    Route::post('assessment/export', [AssessmentAdminController::class, 'export'])->name('assessment.export');
 
-    // document
-    Route::get('document', [DocumentController::class, 'index'])->name('document');
-    Route::post('document/advisorDocumentSearch', [DocumentController::class, 'advisorDocumentSearch'])->name('document.advisorSearch');
+    // administration data
+    Route::get('administrationData', [AdministrationDataController::class, 'index'])->name('administrationData');
+    // Route::post('administrationData/advisorDocumentSearch', [DocumentController::class, 'advisorDocumentSearch'])->name('document.advisorSearch');
+    Route::post('administrationData', [AdministrationDataController::class, 'update'])->name('administrationData.update');
+    Route::get('administrationData/{filename}', [AdministrationDataController::class, 'downloadFile'])->name('administrationData.downloadFile');
+
+    // account
+    Route::get('account', [AccountAdminController::class, 'index'])->name('account');
+    Route::post('account/updateAccount', [AccountAdminController::class, 'updateAccount'])->name('account.updateAccount');
+    Route::post('account/updateProfile', [AccountAdminController::class, 'updateProfile'])->name('account.updateProfile');
 });
 
 Route::prefix('advisor')->name('advisor.')->middleware('role:advisor')->group(function () {
@@ -197,7 +189,12 @@ Route::prefix('advisor')->name('advisor.')->middleware('role:advisor')->group(fu
     // assessment
     Route::get('assessment', [AssessmentAdvisorController::class, 'index'])->name('assessment');
     Route::patch('assessment/{id}', [AssessmentAdvisorController::class, 'update'])->name('assessment.update');
-    Route::get('assessment/download/{filename}', [AssessmentAdvisorController::class, 'downloadLaporanAkhir'])->name('assessment.download.finalReport');
+    Route::get('assessment/download/{filename}', [AssessmentAdvisorController::class, 'index'])->name('assessment.download.finalReport');
+
+    // account
+    Route::get('account', [AccountAdvisorController::class, 'index'])->name('account');
+    Route::post('account/updateAccount', [AccountAdvisorController::class, 'updateAccount'])->name('account.updateAccount');
+    Route::post('account/updateProfile', [AccountAdvisorController::class, 'updateProfile'])->name('account.updateProfile');
 });
 
 Route::prefix('student')->name('student.')->middleware('role:student')->group(function () {
@@ -225,4 +222,9 @@ Route::prefix('student')->name('student.')->middleware('role:student')->group(fu
     Route::get('final-report', [FinalReportStudentController::class, 'index'])->name('finalReport');
     Route::post('final-report', [FinalReportStudentController::class, 'store'])->name('finalReport.store');
     Route::get('final-report/download/{filename}', [FinalReportStudentController::class, 'downloadLaporanAkhir'])->name('finalReport.downloadLaporanAkhir');
+    
+    // account
+    Route::get('account', [AccountStudentController::class, 'index'])->name('account');
+    Route::post('account/updateAccount', [AccountStudentController::class, 'updateAccount'])->name('account.updateAccount');
+    Route::post('account/updateProfile', [AccountStudentController::class, 'updateProfile'])->name('account.updateProfile');
 });

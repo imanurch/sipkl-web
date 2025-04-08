@@ -16,6 +16,7 @@ return new class extends Migration
             $table->foreignId('user_id')->constrained('users')->cascadeOnDelete();
             $table->string('name');
             $table->string('nisn')->unique();
+            $table->string('nis')->unique();
             $table->enum('gender', ['women', 'men'])->default('men');
             $table->foreignId('department_id')->constrained('departments');
             $table->string('year');

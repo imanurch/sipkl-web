@@ -19,8 +19,8 @@ class Batch extends Model
     {
         return $this->hasMany(Internship::class, 'id');
     }
-    public function advisorDocument(): HasMany
-    {
-        return $this->hasMany(AdvisorDocument::class, 'id');
-    }
+    // public function advisorDocument(): HasMany
+    // {
+    //     return $this->hasMany(AdvisorDocument::class, 'id');
+    // }
 }

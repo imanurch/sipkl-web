@@ -5,19 +5,11 @@
 @section('content')
 
     <div x-data="{ modalAction: null }">
-        <x-table.table>
+        <x-table.table classFilter="hidden">
             <x-slot name="tableTitle">Batch PKL</x-slot>
             <x-slot name="filterActionForm">batchManagement</x-slot>
             <x-slot name="btnAdd">
                 <x-table.add_data></x-table.add_data>
-            </x-slot>
-            <x-slot name="filter">
-                <div class="flex w-full space-x-2">
-                    <div class="space-y-1 w-full">
-                        <span class="text-xs text-neutral-400 w-32">Search</span>
-                        <x-table.search value="{{ $filters['search'] ?? '' }}"></x-table.search>
-                    </div>
-                </div>
             </x-slot>
             {{-- setting batch status --}}
             <x-slot name="addition">

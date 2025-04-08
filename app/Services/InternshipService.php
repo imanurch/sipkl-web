@@ -19,6 +19,11 @@ class InternshipService
         return $this->internshipRepository->getInternship($filters);
     }
 
+    public function getAllInternshipList($batch)
+    {
+        return $this->internshipRepository->getAllInternshipList($batch);
+    }
+
     public function getInternshipListByAdvisor($advisor_id, $batch)
     {
         return $this->internshipRepository->getInternshipListByAdvisor($advisor_id, $batch);

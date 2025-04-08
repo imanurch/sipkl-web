@@ -45,12 +45,15 @@ class MonitoringAdvisorController extends Controller
         $advisor_id = session('user_bio')->id;
 
         $currentBatch = $this->batchService->getBatchByStatus('active');
-        $batch_id = $currentBatch != null ? $currentBatch->id : '';
+        $batch_id = $request->batch ?? ($currentBatch->id ?? '');
+
+        $batchData = $this->batchService->getAllBatch('');
 
         // filter
         $filters = [
             'search' => $request->searchKeyword ?? '',
             'type' => $request->type ?? '',
+            'batch_id' => $batch_id,
         ];
 
         $data = $this->monitoringService->getMonitoringByAdvisorIdAndBatch($advisor_id, $batch_id, $filters);
@@ -60,6 +63,7 @@ class MonitoringAdvisorController extends Controller
 
         return view('pages.advisor.monitoring', [
             'data' => $data,
+            'batchData' => $batchData,
             'filters' => $filters,
             'internshipListData' => $internshipListData,
             'pages' => 'monitoring',
@@ -92,62 +96,7 @@ class MonitoringAdvisorController extends Controller
                 'note' => 'nullable|string',
             ]);
 
-            DB::transaction(function () use ($validatedData) {
-                $newMonitoring = $this->monitoringService->addMonitoring($validatedData);
-
-                $dataDoc = [
-                    'title' => 'Contoh Dokumen PDF',
-                    'date'  => date('d-m-Y'),
-                ];
-                $pdf = Pdf::loadView('document_templates/surat_pengantar_template', $dataDoc);
-
-                if ($newMonitoring->type == 'Pelepasan') {
-                    // generate surat pengantar
-                    $filename = 'surat_pengantar' . time() . '.pdf';
-                    $path = storage_path('app/monitoring_documents/surat_pengantar/' . $filename);
-                    $pdf->save($path);
-
-                    $monitoringDocumentData = [
-                        'monitoring_id' => $newMonitoring->id,
-                        'type' => 'surat pengantar',
-                        'url' => $filename,
-                    ];
-
-                    $this->monitoringDocumentService->addMonitoringDocument($monitoringDocumentData);
-
-                    // generate doc lain
-                } elseif ($newMonitoring->type == 'Kunjungan') {
-                    // generate surat pengantar
-                    $filename = 'surat_tugas' . time() . '.pdf';
-                    $path = storage_path('app/monitoring_documents/surat_tugas/' . $filename);
-                    $pdf->save($path);
-
-                    $monitoringDocumentData = [
-                        'monitoring_id' => $newMonitoring->id,
-                        'type' => 'surat tugas',
-                        'url' => $filename,
-                    ];
-
-                    $this->monitoringDocumentService->addMonitoringDocument($monitoringDocumentData);
-
-                    // generate doc lain
-                } elseif ($newMonitoring->type == 'Penarikan') {
-                    // generate surat pengantar
-                    $filename = 'surat_penarikan' . time() . '.pdf';
-                    $path = storage_path('app/monitoring_documents/surat_penarikan/' . $filename);
-                    $pdf->save($path);
-
-                    $monitoringDocumentData = [
-                        'monitoring_id' => $newMonitoring->id,
-                        'type' => 'surat penarikan',
-                        'url' => $filename,
-                    ];
-
-                    $this->monitoringDocumentService->addMonitoringDocument($monitoringDocumentData);
-
-                    // generate doc lain
-                }
-            });
+            $this->monitoringService->addMonitoring($validatedData);
             Toastr::addSuccess('Data monitoring berhasil ditambah!');
         } catch (\Exception $e) {
             Toastr::addError('Data monitoring gagal ditambah!');
@@ -161,68 +110,23 @@ class MonitoringAdvisorController extends Controller
 
         try {
             $validatedData = $request->validate([
-                'internship_id' => 'required',
                 'type' => 'required',
                 'date' => 'required',
                 'note' => 'nullable|string',
             ]);
 
             $lastMonitoringData = $this->monitoringService->getById($id);
-            $lastMonitoringDocumentType = $lastMonitoringData->type == 'pelepasan' ? 'surat pengantar' : ($lastMonitoringData->type == 'penarikan' ? 'surat penarikan' : 'surat tugas');
-            // dd($lastMonitoringDocumentType,$lastMonitoringDocumentType);
-            $lastMonitoringDocumentId = $this->monitoringDocumentService->getByMonitoringIdAndType($id, $lastMonitoringDocumentType)->id;
+            // $lastMonitoringDocumentType = $lastMonitoringData->type == 'pelepasan' ? 'surat pengantar' : ($lastMonitoringData->type == 'penarikan' ? 'surat penarikan' : 'surat tugas');
+            // $lastMonitoringDocumentId = $this->monitoringDocumentService->getByMonitoringIdAndType($id, $lastMonitoringDocumentType)->id;
 
-            // dd($lastMonitoringDocumentType,$lastMonitoringDocumentId);
-
-            DB::transaction(function () use ($validatedData, $id, $lastMonitoringDocumentId) {
+            DB::transaction(function () use ($validatedData, $id) {
                 // update data monitoring
                 $this->monitoringService->updateMonitoring($id, $validatedData);
 
-                // generate ulang document
+                // harusnya generate ulang document tapi sementara hapus dulu aja biar diulang dr awal generate
                 // seharusnya dokumen yang lama dihapus biar ga beban memori
-                $dataDoc = [
-                    'title' => 'Contoh Dokumen PDF',
-                    'date'  => date('d-m-Y'),
-                ];
-                $pdf = Pdf::loadView('document_templates/surat_pengantar_template', $dataDoc);
 
-                if ($validatedData['type'] == 'Pelepasan') {
-                    // generate surat pengantar
-                    $filename = 'surat_pengantar' . time() . '.pdf';
-                    $path = storage_path('app/monitoring_documents/surat_pengantar/' . $filename);
-                    $pdf->save($path);
-
-                    $monitoringDocumentData = [
-                        'type' => 'surat pengantar',
-                        'url' => $filename,
-                    ];
-
-                    // generate doc lain
-                } elseif ($validatedData['type'] == 'Kunjungan') {
-                    // generate surat pengantar
-                    $filename = 'surat_tugas' . time() . '.pdf';
-                    $path = storage_path('app/monitoring_documents/surat_tugas/' . $filename);
-                    $pdf->save($path);
-
-                    $monitoringDocumentData = [
-                        'type' => 'surat tugas',
-                        'url' => $filename,
-                    ];
-
-                    // generate doc lain
-                } elseif ($validatedData['type'] == 'Penarikan') {
-                    // generate surat pengantar
-                    $filename = 'surat_penarikan' . time() . '.pdf';
-                    $path = storage_path('app/monitoring_documents/surat_penarikan/' . $filename);
-                    $pdf->save($path);
-
-                    $monitoringDocumentData = [
-                        'type' => 'surat penarikan',
-                        'url' => $filename,
-                    ];
-
-                }
-                $this->monitoringDocumentService->updateMonitoringDocument($lastMonitoringDocumentId, $monitoringDocumentData);
+                $this->monitoringDocumentService->deleteMonitoringDocument($id);
             });
             Toastr::addSuccess('Data monitoring berhasil diubah!');
         } catch (\Exception $e) {

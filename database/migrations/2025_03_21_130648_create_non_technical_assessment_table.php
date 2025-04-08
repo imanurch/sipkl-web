@@ -11,11 +11,11 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('advisor_documents', function (Blueprint $table) {
+        Schema::create('non_technical_assessment', function (Blueprint $table) {
             $table->id();
-            $table->foreignId('advisor_id')->constrained('advisors');
-            $table->foreignId('batch_id')->constrained('batches');
-            $table->string('surat_tugas');
+            $table->foreignId('assessment_id')->nullable()->constrained('assessments')->cascadeOnDelete();
+            $table->enum('aspect', ['Kedisiplinan', 'Kerja Sama', 'Inisiatif', 'Tanggung Jawab', 'Jujur dan Santun']);
+            $table->integer('score')->nullable();
             $table->timestamps();
         });
     }
@@ -25,6 +25,6 @@ return new class extends Migration
      */
     public function down(): void
     {
-        Schema::dropIfExists('advisor_documents');
+        Schema::dropIfExists('non_technical_asessment');
     }
 };

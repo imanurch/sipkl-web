@@ -30,7 +30,7 @@
                 <x-table.search value="{{ $filters['search'] ?? '' }}"></x-table.search>
             </div>
             <div class="space-y-1 w-full">
-                <span class="text-xs text-neutral-400 w-32">Search</span>
+                <span class="text-xs text-neutral-400 w-32">Batch</span>
                 <x-table.select_option_filter optionName="batch"
                     defaultSelected="{{ $filters['batch_id'] != '' ? $filters['batch_id'] : 'Semua batch' }}">
                     <x-slot name="option">
@@ -61,26 +61,30 @@
                     @foreach ($dt->groupMember as $member)
                         @if ($member->group->internship)
                             <td>{{ $member->group->internship->industry->name }}</td>
-                            <x-table.action_btn_table
-                                href="{{ route('admin.logbook.detail', ['studentId' => $dt->id ?? '', 'internshipId' => $member->group->internship->id]) }}"
-                                name="Lihat"></x-table.action_btn_table>
+                            <td>
+                                <x-table.action_btn_table
+                                    href="{{ route('admin.logbook.detail', ['studentId' => $dt->id ?? '', 'internshipId' => $member->group->internship->id]) }}"
+                                    name="Lihat"></x-table.action_btn_table>
+                            </td>
                         @endif
                     @endforeach
-                    @if (!$dt->internDocument->isEmpty())
-                        @foreach ($dt->internDocument as $doc)
-                            @if ($doc->type == 'laporan akhir')
-                                <x-table.action_btn_table
-                                    href="{{ route('admin.output.download.finalReport', ['filename' => $doc->url]) }}"
-                                    name="Lihat"></x-table.action_btn_table>
-                                @break
+                    <td>
+                        @if (!$dt->internDocument->isEmpty())
+                            @foreach ($dt->internDocument as $doc)
+                                @if ($doc->type == 'laporan akhir')
+                                    <x-table.action_btn_table
+                                        href="{{ route('admin.output.download.finalReport', ['filename' => $doc->url]) }}"
+                                        name="Lihat"></x-table.action_btn_table>
+                                    @break
 
-                            @elseif($loop->last)
-                                <td>Belum Tersedia</td>
-                            @endif
-                        @endforeach
-                    @else
-                        <td>Belum Tersedia</td>
-                    @endif
+                                @elseif($loop->last)
+                                    Belum Tersedia
+                                @endif
+                            @endforeach
+                        @else
+                            Belum Tersedia
+                        @endif
+                    </td>
                     <x-table.status_table status="{{ $dt->status }}"></x-table.status_table>
                 </tr>
             @endforeach

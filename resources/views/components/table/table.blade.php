@@ -7,8 +7,9 @@
                 <div class="flex">
                     <div class="relative w-full">
                         <input class="input w-full rounded-e-[0] border-e-0" type="text" placeholder="Cari Disini ..."
-                            name="searchKeyword" value="{{ $value ?? '' }}">
+                            name="{{ $mainSearchName ?? 'searchKeyword' }}" value="{{ $value ?? '' }}">
                     </div>
+                    {{ $mainSearchAddition ?? '' }}
                     <button class="btn btn-xs btn-default-fill rounded-s-[0]">
                         <svg class="" width="18" height="18" viewBox="0 0 28 24" fill="none"
                             xmlns="http://www.w3.org/2000/svg">
@@ -19,7 +20,7 @@
                 </div>
             </form>
             {{-- filter --}}
-            <div x-data="{ filter: false }" class="relative space-y-2">
+            <div x-data="{ filter: false }" class="relative space-y-2 {{ $classFilter ?? '' }}">
                 <button @click.prevent="filter=!filter" class="btn btn-xs btn-default-fill">Filter</button>
                 <form x-show="filter" @click.away="filter=false" action="{{ $filterActionForm ?? '' }}" method="GET"
                     class="absolute bg-neutral-0 end-0 shadow-lg">
@@ -34,7 +35,7 @@
                                     stroke-linejoin="round" />
                             </svg>
                         </div>
-                        <div class="px-4 gap-2 w-full">
+                        <div class="px-4 space-y-2 w-full">
                             {{ $filter ?? '' }}
                         </div>
                         <div class="flex justify-end space-x-2 border-t border-neutral-200 py-3 px-4">

@@ -11,7 +11,7 @@ class RegistrationRepository
     {
         $query = Registration::with(
             'group',
-            'group.groupMember.student:id,name,department_id',
+            'group.groupMember.student:id,name,nisn,nis,department_id',
             'group.groupMember.student.department:id,name',
             'industry:id,name',
             'registrationDocument'
@@ -30,8 +30,15 @@ class RegistrationRepository
 
         // filter search
         if ($filters['search'] != null) {
-            $query->whereHas('group', function ($query) use ($filters) {
-                $query->where('name', 'like', '%' . $filters['search'] . '%');
+            $query->where(function ($subQuery) use ($filters) {
+                $subQuery->whereHas('group', function ($subSubQuery) use ($filters) {
+                    $subSubQuery->where('name', 'like', '%' . $filters['search'] . '%')
+                        ->orWhereHas('groupMember.student', function ($subSubQuery) use ($filters) {
+                            $subSubQuery->where('name', 'like', '%' . $filters['search'] . '%');
+                        });
+                })->orWhereHas('industry', function ($subSubQuery) use ($filters) {
+                    $subSubQuery->where('name', 'like', '%' . $filters['search'] . '%');
+                });
             });
         };
 
@@ -55,9 +62,9 @@ class RegistrationRepository
         return Registration::with(
             'group',
             // 'group.groupMember:student_id',
-            'group.groupMember.student:id,name,department_id',
+            'group.groupMember.student:id,nisn,name,department_id',
             'group.groupMember.student.department:id,name',
-            'industry:id,name',
+            'industry:id,name,address',
             'registrationDocument'
         )->where('id', $id)->first();
     }
@@ -66,7 +73,7 @@ class RegistrationRepository
     {
         return Registration::whereHas('group.groupMember.student', function ($query) use ($student_id, $batch_id) {
             $query->where('id', $student_id);
-        })->with('industry:id,name,address')->where('batch_id', $batch_id)->where('step', '!=' , '0')->first();
+        })->with('industry:id,name,address')->where('batch_id', $batch_id)->where('step', '!=', '0')->first();
     }
 
     public function getAllHistoryRegistrationByStudentId($student_id)
@@ -91,7 +98,7 @@ class RegistrationRepository
         // dd($id, $status);
         if ($status == 'accept') {
             return Registration::where('id', $id)->update(['status' => '1']);
-        }else if ($status == 'reject') {
+        } else if ($status == 'reject') {
             return Registration::where('id', $id)->update(['status' => '2']);
         }
     }

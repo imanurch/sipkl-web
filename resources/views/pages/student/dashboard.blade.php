@@ -32,6 +32,11 @@
                     <input class="input w-full" type="text" value="{{ $studentData->phone_num ?? '' }}" disabled>
                 </div>
                 <div class="flex space-x-3 place-items-center">
+                    <h6 class="text-xs-reguler w-32" for="">NIS</h6>
+                    <span>:</span>
+                    <input class="input w-full" type="text" value="{{ $studentData->nis ?? '' }}" disabled>
+                </div>
+                <div class="flex space-x-3 place-items-center">
                     <h6 class="text-xs-reguler w-32" for="">Jenis Kelamin</h6>
                     <span>:</span>
                     <input class="input w-full" type="text"

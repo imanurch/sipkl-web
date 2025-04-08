@@ -48,18 +48,20 @@
             <h6 class="text-xs-medium">Pengajuan Lokasi Baru</h6>
             <table class="table">
                 <thead>
-                    <th>NO</th>
-                    <th>NAMA</th>
-                    <th>ALAMAT</th>
-                    <th>NO TELP</th>
+                    <th>No</th>
+                    <th>Nama</th>
+                    <th>Alamat</th>
+                    <th>No Telp</th>
+                    <th>Nama Pimpinan</th>
                 </thead>
                 <tbody>
                     @foreach ($industryRequestData as $dt)
                         <tr>
                             <td class="text-center">{{ $industryRequestData->firstItem() + $loop->index }}</td>
-                            <td>{{ $dt->name }}</td>
-                            <td>{{ $dt->address }}</td>
-                            <td>{{ $dt->phone_num }}</td>
+                            <td>{{ $dt->name ?? ''}}</td>
+                            <td>{{ $dt->address ?? ''}}</td>
+                            <td>{{ $dt->phone_num ?? ''}}</td>
+                            <td>{{ $dt->leader_name ?? ''}}</td>
                         </tr>
                     @endforeach
                 </tbody>

@@ -47,15 +47,30 @@
                         </x-slot>
                     </x-table.select_option_filter>
                 </div>
+                <div class="flex w-full space-x-2">
+                    <div class="space-y-1 w-full">
+                        <span class="text-xs text-neutral-400 w-32">Batch</span>
+                        <x-table.select_option_filter optionName="batch"
+                            defaultSelected="{{ $filters['batch_id'] != '' ? $filters['batch_id'] : 'Semua batch' }}">
+                            <x-slot name="option">
+                                @foreach ($batchData as $dt)
+                                    <li class="option-filter-toolbar-table"
+                                        @click="option=false;selected='{{ $dt->name }}';valueSelected='{{ $dt->id }}'">
+                                        {{ $dt->name }}</li>
+                                @endforeach
+                            </x-slot>
+                        </x-table.select_option_filter>
+                    </div>
+                </div>
             </x-slot>
             <x-slot name="tHeader">
-                <th>NO</th>
-                <th>JENIS MONITORING</th>
-                <th>WAKTU</th>
-                <th>KELOMPOK - INDUSTRI</th>
-                <th>MATERI</th>
-                <th>DOKUMEN</th>
-                <th>AKSI</th>
+                <th>No</th>
+                <th>Jenis Monitoring</th>
+                <th>Waktu</th>
+                <th>Kelompok - Industri</th>
+                <th>Keterangan</th>
+                <th>Dokumen</th>
+                <th>Aksi</th>
             </x-slot>
             <x-slot name="tBody">
                 @foreach ($data as $dt)
@@ -64,25 +79,29 @@
                         <td>{{ $dt->type }}</td>
                         <td>{{ $dt->date }}</td>
                         <td>{{ $dt->internship->group_id }} - {{ $dt->internship->industry->name }}</td>
-                        <td class="">{{ $dt->note }}</td>
+                        <td class="">{{ $dt->note ?? '-' }}</td>
                         <td class="place-items-center">
                             <div class="flex space-x-2">
-                                @foreach ($dt->monitoringDocument as $doc)
-                                    <a href="{{ route('advisor.monitoring.downloadFile', ['type' => $doc->type, 'filename' => $doc->url]) }}"
-                                        class="btn btn-xs btn-default-fill">
-                                        <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
-                                            viewBox="0 0 14 14" fill="none">
-                                            <path
-                                                d="M12.25 5.25001L12.25 1.75001M12.25 1.75001H8.74999M12.25 1.75001L7 7M5.83333 1.75H4.55C3.56991 1.75 3.07986 1.75 2.70552 1.94074C2.37623 2.10852 2.10852 2.37623 1.94074 2.70552C1.75 3.07986 1.75 3.56991 1.75 4.55V9.45C1.75 10.4301 1.75 10.9201 1.94074 11.2945C2.10852 11.6238 2.37623 11.8915 2.70552 12.0593C3.07986 12.25 3.56991 12.25 4.55 12.25H9.45C10.4301 12.25 10.9201 12.25 11.2945 12.0593C11.6238 11.8915 11.8915 11.6238 12.0593 11.2945C12.25 10.9201 12.25 10.4301 12.25 9.45V8.16667"
-                                                stroke="white" stroke-width="0.93" stroke-linecap="round"
-                                                stroke-linejoin="round" />
-                                        </svg>
-                                        <span class="min-w-max">{{ $doc->type }}</span>
-                                    </a>
-                                @endforeach
+                                @if (count($dt->monitoringDocument) > 0)
+                                    @foreach ($dt->monitoringDocument as $doc)
+                                        <a href="{{ route('advisor.monitoring.downloadFile', ['type' => $doc->type, 'filename' => $doc->url]) }}"
+                                            target="_blank" class="btn btn-xs btn-default-fill">
+                                            <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
+                                                viewBox="0 0 14 14" fill="none">
+                                                <path
+                                                    d="M12.25 5.25001L12.25 1.75001M12.25 1.75001H8.74999M12.25 1.75001L7 7M5.83333 1.75H4.55C3.56991 1.75 3.07986 1.75 2.70552 1.94074C2.37623 2.10852 2.10852 2.37623 1.94074 2.70552C1.75 3.07986 1.75 3.56991 1.75 4.55V9.45C1.75 10.4301 1.75 10.9201 1.94074 11.2945C2.10852 11.6238 2.37623 11.8915 2.70552 12.0593C3.07986 12.25 3.56991 12.25 4.55 12.25H9.45C10.4301 12.25 10.9201 12.25 11.2945 12.0593C11.6238 11.8915 11.8915 11.6238 12.0593 11.2945C12.25 10.9201 12.25 10.4301 12.25 9.45V8.16667"
+                                                    stroke="white" stroke-width="0.93" stroke-linecap="round"
+                                                    stroke-linejoin="round" />
+                                            </svg>
+                                            <span class="min-w-max">{{ $doc->type }}</span>
+                                        </a>
+                                    @endforeach
+                                @else
+                                    Belum Tersedia
+                                @endif
                             </div>
                         </td>
-                        <x-table.action_table btnInput="hidden" :data="$dt"></x-table.action_table>
+                        <x-table.action_table detail="hidden" :data="$dt"></x-table.action_table>
                     </tr>
                 @endforeach
             </x-slot>
@@ -134,13 +153,13 @@
                         <label class="input-label" for="">Kelompok - Industri</label>
                         {{-- isAdd / isEdit --}}
                         <input type="hidden" name="internship_id" x-model="selectedValueInternship">
-                        <div x-show="modalAction == 'isAdd' || modalAction == 'isEdit'">
+                        <div x-show="modalAction == 'isAdd'">
                             <button @click.prevent="optionInternship=!optionInternship" class="input input-select w-full"
                                 :disabled="isDelete" required>
                                 <span x-text="selectedInternship"
                                     :class="selected == 'Pilih Opsi' ? 'text-neutral-300' : 'text-neutral-800'"></span>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"
-                                    fill="none">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                    viewBox="0 0 20 20" fill="none">
                                     <path d="M5 7.5L10 12.5L15 7.5" stroke="#667085" stroke-width="0.933333"
                                         stroke-linecap="round" stroke-linejoin="round" :hidden="isDelete" />
                                 </svg>
@@ -157,17 +176,16 @@
                             </div>
                         </div>
                         {{-- isView / isDelete --}}
-                        <input x-show="modalAction == 'isView' || modalAction == 'isDelete'" type="text"
-                            class="input" disabled
+                        <input x-show="modalAction != 'isAdd'" type="text" class="input" disabled
                             :value="modalAction != null ? dataId.internship.group_id + ' - ' + dataId.internship.industry.name :
                                 ''">
 
                     </div>
                     <div class="input-group">
-                        <label class="input-label" for="">Materi</label>
+                        <label class="input-label" for="">Keterangan</label>
                         <input name="note" class="input" type="text" placeholder="Masukkan Keterangan"
                             :disabled="modalAction == 'isView' || modalAction == 'isDelete'"
-                            :value="modalAction != null ? dataId.note : ''" required>
+                            :value="modalAction != null ? dataId.note : ''">
                     </div>
                     {{-- <div class="input-group">
                         <label class="input-label" for="">Label</label>
