@@ -15,7 +15,7 @@
         </x-card>
     </div>
 
-    <div x-data="{ modalAction: null, option: false, selected: 'Pilih Opsi', selectedValue: null }">
+    <div x-data="{ modalAction: null, option: false, selected: 'Pilih Opsi', selectedValue: null, generateDocumentModal: false }">
         <x-table.table>
             <x-slot name="tableTitle">Data Peserta Didik</x-slot>
             <x-slot name="filterActionForm">intern</x-slot>
@@ -52,6 +52,7 @@
                 <th>Waktu</th>
                 <th>Guru Pembimbing</th>
                 <th>Lokasi PKL</th>
+                <th>Surat Jalan</th>
                 <th>Aksi</th>
             </x-slot>
             <x-slot name="tBody">
@@ -76,9 +77,9 @@
                         <td class="whitespace-nowrap">{{ date('d-m-Y', strtotime($dt->start_date)) }} <br>s/d
                             <br>{{ date('d-m-Y', strtotime($dt->end_date)) }}
                         </td>
-                        @php
+                        {{-- @php
                             $dt->member = $dt->group->groupMember->pluck('student.name')->toArray();
-                        @endphp
+                        @endphp --}}
                         <td>
                             @if ($dt->advisor)
                                 {{ $dt->advisor->name }}
@@ -90,6 +91,31 @@
                             @endif
                         </td>
                         <td>{{ $dt->industry->name ?? '' }}</td>
+                        <td>
+                            @if (count($dt->internDocument)>0)
+                                <div class="flex space-x-2">
+                                    @foreach ($dt->internDocument as $doc)
+                                        {{-- {{ $doc }} --}}
+                                        @if ($doc->type == 'surat jalan')
+                                            <x-table.action_btn_table name="{{ $doc->student->name }}"
+                                                href="{{ route('admin.intern.downloadFile', ['filename' => $doc->url]) }}"></x-table.action_btn_table>
+                                        @endif
+                                    @endforeach
+                                </div>
+                            @else
+                                <button
+                                    @click.prevent="generateDocumentModal=true;dataId={{ $dt }};generateSuratJalan({{ $dt->group->groupMember }})"
+                                    class="btn btn-xs btn-success-fill min-w-max">
+                                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18"
+                                        viewBox="0 0 18 18" fill="none">
+                                        <path
+                                            d="M7.87464 10.1251L15.7496 2.25013M7.97033 10.3712L9.94141 15.4397C10.1151 15.8862 10.2019 16.1094 10.327 16.1746C10.4354 16.2311 10.5646 16.2312 10.6731 16.1748C10.7983 16.1098 10.8854 15.8866 11.0596 15.4403L16.0023 2.77453C16.1595 2.37164 16.2381 2.1702 16.1951 2.04148C16.1578 1.92969 16.0701 1.84197 15.9583 1.80462C15.8296 1.76162 15.6281 1.84023 15.2252 1.99746L2.55943 6.94021C2.11313 7.11438 1.88997 7.20146 1.82494 7.32664C1.76857 7.43516 1.76864 7.56434 1.82515 7.67279C1.89033 7.7979 2.11358 7.88472 2.56009 8.05836L7.62859 10.0294C7.71923 10.0647 7.76455 10.0823 7.80271 10.1095C7.83653 10.1337 7.86611 10.1632 7.89024 10.1971C7.91746 10.2352 7.93508 10.2805 7.97033 10.3712Z"
+                                            stroke="" stroke-linecap="round" stroke-linejoin="round" />
+                                    </svg>
+                                    <span class="">Generate Dokumen</span>
+                                </button>
+                            @endif
+                        </td>
                         <x-table.action_table :data="$dt"></x-table.action_table>
                     </tr>
                 @endforeach
@@ -153,6 +179,43 @@
                 </x-slot>
             </x-form>
         </div>
+
+        {{-- generate doc --}}
+        <div x-show="generateDocumentModal" class="form-modal ">
+            {{-- <div class="form-modal"> --}}
+            <form class="form w-[55%]" action="{{ route('admin.intern.generateDocument') }}" method="POST"
+                @click.away="generateDocumentModal=false">
+                <div class="form-header">
+                    @csrf
+                    <h3>Generate Dokumen Surat Jalan</h3>
+                    <svg @click="generateDocumentModal=false,selected='Pilih Opsi'" class="cursor-pointer"
+                        xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28"
+                        fill="none">
+                        <path d="M19.8333 8.16675L8.16663 19.8334M8.16663 8.16675L19.8333 19.8334" stroke="#525A6A"
+                            stroke-width="1.03704" stroke-linecap="round" stroke-linejoin="round" />
+                    </svg>
+                </div>
+                <div class="form-body">
+                    {{-- <div class="space-y-2 w-full"> --}}
+                    <input type="" name="internship_id" :value="generateDocumentModal ? dataId.id : ''">
+                    {{-- <div class="input-group">
+                        <label class="input-label" for="">Nomor Surat</label>
+                        <input class="input h-full w-full" name="letter_num" type="text"
+                            placeholder="Masukkan Nomor Surat" required>
+                    </div> --}}
+                    <div id="documentGenerateField" class="space-y-2">
+                        {{-- documentGenerateField --}}
+                    </div>
+                </div>
+                <div class="form-footer">
+                    <button @click.prevent="generateDocumentModal=false" class="btn btn-sm"
+                        :class="modalAction == 'isView' ? 'btn-success-fill' : 'btn-error-fill'">
+                        <span>Batalkan</span>
+                    </button>
+                    <button type="submit" class="btn btn-success-fill btn-sm">Generate</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     {{-- empty state --}}
@@ -186,6 +249,75 @@
                 member.classList.add('input', 'w-full');
 
                 container.appendChild(member);
+            });
+        }
+    </script>
+
+    <script>
+        function generateSuratJalan(dataMember) {
+            console.log(dataMember);
+            const container = document.getElementById('documentGenerateField');
+            container.innerHTML = '';
+
+            dataMember.forEach(function(teamMember, index) {
+                const section = document.createElement('div');
+                section.classList.add('flex', 'space-x-2');
+
+                const div = document.createElement('div');
+                div.classList.add('input-group', 'w-full');
+
+                const labelMember = document.createElement('label');
+                labelMember.innerHTML = 'Anggota Kelompok';
+                labelMember.classList.add('input-label');
+
+                const member = document.createElement('input');
+                member.value = teamMember.student.name;
+                member.readOnly = true;
+                member.classList.add('input', 'w-full');
+
+                const memberId = document.createElement('input');
+                memberId.value = teamMember.student.id;
+                memberId.name = 'memberId[]';
+                memberId.hidden = true;
+
+                const div2 = document.createElement('div');
+                div2.classList.add('input-group', 'w-full');
+
+                const labelLetterNum = document.createElement('label');
+                labelLetterNum.innerHTML = 'Nomor Surat';
+                labelLetterNum.classList.add('input-label');
+
+                const letterNum = document.createElement('input');
+                letterNum.name = 'letterNum[]';
+                letterNum.placeholder = 'Masukkan Nomor Surat';
+                letterNum.classList.add('input', 'w-full');
+                letterNum.required = true;
+
+                const div3 = document.createElement('div');
+                div3.classList.add('input-group', 'w-full');
+
+                const labelTransportation = document.createElement('label');
+                labelTransportation.innerHTML = 'Kendaraan';
+                labelTransportation.classList.add('input-label');
+                labelTransportation.required = true;
+
+                const transportation = document.createElement('input');
+                transportation.name = 'transportation[]';
+                transportation.value = 'Motor';
+                transportation.classList.add('input', 'w-full');
+                transportation.required = true;
+
+                container.appendChild(section);
+                section.appendChild(div);
+                section.appendChild(div2);
+                section.appendChild(div3);
+                div.appendChild(labelMember);
+                div.appendChild(member);
+                div.appendChild(memberId);
+                div2.appendChild(labelLetterNum);
+                div2.appendChild(letterNum);
+                div3.appendChild(labelTransportation);
+                div3.appendChild(transportation);
             });
         }
     </script>

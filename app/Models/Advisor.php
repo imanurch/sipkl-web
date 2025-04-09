@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class Advisor extends Model
 {
     use HasFactory;
-    protected $fillable = ['user_id', 'name', 'nip', 'department_id', 'phone_num'];
+    protected $fillable = ['user_id', 'name', 'nip', 'position_id', 'level_id', 'department_id', 'phone_num'];
 
     public function user(): BelongsTo
     {
@@ -20,6 +20,14 @@ class Advisor extends Model
     public function department(): BelongsTo
     {
         return $this->belongsTo(Department::class, 'department_id');
+    }
+    public function advisorPosition(): BelongsTo
+    {
+        return $this->belongsTo(AdvisorPosition::class, 'position_id');
+    }
+    public function advisorLevel(): BelongsTo
+    {
+        return $this->belongsTo(AdvisorLevel::class, 'level_id');
     }
     // public function advisorDocument(): HasMany
     // {

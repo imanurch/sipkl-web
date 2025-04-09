@@ -9,7 +9,7 @@ use App\Services\DepartmentService;
 use App\Http\Controllers\Controller;
 use App\Services\InternDocumentService;
 use Illuminate\Support\Facades\Hash;
-use App\Services\internshipService;
+use App\Services\InternshipService;
 use App\Services\LogbookService;
 use App\Services\StudentService;
 

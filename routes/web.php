@@ -43,32 +43,32 @@ use App\Http\Controllers\Student\AccountStudentController;
 |
 */
 
-Route::get('', function () {
-    return view('welcome');
-});
+// Route::get('', function () {
+//     return view('welcome');
+// });
 
-Route::get('content', function () {
-    return view('components.content');
-});
+// Route::get('content', function () {
+//     return view('components.content');
+// });
 
 // Route::get('sipkl-admin', function () {
 //     return view('pages.admin.home');
 // });
 
 
-Route::get('testing', [GenerateTestingController::class, 'index'])->name('testing');
-Route::get('testing/generate', [GenerateTestingController::class, 'create'])->name('testing.generate');
+// Route::get('testing', [GenerateTestingController::class, 'index'])->name('testing');
+// Route::get('testing/generate', [GenerateTestingController::class, 'create'])->name('testing.generate');
 
 
-Route::get('doc', function () {
-    // return view('document_templates/surat_pengantar_template');
-    return view('document_templates/surat_tugas');
-});
+// Route::get('doc', function () {
+//     // return view('document_templates/surat_pengantar_template');
+//     return view('document_templates/surat_tugas');
+// });
 
-Route::get('sipkl', [AuthenticationController::class, 'index'])->name('sipkl');
-Route::post('sipkl/login', [AuthenticationController::class, 'login'])->name('sipkl.login');
-Route::get('sipkl/logout', [AuthenticationController::class, 'logout'])->name('sipkl.logout');
-Route::get('sipkl/account', [AccountController::class, 'index'])->name('sipkl.account');
+Route::get('', [AuthenticationController::class, 'index'])->name('sipkl');
+Route::post('login', [AuthenticationController::class, 'login'])->name('sipkl.login');
+Route::get('logout', [AuthenticationController::class, 'logout'])->name('sipkl.logout');
+Route::get('account', [AccountController::class, 'index'])->name('sipkl.account');
 
 Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
     // dashboard
@@ -128,6 +128,8 @@ Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function
     Route::get('intern', [InternshipAdminController::class, 'index'])->name('intern');
     Route::patch('intern/updateAdvisor/{id}', [InternshipAdminController::class, 'updateAdvisor'])->name('intern.updateAdvisor');
     Route::delete('intern/delete/{id}', [InternshipAdminController::class, 'destroy'])->name('intern.destroy');
+    Route::post('intern/generateDokumen', [InternshipAdminController::class, 'generateDocument'])->name('intern.generateDocument');
+    Route::get('intern/downloadFile/{filename}', [InternshipAdminController::class, 'downloadFile'])->name('intern.downloadFile');
 
     // output
     Route::get('output', [OutputController::class, 'index'])->name('output');

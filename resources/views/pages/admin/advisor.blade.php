@@ -21,7 +21,10 @@
         </x-card>
     </div>
 
-    <div x-data="{ modalAction: null, option: false, selected: 'Pilih Opsi', exportModal:false }">
+    <div x-data="{ modalAction: null, option: false, selected: 'Pilih Opsi', exportModal: false,
+    positionOption: false, positionSelected: 'Pilih Opsi', positionSelectedValue: '',
+    levelOption: false, levelSelected: 'Pilih Opsi', levelSelectedValue: ''
+    }">
         <x-table.table>
             <x-slot name="tableTitle">Data Guru Pembimbing</x-slot>
             <x-slot name="filterActionForm">advisorManagement</x-slot>
@@ -136,6 +139,8 @@
                 <th>No</th>
                 <th>Nama</th>
                 <th>NIP</th>
+                <th>Jabatan</th>
+                <th>Pangkat/Golongan</th>
                 <th>Jurusan</th>
                 <th>Username</th>
                 <th>Email</th>
@@ -147,12 +152,14 @@
                 @foreach ($data as $dt)
                     <tr>
                         <td class="text-center">{{ $data->firstItem() + $loop->index }}</td>
-                        <td class="left whitespace-nowrap">{{ $dt->name }}</td>
-                        <td>{{ $dt->nip }}</td>
-                        <td>{{ $dt->department->name }}</td>
-                        <td class="left whitespace-nowrap">{{ $dt->user->username }}</td>
-                        <td>{{ $dt->user->email }}</td>
-                        <td>{{ $dt->phone_num }}</td>
+                        <td class="left whitespace-nowrap">{{ $dt->name ?? '' }}</td>
+                        <td>{{ $dt->nip ?? '' }}</td>
+                        <td>{{ $dt->advisorPosition->name ?? '' }}</td>
+                        <td>{{ $dt->advisorLevel->name ?? '' }}</td>
+                        <td>{{ $dt->department->name ?? '' }}</td>
+                        <td class="left whitespace-nowrap">{{ $dt->user->username ?? '' }}</td>
+                        <td>{{ $dt->user->email ?? '' }}</td>
+                        <td>{{ $dt->phone_num ?? '' }}</td>
                         <x-table.status_table status="{{ $dt->status }}"></x-table.status_table>
                         <x-table.action_table detail="hidden" btnInput="hidden" :data="$dt"></x-table.action_table>
                     </tr>
@@ -180,6 +187,57 @@
                         <input name="nip" class="input" type="text" placeholder="Masukkan NIP"
                             :disabled="modalAction == 'isDelete'"
                             :value="modalAction == 'isEdit' || modalAction=='isDelete' ? dataId.nip : ''" required>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label" for="">Posisi</label>
+                        <input type="" name="position_id" x-model="positionSelectedValue">
+                        <div>
+                            <button @click.prevent="positionOption=!positionOption" class="input input-select w-full"
+                                :disabled="modalAction == 'isDelete'" required>
+                                <span x-text="positionSelected" class="text-neutral-800"></span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                    viewBox="0 0 20 20" fill="none">
+                                    <path d="M5 7.5L10 12.5L15 7.5" stroke="#667085" stroke-width="0.933333"
+                                        stroke-linecap="round" stroke-linejoin="round"
+                                        :hidden="modalAction == 'isDelete'" />
+                                </svg>
+                            </button>
+                            <div x-show="positionOption" @click.away="positionOption=false">
+                                <ul class="border border-brand-600 rounded py-2 my-2 max-h-32 overflow-auto">
+                                    @foreach ($positionData as $dt)
+                                        <li @click="positionOption=false;positionSelected='{{ $dt->name }}';positionSelectedValue='{{ $dt->id }}'"
+                                            class="text-xs-reguler px-4 py-2 hover:bg-brand-600 hover:text-neutral-0 hover:text-xs-medium">{{ $dt->name }}
+                                            </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="input-group">
+                        <label class="input-label" for="">Pangkat/Golongan</label>
+                        <input type="" name="level_id" x-model="levelSelectedValue">
+                        <div>
+                            <button @click.prevent="levelOption=!levelOption" class="input input-select w-full"
+                                :disabled="modalAction == 'isDelete'" required>
+                                {{-- <span x-text="selected" :class="selected=='Pilih Opsi' ? 'text-neutral-300' : 'text-neutral-800'"></span> --}}
+                                <span x-text="levelSelected" class="text-neutral-800"></span>
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                    viewBox="0 0 20 20" fill="none">
+                                    <path d="M5 7.5L10 12.5L15 7.5" stroke="#667085" stroke-width="0.933333"
+                                        stroke-linecap="round" stroke-linejoin="round"
+                                        :hidden="modalAction == 'isDelete'" />
+                                </svg>
+                            </button>
+                            <div x-show="levelOption" @click.away="levelOption=false">
+                                <ul class="border border-brand-600 rounded py-2 my-2 max-h-32 overflow-auto">
+                                    @foreach ($levelData as $dt)
+                                        <li @click="levelOption=false;levelSelected='{{ $dt->name }}';levelSelectedValue='{{ $dt->id }}'"
+                                            class="text-xs-reguler px-4 py-2 hover:bg-brand-600 hover:text-neutral-0 hover:text-xs-medium">{{ $dt->name }}
+                                            </li>
+                                    @endforeach
+                                </ul>
+                            </div>
+                        </div>
                     </div>
                     <div class="input-group">
                         <label class="input-label" for="">Jurusan</label>

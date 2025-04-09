@@ -48,7 +48,7 @@
 
     <div style="float: right">
         <p>Dikeluarkan di Bantul,<br>Pada tanggal: {{ $create_date ?? '#####' }}<br>Kepala SMK Negeri 1 Pajangan,</p>
-        <img src="{{ public_path('storage/signatures/' . $principal_signature) }}" alt="" width="100">
+        <img src="{{ storage_path('app/signatures/' . $principal_signature) }}" alt="" width="100">
         <p>{{ $principal_name ?? '' }}<br>NIP. {{ $principal_nip ?? '' }}</p>
     </div>
 </body>

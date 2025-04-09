@@ -178,7 +178,6 @@
                         <input x-show="modalAction != 'isAdd'" type="text" class="input" disabled
                             :value="modalAction != null ? dataId.internship.group_id + ' - ' + dataId.internship.industry.name :
                                 ''">
-
                     </div>
                     <div class="input-group">
                         <label class="input-label" for="">Keterangan</label>
@@ -186,28 +185,11 @@
                             :disabled="modalAction == 'isView' || modalAction == 'isDelete'"
                             :value="modalAction != null ? dataId.note : ''">
                     </div>
-                    {{-- <div class="input-group">
-                        <label class="input-label" for="">Label</label>
-                        <div class="space-y-2">
-                            <div class="checkbox-option">
-                                <input class="checkbox" type="checkbox">
-                                <span>Option 1</span>
-                            </div>
-                            <div class="checkbox-option">
-                                <input class="checkbox" type="checkbox">
-                                <span>Option 2</span>
-                            </div>
-                            <div class="checkbox-option">
-                                <input class="checkbox" type="checkbox">
-                                <span>Option 3</span>
-                            </div>
-                        </div>
-                    </div> --}}
                 </x-slot>
             </x-form>
         </div>
 
-        <div x-show="generateDocumentModal" class="form-modal">
+        <div x-show="generateDocumentModal" class="form-modal" x-data="{ transportationField: false }">
             {{-- <div class="form-modal"> --}}
             <form class="form" action="{{ route('admin.monitoring.generateSurat') }}" method="POST"
                 @click.away="generateDocumentModal=false">
@@ -237,13 +219,13 @@
                                         stroke-linecap="round" stroke-linejoin="round" :hidden="isDelete" />
                                 </svg>
                             </button>
-                            <input type="hidden" name="documentGenerateType" x-model="selected">
+                            <input type="hidden" name="documentGenerateType" id="documentType" x-model="selected">
                             <div x-show="option" @click.away="option=false" class="bg-neutral-0">
                                 <ul class="border border-brand-600 rounded py-2 mt-2 max-h-32 overflow-auto">
                                     <li @click.prevent="option=false;selected='Surat Tugas'"
                                         class="text-xs-reguler px-4 py-2 hover:bg-brand-600 hover:text-neutral-0 hover:text-xs-medium">
                                         Surat Tugas</li>
-                                    <li @click.prevent="option=false;selected='SPPD'"
+                                    <li @click.prevent="option=false;selected='SPPD';transportationField=true"
                                         class="text-xs-reguler px-4 py-2 hover:bg-brand-600 hover:text-neutral-0 hover:text-xs-medium">
                                         SPPD</li>
                                     <li @click.prevent="option=false;selected='Surat Pengantar'"
@@ -256,11 +238,15 @@
                             </div>
                         </div>
                     </div>
-
                     <div class="input-group">
                         <label class="input-label" for="">Nomor Surat</label>
                         <input class="input h-full w-full" name="letter_num" type="text"
                             placeholder="Masukkan Nomor Surat" required>
+                    </div>
+                    <div x-show="transportationField" class="input-group">
+                        <label class="input-label" for="">Kendaraan</label>
+                        <input class="input h-full w-full" value="Motor" name="transportation" type="text"
+                            placeholder="Masukkan Kendaraan" required>
                     </div>
                 </div>
                 <div class="form-footer">

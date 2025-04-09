@@ -70,8 +70,8 @@
                             <li style="list-style: none">b. Jabatan</li>
                         </td>
                         <td style="text-align: left">
-                            <li style="list-style: none">a. {{ $pangkat ?? '' }}/{{ $golongan ?? '' }}</li>
-                            <li style="list-style: none">b. {{ $jabatan ?? '' }}'</li>
+                            <li style="list-style: none">a. {{ $advisor_level ?? '' }}</li>
+                            <li style="list-style: none">b. {{ $advisor_position ?? '' }}'</li>
                         </td>
                     </tr>
                     <tr>
@@ -83,7 +83,7 @@
                     <tr>
                         <td>5</td>
                         <td style="text-align: left">Alat angkutan yang dipergunakan</td>
-                        <td style="text-align: left">{{ $kendaraan ?? '' }}</td>
+                        <td style="text-align: left">{{ $transportation ?? '' }}</td>
                     </tr>
                     <tr>
                         <td>6</td>

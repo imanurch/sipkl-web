@@ -9,6 +9,8 @@ use App\Services\AdvisorService;
 use Illuminate\Support\Facades\DB;
 use App\Services\DepartmentService;
 use App\Http\Controllers\Controller;
+use App\Services\AdvisorLevelService;
+use App\Services\AdvisorPositionService;
 use Illuminate\Support\Facades\Hash;
 use PhpOffice\PhpSpreadsheet\IOFactory;
 use Flasher\Toastr\Laravel\Facade\Toastr;
@@ -21,19 +23,25 @@ class AdvisorManagementController extends Controller
         $advisorService,
         $batchService,
         $departmentService,
-        $userService;
+        $userService,
+        $advisorPositionService,
+        $advisorLevelService;
 
     // Constructor Injection
     public function __construct(
         AdvisorService $advisorService,
         BatchService $batchService,
         DepartmentService $departmentService,
-        UserService $userService
+        UserService $userService,
+        AdvisorPositionService $advisorPositionService,
+        AdvisorLevelService $advisorLevelService
     ) {
         $this->advisorService = $advisorService;
         $this->batchService = $batchService;
         $this->departmentService = $departmentService;
         $this->userService = $userService;
+        $this->advisorPositionService = $advisorPositionService;
+        $this->advisorLevelService = $advisorLevelService;
     }
 
     public function index(Request $request)
@@ -45,6 +53,9 @@ class AdvisorManagementController extends Controller
         // table filters
         $departmentData = $this->departmentService->getAllDepartment();
         $batchData = $this->batchService->getAllBatch('');
+        $positionData = $this->advisorPositionService->getAllPosition();
+        $levelData = $this->advisorLevelService->getAllLevel();
+
         $filters = [
             'batch_id' => $batch_id,
             'department' => $request->department ?? '',
@@ -64,6 +75,8 @@ class AdvisorManagementController extends Controller
             'activeAdvisor' => $activeAdvisor,
             'inactiveAdvisor' => $inactiveAdvisor,
             'batchData' => $batchData,
+            'positionData' => $positionData,
+            'levelData' => $levelData,
             'departmentData' => $departmentData,
             'filters' => $filters,
             'pages' => 'advisorManagement',
@@ -82,6 +95,8 @@ class AdvisorManagementController extends Controller
             $validatedData = $request->validate([
                 'name' => 'required|string',
                 'nip' => 'required|size:18',
+                'position_id' => 'required',
+                'level_id' => 'required',
                 'department_id' => 'required',
                 'username' => 'required|string',
                 'email' => 'required|unique:users,email|email',
@@ -102,6 +117,8 @@ class AdvisorManagementController extends Controller
                     'user_id' => $newUser->id,
                     'name' => $validatedData['name'],
                     'nip' => $validatedData['nip'],
+                    'position_id' => $validatedData['position_id'],
+                    'level_id' => $validatedData['level_id'],
                     'department_id' => $validatedData['department_id'],
                     'phone_num' => $validatedData['phone_num'],
                 ]);
@@ -122,6 +139,8 @@ class AdvisorManagementController extends Controller
                 'user_id' => 'required',
                 'name' => 'required|string',
                 'nip' => 'required|size:18',
+                'position_id' => 'required',
+                'level_id' => 'required',
                 'department_id' => 'required',
                 'username' => 'required|string',
                 'email' => 'required|email|unique:users,email,' . $request->input('user_id'),
@@ -143,6 +162,8 @@ class AdvisorManagementController extends Controller
                 $this->advisorService->updateAdvisor($id, [
                     'name' => $validatedData['name'],
                     'nip' => $validatedData['nip'],
+                    'position_id' => $validatedData['position_id'],
+                    'level_id' => $validatedData['level_id'],
                     'department_id' => $validatedData['department_id'],
                     'phone_num' => $validatedData['phone_num'],
                 ]);

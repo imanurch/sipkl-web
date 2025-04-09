@@ -68,11 +68,11 @@ class AdministrationDataController extends Controller
         // dd($validatedData);
 
         if (!empty($validatedData['principal_signature'])) {
-            $path_principal_signature_file = $validatedData['principal_signature']->store('public/signatures');
+            $path_principal_signature_file = $validatedData['principal_signature']->store('signatures');
             $validatedData['principal_signature'] = basename($path_principal_signature_file);
         }
         if (!empty($validatedData['school_stamp'])) {
-            $path_school_stamp_file = $validatedData['school_stamp']->store('public/signatures');
+            $path_school_stamp_file = $validatedData['school_stamp']->store('signatures');
             $validatedData['school_stamp'] = basename($path_school_stamp_file);
         }
 
@@ -89,7 +89,8 @@ class AdministrationDataController extends Controller
 
     public function downloadFile($filename){
         // dd($filename);
-        $path = public_path('storage/signatures/' . $filename);
+        // $path = public_path('storage/signatures/' . $filename);
+        $path = storage_path('app/signatures/' . $filename);
         // dd($path);
 
         if (file_exists($path)) {

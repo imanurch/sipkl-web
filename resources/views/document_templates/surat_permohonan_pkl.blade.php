@@ -91,7 +91,7 @@
         </div>
         <div class="float-right">
             <p style="margin: 0">Hormat kami,<br>Kepala SMK Negeri 1 Pajangan</p>
-            <img src="{{ public_path('storage/signatures/' . $principal_signature) }}" alt="" width="100">
+            <img src="{{ storage_path('app/signatures/' . $principal_signature) }}" alt="" width="100">
             <p style="margin: 0">{{ $principal_name ?? '' }}<br>NIP. {{ $principal_nip ?? '' }}</p>
         </div>
     </div>
@@ -145,7 +145,7 @@
         </div>
         <div class="float-right">
             <p style="margin: 0">Hormat kami,<br>Kepala SMK Negeri 1 Pajangan</p>
-            <img src="{{ public_path('storage/signatures/' . $principal_signature) }}" alt="" width="100">
+            <img src="{{ storage_path('app/signatures/' . $principal_signature) }}" alt="" width="100">
             <p style="margin: 0">{{ $principal_name ?? '' }}<br>NIP. {{ $principal_nip ?? '' }}</p>
         </div>
     </div>

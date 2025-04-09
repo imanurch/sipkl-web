@@ -7,6 +7,8 @@ use App\Models\User;
 use App\Models\Admin;
 use App\Models\Batch;
 use App\Models\Advisor;
+use App\Models\AdvisorLevel;
+use App\Models\AdvisorPosition;
 use App\Models\Student;
 use App\Models\Industry;
 use App\Models\Department;
@@ -74,12 +76,89 @@ class DatabaseSeeder extends Seeder
             ))
             ->create();
 
+        AdvisorPosition::factory()
+            ->count(4)
+            ->state(new Sequence(
+                [
+                    'name' => 'Guru Pertama',
+                ],
+                [
+                    'name' => 'Guru Muda',
+                ],
+                [
+                    'name' => 'Guru Madya',
+                ],
+                [
+                    'name' => 'Guru Utama',
+                ],
+            ))
+            ->create();
+
+        AdvisorLevel::factory()
+            ->count(17)
+            ->state(new Sequence(
+                [
+                    'name' => 'I/a',
+                ],
+                [
+                    'name' => 'I/b',
+                ],
+                [
+                    'name' => 'I/c',
+                ],
+                [
+                    'name' => 'I/d',
+                ],
+                [
+                    'name' => 'II/a',
+                ],
+                [
+                    'name' => 'II/b',
+                ],
+                [
+                    'name' => 'II/c',
+                ],
+                [
+                    'name' => 'II/d',
+                ],
+                [
+                    'name' => 'III/a',
+                ],
+                [
+                    'name' => 'III/b',
+                ],
+                [
+                    'name' => 'III/c',
+                ],
+                [
+                    'name' => 'III/d',
+                ],
+                [
+                    'name' => 'IV/a',
+                ],
+                [
+                    'name' => 'IV/b',
+                ],
+                [
+                    'name' => 'IV/c',
+                ],
+                [
+                    'name' => 'IV/d',
+                ],
+                [
+                    'name' => 'IV/e',
+                ],
+            ))
+            ->create();
+
         Advisor::factory()
             ->state(new Sequence(
                 [
                     'user_id' => '2',
                     'name' => 'Drs. Endah Setyowati',
                     'nip' => '198812282002122003',
+                    'position_id' => '3',
+                    'level_id' => '14',
                     'department_id' => '1',
                     'phone_num' => fake()->phoneNumber(),
                 ],

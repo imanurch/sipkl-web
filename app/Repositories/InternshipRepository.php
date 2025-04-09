@@ -16,7 +16,8 @@ class InternshipRepository
             'group.groupMember.student:id,name,nis,nisn,department_id',
             'group.groupMember.student.department:id,name',
             'industry:id,name',
-            'advisor:id,name'
+            'advisor:id,name',
+            'internDocument'
         );
 
         // filter search

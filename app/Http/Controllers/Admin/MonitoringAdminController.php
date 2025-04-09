@@ -160,7 +160,7 @@ class MonitoringAdminController extends Controller
                 'principal_name' => $school_profile->principal_name,
                 'principal_nip' => $school_profile->principal_nip,
                 'principal_signature'  => $school_profile->principal_signature,
-                'internship_team_decree'  => $school_profile->internship_team_decree,                
+                'internship_team_decree'  => $school_profile->internship_team_decree,
             ];
 
             $pdf = Pdf::loadView('document_templates/surat_tugas_advisor', $data);
@@ -175,11 +175,14 @@ class MonitoringAdminController extends Controller
                 'school_email'  => $school_profile->email,
                 'letter_num' => $request->letter_num,
                 'advisor_name' => $monitoring_data->internship->advisor->name,
+                'advisor_position' => $monitoring_data->internship->advisor->position_id,
+                'advisor_level' => $monitoring_data->internship->advisor->level_id,
                 'advisor_nip' => $monitoring_data->internship->advisor->nip,
                 'industry_name' => $monitoring_data->internship->industry->name,
                 'monitoring_date' => date("d/m/Y", strtotime($monitoring_data->date)),
                 'academic_year' => date("Y", strtotime($monitoring_data->date)) . '/' . (date("Y", strtotime($monitoring_data->date)) + 1),
                 'activity' => $monitoring_data->type == 'pelepasan' ? 'Pembimbingan pertama' : ($monitoring_data->type = 'monitoring' ? 'Monitoring' : 'Pembimbingan kedua'),
+                'transportation' => $request->transportation,
                 'principal_name' => $school_profile->principal_name,
                 'principal_nip' => $school_profile->principal_nip,
             ];

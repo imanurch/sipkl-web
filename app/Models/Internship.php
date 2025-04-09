@@ -11,7 +11,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Internship extends Model
 {
     use HasFactory;
-    protected $fillable = ['group_id','industry_id', 'advisor_id', 'start_date', 'end_date', 'batch_id'];
+    protected $fillable = ['group_id', 'industry_id', 'advisor_id', 'start_date', 'end_date', 'batch_id'];
 
     public function group(): BelongsTo
     {
@@ -31,7 +31,7 @@ class Internship extends Model
     }
     public function internDocument(): HasMany
     {
-        return $this->hasMany(InternDocument::class, 'id');
+        return $this->hasMany(InternDocument::class, 'internship_id');
     }
     public function monitoring(): HasMany
     {

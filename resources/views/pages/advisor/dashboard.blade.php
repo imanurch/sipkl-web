@@ -26,29 +26,39 @@
         <div class="w-full">
             <div class="grid md:grid-cols-2 gap-y-2 gap-x-5">
                 <div class="flex space-x-3 place-items-center">
-                    <h6 class="text-xs-reguler w-32" for="">Nama Lengkap</h6>
+                    <h6 class="text-xs-reguler w-[10rem]" for="">Nama Lengkap</h6>
                     <span>:</span>
                     <input class="input w-full" type="text" value="{{ $data->name }}" disabled>
                 </div>
                 <div class="flex space-x-3 place-items-center">
-                    <h6 class="text-xs-reguler w-32" for="">Email</h6>
+                    <h6 class="text-xs-reguler w-[10rem]" for="">Email</h6>
                     <span>:</span>
                     <input class="input w-full" type="text" value="{{ $data->user->email }}" disabled>
                 </div>
                 <div class="flex space-x-3 place-items-center">
-                    <h6 class="text-xs-reguler w-32" for="">NIP</h6>
+                    <h6 class="text-xs-reguler w-[10rem]" for="">NIP</h6>
                     <span>:</span>
                     <input class="input w-full" type="text" value="{{ $data->nip }}" disabled>
                 </div>
                 <div class="flex space-x-3 place-items-center">
-                    <h6 class="text-xs-reguler w-32" for="">Nomor Telepon</h6>
+                    <h6 class="text-xs-reguler w-[10rem]" for="">Nomor Telepon</h6>
                     <span>:</span>
                     <input class="input w-full" type="text" value="{{ $data->phone_num }}" disabled>
                 </div>
                 <div class="flex space-x-3 place-items-center">
-                    <h6 class="text-xs-reguler w-32" for="">Jurusan</h6>
+                    <h6 class="text-xs-reguler w-[10rem]" for="">Jabatan</h6>
+                    <span>:</span>
+                    <input class="input w-full" type="text" value="{{ $data->AdvisorPosition->name }}" disabled>
+                </div>
+                <div class="flex space-x-3 place-items-center">
+                    <h6 class="text-xs-reguler w-[10rem]" for="">Jurusan</h6>
                     <span>:</span>
                     <input class="input w-full" type="text" value="{{ $data->department->name }}" disabled>
+                </div>
+                <div class="flex space-x-3 place-items-center">
+                    <h6 class="text-xs-reguler w-[10rem]" for="">Pangkat/Golongan</h6>
+                    <span>:</span>
+                    <input class="input w-full" type="text" value="{{ $data->AdvisorLevel->name }}" disabled>
                 </div>
             </div>
         </div>
