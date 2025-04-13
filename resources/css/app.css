@@ -179,7 +179,7 @@
         SIDEBAR 
     */
     .sidebar {
-        @apply flex flex-col space-y-4;
+        @apply flex flex-col;
     }
     .sidebar-head {
         @apply h-14 flex place-items-center justify-center border-b border-neutral-100 text-sm-semibold;
@@ -188,10 +188,10 @@
         }
     }
     .sidebar-body {
-        @apply flex flex-col space-y-3 py-5 px-4;
+        @apply flex flex-col space-y-2 py-4 px-4 m-0;
     }
     .sidebar-label {
-        @apply w-44 py-3 px-2 text-xs-medium text-neutral-600;
+        @apply w-44 py-2.5 px-2 text-xs-medium text-neutral-600;
     }
     .sidebar-menu {
         @apply w-48 flex space-x-2 py-2 px-4 rounded-xs place-items-center text-sm-reguler text-neutral-500;

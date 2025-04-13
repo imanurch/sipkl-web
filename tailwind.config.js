@@ -5,8 +5,8 @@ module.exports = {
         extend: {},
         fontFamily: {
             // primary: ["IBM Plex Sans", "sans-serif"],
-            // sans: ['Plus Jakarta Sans'],
             sans: ["Inter","sans-serif"],
+            ibm: ['IBM Plex Sans'],
             // sans: ['Roboto'],
             // sans: ['Lato'],
             // sans: ['Open Sans'],

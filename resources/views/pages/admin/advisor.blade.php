@@ -39,7 +39,7 @@
                     <span class="p-0 m-0">Ekspor</span>
                 </a> --}}
                 <div>
-                    <button @click="exportModal=true" class="btn btn-default-fill btn-xs">
+                    <button @click="exportModal=true" class="btn btn-default-fill btn-xs h-full">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14"
                             fill="none">
                             <path d="M7.00002 2.91675V11.0834M2.91669 7.00008H11.0834" stroke-width="1.6"

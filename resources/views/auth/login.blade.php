@@ -49,12 +49,19 @@
             </div>
         </div>
         <div class="relative col-span-12 md:col-span-8">
-            <div class="absolute inset-0 bg-brand-900 bg-opacity-80"></div>
-            <div class="absolute inset-0 translate-y-1/2 translate-x-16 space-y-4">
-                <p class="text-xl-semibold text-neutral-0 italic">"Sukses tidak diberikan, tapi diperoleh. <br>Kamu
-                    harus bekerja keras untuk mendapatkannya."</p>
-                <p class="text-md text-neutral-0">- The Rock -</p>
-            </div>
+            {{-- <div class="absolute max-w-md inset-0 translate-y-[10%] translate-x-16 space-y-4">
+                <p class="text-2xl font-bold text-neutral-0 italic font-ibm">"Orang sukses adalah mereka yang terus belajar, <br>tidak pernah berhenti."</p>
+                <p class="text-md text-neutral-0">- Bill Gates -</p>
+            </div> --}}
+            <div class="absolute inset-0 translate-y-[10%] translate-x-[4%]">
+                <div class="w-full max-w-2xl space-y-3 ">
+                    <p class="text-xl md:text-2xl font-bold text-neutral-0 italic font-ibm">
+                        "Orang sukses adalah mereka yang terus belajar, <br>tidak pernah berhenti."
+                    </p>
+                    <p class="text-sm sm:text-md text-neutral-0">- Bill Gates</p>
+                </div>
+            </div>         
+            
             <img class="object-none object-top  h-full w-full" src="{{ url('storage/images/school.jpg') }}"
                 alt="">
         </div>
