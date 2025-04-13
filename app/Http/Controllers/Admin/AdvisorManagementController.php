@@ -217,35 +217,45 @@ class AdvisorManagementController extends Controller
             DB::transaction(function () use ($rows, $request) {
                 foreach ($rows as $index => $row) {
                     if ($index == 0) continue;
+                    if ($row[1] == null) break;
 
                     $validatedData = $request->validate([
                         'name' => $row[1],
                         'nip' => $row[2],
                         'department_id' => $row[3],
-                        'username' => $row[4],
-                        'email' => $row[5],
-                        'phone_num' => $row[6],
-                        'password' => $row[7],
+                        'position_id' => $row[4],
+                        'level_id' => $row[5],
+                        'username' => $row[6],
+                        'email' => $row[7],
+                        'phone_num' => $row[8],
+                        'password' => $row[9],
                     ], [
                         'name' => 'required|string',
-                        'nip' => 'required|size:18',
+                        'nip' => 'required|size:18|unique:advisors,nip',
                         'department_id' => 'required',
+                        'position_id' => 'required',
+                        'level_id' => 'required',
                         'username' => 'required|string',
                         'email' => 'required|email|unique:users,email',
                         'phone_num' => 'required|string|min:10|max:14|unique:advisors,phone_num',
                         'password' => 'nullable|string|size:8',
                     ]);
 
+
                     $row[3] = $row[3] == 'K3R' ? '1' : ($row[3] == 'DPIB' ? '2' : ($row[3] == 'RPL' ? '3' : ''));
-                    $row[7] = Hash::make($row[7]);
+                    $row[4] = $row[4] == 'Guru Pertama' ? '1' : ($row[4] == 'Guru Muda' ? '2' : ($row[4] == 'Guru Madya' ? '3' : ($row[4] == 'Guru Utama' ? '4' : '')));
+                    $row[5] = $row[5] == 'I/a' ? '1' : ($row[5] == 'I/b' ? '2' : ($row[5] == 'I/c' ? '3' : ($row[5] == 'I/d' ? '4' : ('II/a' ? '1' : ($row[5] == 'II/b' ? '2' : ($row[5] == 'II/c' ? '3' : ($row[5] == 'II/d' ? '4' : ('III/a' ? '1' : ($row[5] == 'III/b' ? '2' : ($row[5] == 'III/c' ? '3' : ($row[5] == 'III/d' ? '4' : ('IV/a' ? '1' : ($row[5] == 'IV/b' ? '2' : ($row[5] == 'IV/c' ? '3' : ($row[5] == 'IV/d' ? '4' : ($row[5] == 'IV/e' ? '4' : ''))))))))))))))));
+                    $row[9] = Hash::make($row[9]);
+
+                    // dd($row);
 
                     $userData = [
-                        'username' => $row[4],
-                        'email' => $row[5],
-                        'password' => $row[7],
+                        'username' => $row[6],
+                        'email' => $row[7],
+                        'password' => $row[9],
                         'role' => 'advisor',
                     ];
-
+                    // dd($userData);
                     $newUser = $this->userService->addUser($userData);
 
                     $advisorData = [
@@ -253,11 +263,14 @@ class AdvisorManagementController extends Controller
                         'name' => $row[1],
                         'nip' => $row[2],
                         'department_id' => $row[3],
-                        'username' => $row[4],
-                        'phone_num' => $row[6],
+                        'position_id' => $row[4],
+                        'level_id' => $row[5],
+                        'phone_num' => $row[8],
                     ];
+                    // dd($advisorData);
 
                     $this->advisorService->addAdvisor($advisorData);
+                    // dd($advisorData);
                 }
             });
             Toastr::addSuccess('Impor data guru berhasil!');
@@ -287,9 +300,11 @@ class AdvisorManagementController extends Controller
         $sheet->setCellValue('B1', 'NAMA');
         $sheet->setCellValue('C1', 'NIP');
         $sheet->setCellValue('D1', 'JURUSAN');
-        $sheet->setCellValue('E1', 'USERNAME');
-        $sheet->setCellValue('F1', 'EMAIL');
-        $sheet->setCellValue('G1', 'NOMOR TELEPON');
+        $sheet->setCellValue('E1', 'JABATAN');
+        $sheet->setCellValue('F1', 'PANGKAT/GOL');
+        $sheet->setCellValue('G1', 'USERNAME');
+        $sheet->setCellValue('H1', 'EMAIL');
+        $sheet->setCellValue('I1', 'NOMOR TELEPON');
 
         $current_batch = $this->batchService->getBatchByStatus('active');
         $batch_id = $current_batch != null ? $current_batch->id : $batch_id = '';
@@ -303,9 +318,11 @@ class AdvisorManagementController extends Controller
             $sheet->setCellValue('B' . $row, $dt->name);
             $sheet->setCellValue('C' . $row, $dt->nip);
             $sheet->setCellValue('D' . $row, $dt->department->name);
-            $sheet->setCellValue('E' . $row, $dt->user->username);
-            $sheet->setCellValue('F' . $row, $dt->user->email);
-            $sheet->setCellValue('G' . $row, $dt->phone_num);
+            $sheet->setCellValue('E' . $row, $dt->advisor_position->name);
+            $sheet->setCellValue('F' . $row, $dt->advisor_level->name);
+            $sheet->setCellValue('G' . $row, $dt->user->username);
+            $sheet->setCellValue('H' . $row, $dt->user->email);
+            $sheet->setCellValue('I' . $row, $dt->phone_num);
             $row++;
             $num++;
         }

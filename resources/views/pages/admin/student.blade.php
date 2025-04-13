@@ -79,6 +79,7 @@
                 <th>Nama</th>
                 <th>NISN</th>
                 <th>NIS</th>
+                <th>Tahun Ajaran</th>
                 <th>JK</th>
                 <th>Jurusan</th>
                 <th>Username</th>
@@ -94,12 +95,12 @@
                         <td class="left whitespace-nowrap">{{ $dt->name }}</td>
                         <td>{{ $dt->nisn }}</td>
                         <td>{{ $dt->nis }}</td>
+                        <td>{{ $dt->year }}/{{ $dt->year + 1 }}</td>
                         <td>{{ $dt->gender == 'men' ? 'L' : 'P' }}</td>
                         <td>{{ $dt->department->name }}</td>
                         <td class="whitespace-nowrap">{{ $dt->user->username }}</td>
                         <td>{{ $dt->user->email }}</td>
                         <td>{{ $dt->phone_num }}</td>
-                        {{-- <td>{{ $dt->status }}</td>        --}}
                         <x-table.status_table status="{{ $dt->status }}"></x-table.status_table>
                         <x-table.action_table detail="hidden" btnInput="hidden" :data="$dt"></x-table.action_table>
                     </tr>
@@ -141,8 +142,8 @@
                                 :disabled="modalAction == 'isDelete'">
                                 <span x-text="selectedGender"
                                     :class="selectedGender == 'Pilih Opsi' ? 'text-neutral-300' : 'text-neutral-800'"></span>
-                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"
-                                    fill="none">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
+                                    viewBox="0 0 20 20" fill="none">
                                     <path d="M5 7.5L10 12.5L15 7.5" stroke="#667085" stroke-width="0.933333"
                                         stroke-linecap="round" stroke-linejoin="round" :hidden="isDelete" />
                                 </svg>
@@ -235,7 +236,8 @@
                     </div>
                     <div class="flex place-items-center">
                         <span class="text-xs-reguler">Template Impor Data :</span>
-                        <a href="{{ route('admin.studentManagement.downloadTemplateFile') }}" class="btn btn-xs btn-default-clear">
+                        <a href="{{ route('admin.studentManagement.downloadTemplateFile') }}"
+                            class="btn btn-xs btn-default-clear">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14"
                                 fill="none">
                                 <path

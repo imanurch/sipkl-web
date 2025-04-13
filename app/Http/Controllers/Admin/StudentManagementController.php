@@ -226,6 +226,7 @@ class StudentManagementController extends Controller
             DB::transaction(function () use ($rows, $request) {
                 foreach ($rows as $index => $row) {
                     if ($index == 0) continue;
+                    if ($row[1] == null) break;
 
                     $validatedData = $request->validate([
                         'name' => $row[1],
