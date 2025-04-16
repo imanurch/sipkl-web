@@ -26,7 +26,7 @@ class MonitoringRepository
 
         return $query->whereHas('internship', function ($query) use ($batch_id) {
             $query->where('batch_id', $batch_id);
-        })->with('monitoringDocument')->get();
+        })->with('monitoringDocument')->orderBy('created_at', 'desc')->paginate(10);
     }
 
     public function getMonitoringByAdvisorIdAndBatch($advisor_id, $batch_id, $filters = [])
@@ -53,7 +53,7 @@ class MonitoringRepository
 
         return $query->whereHas('internship', function ($query) use ($batch_id, $advisor_id) {
             $query->where('advisor_id', $advisor_id)->where('batch_id', $batch_id);
-        })->with('monitoringDocument')->get();
+        })->with('monitoringDocument')->orderBy('created_at', 'desc')->paginate(10);
     }
 
     public function findById($id)

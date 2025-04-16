@@ -190,7 +190,7 @@
                     </div>
                     <div class="input-group">
                         <label class="input-label" for="">Posisi</label>
-                        <input type="" name="position_id" x-model="positionSelectedValue">
+                        <input type="hidden" name="position_id" x-model="positionSelectedValue">
                         <div>
                             <button @click.prevent="positionOption=!positionOption" class="input input-select w-full"
                                 :disabled="modalAction == 'isDelete'" required>
@@ -215,7 +215,7 @@
                     </div>
                     <div class="input-group">
                         <label class="input-label" for="">Pangkat/Golongan</label>
-                        <input type="" name="level_id" x-model="levelSelectedValue">
+                        <input type="hidden" name="level_id" x-model="levelSelectedValue">
                         <div>
                             <button @click.prevent="levelOption=!levelOption" class="input input-select w-full"
                                 :disabled="modalAction == 'isDelete'" required>

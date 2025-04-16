@@ -137,8 +137,9 @@ class RegistrationStudentController extends Controller
             $batch_id = $activeBatch != null ? $activeBatch->id : '';
 
             $student_id = session('user_bio')->id;
+            $student_department = session('user_bio')->department_id;
 
-            $studentListData = $this->studentService->getNonRegisteredInternList($batch_id);
+            $studentListData = $this->studentService->getNonRegisteredInternList($batch_id, $student_department);
             $studentListData = $studentListData->reject(function ($student) use ($student_id) {
                 return $student->id == $student_id;
             });

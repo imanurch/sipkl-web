@@ -42,7 +42,7 @@ class RegistrationRepository
             });
         };
 
-        return $query->where('batch_id', $filters['batch_id'])->paginate(5);
+        return $query->where('batch_id', $filters['batch_id'])->orderBy('created_at', 'desc')->paginate(10);
     }
 
     public function countRegistrationByStatus($status, $batch_id)

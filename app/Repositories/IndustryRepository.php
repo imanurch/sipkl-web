@@ -17,7 +17,7 @@ class IndustryRepository
             }
         }
 
-        return $query->where('status', '0')->paginate(5)->appends([
+        return $query->where('status', '0')->orderBy('created_at', 'desc')->paginate(10)->appends([
             'tab' => 'rejected',
             'unconfirmedIndustrySearch' => $filters['unconfirmedIndustrySearch'] ?? '',
         ]);
@@ -60,7 +60,7 @@ class IndustryRepository
         $query->where('status', '1');
 
         // Paginate dan tambahkan query string (tab + filter yang relevan)
-        $data = $query->paginate(5)->appends([
+        $data = $query->orderBy('created_at', 'desc')->paginate(10)->appends([
             'tab' => 'partner',
             'partnerIndustrySearch' => $filters['partnerIndustrySearch'] ?? '',
             'status' => $filters['status'] ?? '',
@@ -87,7 +87,7 @@ class IndustryRepository
             $query->where('name', 'like', '%' . $filters['rejectedIndustrySearch'] . '%');
         }
 
-        return $query->where('status', '2')->paginate(5)->appends([
+        return $query->where('status', '2')->orderBy('created_at', 'desc')->paginate(10)->appends([
             'tab' => 'rejected',
             'rejectedIndustrySearch' => $filters['rejectedIndustrySearch'] ?? '',
         ]);

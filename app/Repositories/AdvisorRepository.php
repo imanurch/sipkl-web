@@ -43,7 +43,7 @@ class AdvisorRepository
             });
         }
 
-        $data = $query->paginate(5);
+        $data = $query->orderBy('created_at', 'desc')->paginate(10);
         $data->appends($filters);
         $data->through(function ($advisor) use ($batch_id) {
             $advisor->setAttribute('status', $advisor->internship->where('batch_id', $batch_id)->isNotEmpty() ? 'Aktif' : 'Non Aktif');

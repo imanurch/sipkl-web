@@ -24,9 +24,9 @@ class StudentService
     //     return $this->studentRepository->getNonInternStudentList($activeBatch_id);
     // }
 
-    public function getNonRegisteredInternList($activeBatch_id)
+    public function getNonRegisteredInternList($activeBatch_id, $student_department)
     {
-        return $this->studentRepository->getNonRegisteredInternList($activeBatch_id);
+        return $this->studentRepository->getNonRegisteredInternList($activeBatch_id, $student_department);
     }
 
     public function getStudentById($student_id)

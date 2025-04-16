@@ -69,7 +69,7 @@
 
                                     @else
                                         <li class="whitespace-nowrap overflow-hidden text-ellipsis block max-w-40">
-                                            {{ $loop->iteration }}. {{ $member->student->name ?? '' }}</li>
+                                            {{ $loop->iteration }}. {{ $member->student->name ?? '' }} ({{ $member->student->department->name ?? '' }})</li>
                                     @endif
                                 @endforeach
                             </ul>
@@ -197,7 +197,7 @@
                 </div>
                 <div class="form-body">
                     {{-- <div class="space-y-2 w-full"> --}}
-                    <input type="" name="internship_id" :value="generateDocumentModal ? dataId.id : ''">
+                    <input type="hidden" name="internship_id" :value="generateDocumentModal ? dataId.id : ''">
                     {{-- <div class="input-group">
                         <label class="input-label" for="">Nomor Surat</label>
                         <input class="input h-full w-full" name="letter_num" type="text"
@@ -244,7 +244,7 @@
 
             dataMember.forEach(function(teamMember, index) {
                 const member = document.createElement('input');
-                member.value = teamMember.student.name + ' (NIS ' + teamMember.student.nis + ')';
+                member.value = teamMember.student.name + ' (' + teamMember.student.department.name +  '/NIS ' + teamMember.student.nis + ')';
                 member.disabled = true;
                 member.classList.add('input', 'w-full');
 

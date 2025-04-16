@@ -49,7 +49,7 @@ class StudentRepository
         }
 
         // belum tambah kolom status
-        $data = $query->where('year', $filters['year'])->paginate(5);
+        $data = $query->where('year', $filters['year'])->orderBy('created_at', 'desc')->paginate(10);
         $data->appends($filters);
         return $data;
     }
@@ -61,13 +61,13 @@ class StudentRepository
     //     })->select('id', 'name', 'nisn')->get();
     // }
 
-    public function getNonRegisteredInternList($activeBatch_id)
+    public function getNonRegisteredInternList($activeBatch_id, $student_department)
     {
         return Student::whereDoesntHave('groupMember.group.internship', function ($query) use ($activeBatch_id) {
             $query->where('batch_id', $activeBatch_id);
         })->WhereDoesntHave('groupMember.group.registration', function ($query) {
             $query->where('status', ['0', '1']);
-        })->select('id', 'name', 'nis')->get();
+        })->where('department_id', $student_department)->select('id', 'name', 'nis')->get();
     }
 
     public function countStudentByStatus($year, $batch_id, $status)

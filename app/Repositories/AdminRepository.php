@@ -20,7 +20,7 @@ class AdminRepository
                 });
         };
 
-        return $query->paginate(5);
+        return $query->orderBy('created_at', 'desc')->paginate(5);
     }
 
     public function getAdminByUserId($id)

@@ -105,7 +105,10 @@
                     </tr>
                 @endforeach
             </x-slot>
+            {{-- pagination --}}
+            <x-slot name="pagination">{{ $data->links() }}</x-slot>
         </x-table.table>
+
         <div x-show="modalAction != null" class="form-modal">
             <x-form>
                 <x-slot name="formTitle">Monitoring</x-slot>

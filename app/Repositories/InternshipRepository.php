@@ -34,7 +34,7 @@ class InternshipRepository
             });
         };
 
-        return $query->where('batch_id', $filters['batch_id'])->paginate(5);
+        return $query->where('batch_id', $filters['batch_id'])->orderBy('created_at', 'desc')->paginate(5);
     }
 
     public function getIntern($filters = [])
@@ -60,7 +60,7 @@ class InternshipRepository
                 });
         };
 
-        return $query->paginate(5);
+        return $query->orderBy('created_at', 'desc')->paginate(10);
     }
 
     public function getAllIntern($batch_id)
