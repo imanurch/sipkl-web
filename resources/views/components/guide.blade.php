@@ -1,4 +1,4 @@
-<div x-data="{panduan:false}" class="space-y-2">
+<div x-data="{panduan:true}" class="space-y-2">
     <button @click="panduan=!panduan" class="btn btn-xs btn-default-outline">
         <svg class="stroke-brand-800" xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 18 18" fill="none">
             <path

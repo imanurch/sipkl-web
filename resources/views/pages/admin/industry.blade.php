@@ -325,7 +325,7 @@
                     <x-slot name="formTitle">Impor Data Industri</x-slot>
                     <x-slot name="formBody">
                         <div class="input-group">
-                            <label class="input-label" for="">Unggah File</label>
+                            <label class="input-label" for="">Unggah File (Format file: Excel)</label>
                             <input class="input" type="file" name="import_file" id="" required>
                         </div>
                         <div class="flex place-items-center">

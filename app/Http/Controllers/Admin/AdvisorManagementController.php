@@ -101,10 +101,14 @@ class AdvisorManagementController extends Controller
                 'username' => 'required|string',
                 'email' => 'required|unique:users,email|email',
                 'phone_num' => 'required|unique:advisors,phone_num|string|min:10|max:14',
-                'password' => 'required|string|size:8',
+                'password' => 'required|string|min:8|max:12',
             ]);
             $validatedData['password'] = Hash::make($validatedData['password']);
+            // $validatedData['position_id'] = $validatedData['position_id'] == 'Guru Pertama' ? '1' : ($validatedData['position_id'] == 'Guru Muda' ? '2' : ($validatedData['position_id'] == 'Guru Madya' ? '3' : ($validatedData['position_id'] == 'Guru Utama' ? '4' : '')));
+            // $validatedData['level_id'] = $validatedData['level_id'] == 'I/a' ? '1' : ($validatedData['level_id'] == 'I/b' ? '2' : ($validatedData['level_id'] == 'I/c' ? '3' : ($validatedData['level_id'] == 'I/d' ? '4' : ($validatedData['level_id'] == 'II/a' ? '5' : ($validatedData['level_id'] == 'II/b' ? '6' : ($validatedData['level_id'] == 'II/c' ? '7' : ($validatedData['level_id'] == 'II/d' ? '8' : ($validatedData['level_id'] == 'III/a' ? '9' : ($validatedData['level_id'] == 'III/b' ? '10' : ($validatedData['level_id'] == 'III/c' ? '11' : ($validatedData['level_id'] == 'III/d' ? '12' : ($validatedData['level_id'] ==  'IV/a' ? '13' : ($validatedData['level_id'] == 'IV/b' ? '14' : ($validatedData['level_id'] == 'IV/c' ? '15' : ($validatedData['level_id'] == 'IV/d' ? '16' : ($validatedData['level_id'] == 'IV/e' ? '17' : ''))))))))))))))));
             $validatedData['department_id'] = $validatedData['department_id'] == 'K3R' ? '1' : ($validatedData['department_id'] == 'DPIB' ? '2' : ($validatedData['department_id'] == 'RPL' ? '3' : ''));
+
+            // dd($validatedData);
 
             DB::transaction(function () use ($validatedData) {
                 $newUser = $this->userService->addUser([
@@ -117,10 +121,10 @@ class AdvisorManagementController extends Controller
                     'user_id' => $newUser->id,
                     'name' => $validatedData['name'],
                     'nip' => $validatedData['nip'],
-                    'position_id' => $validatedData['position_id'],
-                    'level_id' => $validatedData['level_id'],
                     'department_id' => $validatedData['department_id'],
                     'phone_num' => $validatedData['phone_num'],
+                    'position_id' => $validatedData['position_id'],
+                    'level_id' => $validatedData['level_id'],
                 ]);
             });
             Toastr::addSuccess('Data guru pembimbing berhasil ditambah!');
@@ -145,7 +149,7 @@ class AdvisorManagementController extends Controller
                 'username' => 'required|string',
                 'email' => 'required|email|unique:users,email,' . $request->input('user_id'),
                 'phone_num' => 'required|string|min:10|max:14|unique:advisors,phone_num,' . $id,
-                'password' => 'nullable|string|size:8',
+                'password' => 'nullable|string|min:8|max:12',
             ]);
 
             if (!empty($validatedData['password'])) {
@@ -157,6 +161,8 @@ class AdvisorManagementController extends Controller
             }
 
             $validatedData['department_id'] = $validatedData['department_id'] == 'K3R' ? '1' : ($validatedData['department_id'] == 'DPIB' ? '2' : ($validatedData['department_id'] == 'RPL' ? '3' : ''));
+            // $validatedData['position_id'] = $validatedData['position_id'] == 'Guru Pertama' ? '1' : ($validatedData['position_id'] == 'Guru Muda' ? '2' : ($validatedData['position_id'] == 'Guru Madya' ? '3' : ($validatedData['position_id'] == 'Guru Utama' ? '4' : '')));
+            // $validatedData['level_id'] = $validatedData['level_id'] == 'I/a' ? '1' : ($validatedData['level_id'] == 'I/b' ? '2' : ($validatedData['level_id'] == 'I/c' ? '3' : ($validatedData['level_id'] == 'I/d' ? '4' : ($validatedData['level_id'] == 'II/a' ? '5' : ($validatedData['level_id'] == 'II/b' ? '6' : ($validatedData['level_id'] == 'II/c' ? '7' : ($validatedData['level_id'] == 'II/d' ? '8' : ($validatedData['level_id'] == 'III/a' ? '9' : ($validatedData['level_id'] == 'III/b' ? '10' : ($validatedData['level_id'] == 'III/c' ? '11' : ($validatedData['level_id'] == 'III/d' ? '12' : ($validatedData['level_id'] ==  'IV/a' ? '13' : ($validatedData['level_id'] == 'IV/b' ? '14' : ($validatedData['level_id'] == 'IV/c' ? '15' : ($validatedData['level_id'] == 'IV/d' ? '16' : ($validatedData['level_id'] == 'IV/e' ? '17' : ''))))))))))))))));
 
             DB::transaction(function () use ($id, $validatedData) {
                 $this->advisorService->updateAdvisor($id, [
@@ -238,13 +244,13 @@ class AdvisorManagementController extends Controller
                         'username' => 'required|string',
                         'email' => 'required|email|unique:users,email',
                         'phone_num' => 'required|string|min:10|max:14|unique:advisors,phone_num',
-                        'password' => 'nullable|string|size:8',
+                        'password' => 'required|string|min:8|max:12',
                     ]);
 
 
                     $row[3] = $row[3] == 'K3R' ? '1' : ($row[3] == 'DPIB' ? '2' : ($row[3] == 'RPL' ? '3' : ''));
                     $row[4] = $row[4] == 'Guru Pertama' ? '1' : ($row[4] == 'Guru Muda' ? '2' : ($row[4] == 'Guru Madya' ? '3' : ($row[4] == 'Guru Utama' ? '4' : '')));
-                    $row[5] = $row[5] == 'I/a' ? '1' : ($row[5] == 'I/b' ? '2' : ($row[5] == 'I/c' ? '3' : ($row[5] == 'I/d' ? '4' : ('II/a' ? '1' : ($row[5] == 'II/b' ? '2' : ($row[5] == 'II/c' ? '3' : ($row[5] == 'II/d' ? '4' : ('III/a' ? '1' : ($row[5] == 'III/b' ? '2' : ($row[5] == 'III/c' ? '3' : ($row[5] == 'III/d' ? '4' : ('IV/a' ? '1' : ($row[5] == 'IV/b' ? '2' : ($row[5] == 'IV/c' ? '3' : ($row[5] == 'IV/d' ? '4' : ($row[5] == 'IV/e' ? '4' : ''))))))))))))))));
+                    $row[5] = $row[5] == 'I/a' ? '1' : ($row[5] == 'I/b' ? '2' : ($row[5] == 'I/c' ? '3' : ($row[5] == 'I/d' ? '4' : ($row[5] == 'II/a' ? '5' : ($row[5] == 'II/b' ? '6' : ($row[5] == 'II/c' ? '7' : ($row[5] == 'II/d' ? '8' : ($row[5] == 'III/a' ? '9' : ($row[5] == 'III/b' ? '10' : ($row[5] == 'III/c' ? '11' : ($row[5] == 'III/d' ? '12' : ($row[5] == 'IV/a' ? '13' : ($row[5] == 'IV/b' ? '14' : ($row[5] == 'IV/c' ? '15' : ($row[5] == 'IV/d' ? '16' : ($row[5] == 'IV/e' ? '17' : ''))))))))))))))));
                     $row[9] = Hash::make($row[9]);
 
                     // dd($row);
@@ -318,8 +324,8 @@ class AdvisorManagementController extends Controller
             $sheet->setCellValue('B' . $row, $dt->name);
             $sheet->setCellValue('C' . $row, $dt->nip);
             $sheet->setCellValue('D' . $row, $dt->department->name);
-            $sheet->setCellValue('E' . $row, $dt->advisor_position->name);
-            $sheet->setCellValue('F' . $row, $dt->advisor_level->name);
+            $sheet->setCellValue('E' . $row, $dt->advisorPosition->name);
+            $sheet->setCellValue('F' . $row, $dt->advisorLevel->name);
             $sheet->setCellValue('G' . $row, $dt->user->username);
             $sheet->setCellValue('H' . $row, $dt->user->email);
             $sheet->setCellValue('I' . $row, $dt->phone_num);

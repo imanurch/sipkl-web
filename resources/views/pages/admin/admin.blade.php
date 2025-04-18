@@ -71,10 +71,12 @@
                     <div x-show="modalAction != 'isDelete'" class="input-group">
                         <label class="input-label" for="">Kata Sandi</label>
                         <input name="password" class="input" type="password" placeholder="Masukkan Kata Sandi">
+                        <small class="text-xs text-error-500">*Kata sandi 8-12 karakter</small>
                     </div>
                     <div x-show="modalAction != 'isDelete'" class="input-group">
                         <label class="input-label" for="">Ulangi Kata Sandi</label>
                         <input name="check_password" class="input" type="password" placeholder="Ulangi Kata Sandi">
+                        <small class="text-xs text-error-500">*Harus sama dengan kata sandi</small>
                     </div>
                 </x-slot>
             </x-form>

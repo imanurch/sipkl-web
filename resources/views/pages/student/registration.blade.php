@@ -10,6 +10,7 @@
             anggota kelompok.</li>
         <li>Jika lokasi PKL belum tersedia, ajukan lokasi baru dengan klik "<span class="text-xs-semibold">Pengajuan Lokasi
                 Baru</span>".</li>
+        <li>File permohonan PKL dan surat jalan akan tersedia jika admin PKL sudah membuatkan surat. Hubungi admin PKL jika membutuhkan informasi lebih lanjut</li>
     </x-guide>
 
     <div class="space-y-4">

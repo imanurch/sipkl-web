@@ -34,7 +34,15 @@
                 <li class="text-xs-semibold">Siswa telah mengunggah laporan akhir</li>
             </ul>
         </li>
-        <li>Penilaian didasarkan pada performa kinerja siswa selama PKL dan kualitas laporan akhir</li>
+        <li>Penilaian dibagi menjadi 4 bagian
+            <ul class="list-decimal ps-6">
+                <li class="text-xs-semibold">Penilaian teknis</li>
+                <li class="text-xs-semibold">Penilaian non teknis</li>
+                <li class="text-xs-semibold">Penilaian laporan akhir</li>
+                <li class="text-xs-semibold">Penilaian ujian PKL</li>
+            </ul>
+        </li>
+        <li>Hanya penilaian yang sudah lengkap yang akan dihitung Nilai Akhirnya</li>
     </x-guide>
 
     <div x-data="{ modalAction: null }">

@@ -21,9 +21,17 @@
         </x-card>
     </div>
 
-    <div x-data="{ modalAction: null, option: false, selected: 'Pilih Opsi', exportModal: false,
-    positionOption: false, positionSelected: 'Pilih Opsi', positionSelectedValue: '',
-    levelOption: false, levelSelected: 'Pilih Opsi', levelSelectedValue: ''
+    <div x-data="{
+        modalAction: null,
+        option: false,
+        selected: 'Pilih Opsi',
+        exportModal: false,
+        positionOption: false,
+        positionSelected: 'Pilih Opsi',
+        positionSelectedValue: '',
+        levelOption: false,
+        levelSelected: 'Pilih Opsi',
+        levelSelectedValue: ''
     }">
         <x-table.table>
             <x-slot name="tableTitle">Data Guru Pembimbing</x-slot>
@@ -187,11 +195,12 @@
                         <input name="nip" class="input" type="text" placeholder="Masukkan NIP"
                             :disabled="modalAction == 'isDelete'"
                             :value="modalAction == 'isEdit' || modalAction=='isDelete' ? dataId.nip : ''" required>
+                        <small x-show="modalAction != 'isDelete'" class="text-xs text-error-500">*NIP 18 karakter</small>
                     </div>
                     <div class="input-group">
                         <label class="input-label" for="">Posisi</label>
                         <input type="hidden" name="position_id" x-model="positionSelectedValue">
-                        <div>
+                        <div x-show="modalAction!='isDelete'">
                             <button @click.prevent="positionOption=!positionOption" class="input input-select w-full"
                                 :disabled="modalAction == 'isDelete'" required>
                                 <span x-text="positionSelected" class="text-neutral-800"></span>
@@ -206,17 +215,22 @@
                                 <ul class="border border-brand-600 rounded py-2 my-2 max-h-32 overflow-auto">
                                     @foreach ($positionData as $dt)
                                         <li @click="positionOption=false;positionSelected='{{ $dt->name }}';positionSelectedValue='{{ $dt->id }}'"
-                                            class="text-xs-reguler px-4 py-2 hover:bg-brand-600 hover:text-neutral-0 hover:text-xs-medium">{{ $dt->name }}
-                                            </li>
+                                            class="text-xs-reguler px-4 py-2 hover:bg-brand-600 hover:text-neutral-0 hover:text-xs-medium">
+                                            {{ $dt->name }}
+                                        </li>
                                     @endforeach
                                 </ul>
                             </div>
+                        </div>
+                        <div x-show="modalAction=='isDelete'">
+                            <input class="input w-full" type="text"
+                                :value="modalAction == 'isDelete' ? dataId.advisor_position.name : ''" disabled>
                         </div>
                     </div>
                     <div class="input-group">
                         <label class="input-label" for="">Pangkat/Golongan</label>
                         <input type="hidden" name="level_id" x-model="levelSelectedValue">
-                        <div>
+                        <div x-show="modalAction!='isDelete'">
                             <button @click.prevent="levelOption=!levelOption" class="input input-select w-full"
                                 :disabled="modalAction == 'isDelete'" required>
                                 {{-- <span x-text="selected" :class="selected=='Pilih Opsi' ? 'text-neutral-300' : 'text-neutral-800'"></span> --}}
@@ -232,17 +246,22 @@
                                 <ul class="border border-brand-600 rounded py-2 my-2 max-h-32 overflow-auto">
                                     @foreach ($levelData as $dt)
                                         <li @click="levelOption=false;levelSelected='{{ $dt->name }}';levelSelectedValue='{{ $dt->id }}'"
-                                            class="text-xs-reguler px-4 py-2 hover:bg-brand-600 hover:text-neutral-0 hover:text-xs-medium">{{ $dt->name }}
-                                            </li>
+                                            class="text-xs-reguler px-4 py-2 hover:bg-brand-600 hover:text-neutral-0 hover:text-xs-medium">
+                                            {{ $dt->name }}
+                                        </li>
                                     @endforeach
                                 </ul>
                             </div>
+                        </div>
+                        <div x-show="modalAction=='isDelete'">
+                            <input class="input w-full" type="text"
+                                :value="modalAction == 'isDelete' ? dataId.advisor_level.name : ''" disabled>
                         </div>
                     </div>
                     <div class="input-group">
                         <label class="input-label" for="">Jurusan</label>
                         <input type="hidden" name="department_id" x-model="selected">
-                        <div>
+                        <div x-show="modalAction!='isDelete'">
                             <button @click.prevent="option=!option" class="input input-select w-full"
                                 :disabled="modalAction == 'isDelete'" required>
                                 {{-- <span x-text="selected" :class="selected=='Pilih Opsi' ? 'text-neutral-300' : 'text-neutral-800'"></span> --}}
@@ -264,6 +283,10 @@
                                 </ul>
                             </div>
                         </div>
+                        <div x-show="modalAction=='isDelete'">
+                            <input class="input w-full" type="text"
+                                :value="modalAction == 'isDelete' ? dataId.department.name : ''" disabled>
+                        </div>
                     </div>
                     <div class="input-group">
                         <label class="input-label" for="">Username</label>
@@ -284,16 +307,16 @@
                             :disabled="modalAction == 'isDelete'"
                             :value="modalAction == 'isEdit' || modalAction=='isDelete' ? dataId.phone_num : ''" required>
                     </div>
-                    <div class="input-group" :hidden="modalAction == 'isDelete'">
-                        <label class="input-label" for="" :hidden="modalAction == 'isDelete'">Kata Sandi</label>
-                        <input name="password" class="input" type="password" placeholder="Masukkan Kata Sandi"
-                            :hidden="modalAction == 'isDelete'">
+                    <div x-show="modalAction != 'isDelete'" class="input-group">
+                        <label class="input-label" for="">Kata Sandi</label>
+                        <input name="password" class="input" type="password" placeholder="Masukkan Kata Sandi">
+                        <small class="text-xs text-error-500">*Kata sandi 8-12 karakter</small>
                     </div>
-                    <div class="input-group" :hidden="modalAction == 'isDelete'">
-                        <label class="input-label" for="" :hidden="modalAction == 'isDelete'">Ulangi Kata
+                    <div x-show="modalAction != 'isDelete'" class="input-group">
+                        <label class="input-label" for="">Ulangi Kata
                             Sandi</label>
-                        <input name="check_password" class="input" type="password" placeholder="Ulangi Kata Sandi"
-                            :hidden="modalAction == 'isDelete'">
+                        <input name="check_password" class="input" type="password" placeholder="Ulangi Kata Sandi">
+                        <small class="text-xs text-error-500">*Harus sama dengan kata sandi</small>
                     </div>
                 </x-slot>
             </x-form>
@@ -305,7 +328,7 @@
                 <x-slot name="formTitle">Impor Data Guru</x-slot>
                 <x-slot name="formBody">
                     <div class="input-group">
-                        <label class="input-label" for="">Unggah File</label>
+                        <label class="input-label" for="">Unggah File (Format file: Excel)</label>
                         <input class="input" type="file" name="import_file" id="" required>
                     </div>
                     <div class="flex place-items-center">

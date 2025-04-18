@@ -191,7 +191,7 @@ Route::prefix('advisor')->name('advisor.')->middleware('role:advisor')->group(fu
     // assessment
     Route::get('assessment', [AssessmentAdvisorController::class, 'index'])->name('assessment');
     Route::patch('assessment/{id}', [AssessmentAdvisorController::class, 'update'])->name('assessment.update');
-    Route::get('assessment/download/{filename}', [AssessmentAdvisorController::class, 'index'])->name('assessment.download.finalReport');
+    Route::get('assessment/download/{filename}', [AssessmentAdvisorController::class, 'downloadLaporanAkhir'])->name('assessment.download.finalReport');
 
     // account
     Route::get('account', [AccountAdvisorController::class, 'index'])->name('account');

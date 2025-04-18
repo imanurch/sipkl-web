@@ -98,15 +98,16 @@ class InternshipRepository
                 $subQuery->where('name', 'like', '%' . $filters['search'] . '%')
                     ->orWhere('nisn', 'like', '%' . $filters['search'] . '%')
                     ->orWhere('nis', 'like', '%' . $filters['search'] . '%')
-                    ->orWhere('phone_num', 'like', '%' . $filters['search'] . '%');
-            })->orWhereHas('groupMember.group.internship.industry', function ($query) use ($filters) {
-                $query->where('name', 'like', '%' . $filters['search'] . '%');
+                    ->orWhere('phone_num', 'like', '%' . $filters['search'] . '%')
+                    ->orWhereHas('groupMember.group.internship.industry', function ($query) use ($filters) {
+                        $query->where('name', 'like', '%' . $filters['search'] . '%');
+                    });
             });
         }
 
         return $query->whereHas('groupMember.group.internship', function ($query) use ($advisor_id, $filters) {
             $query->where('advisor_id', $advisor_id)->where('batch_id', $filters['batch_id']);
-        })->with('groupMember.group.internship.industry:id,name')->paginate(5);
+        })->with('groupMember.group.internship.industry:id,name')->paginate(10);
     }
 
     public function getIndustryByAdvisor($filters = [], $advisor_id)

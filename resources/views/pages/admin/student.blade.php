@@ -127,17 +127,19 @@
                         <input name="nisn" class="input" type="text" placeholder="Masukkan NISN"
                             :disabled="modalAction == 'isDelete'"
                             :value="modalAction == 'isEdit' || modalAction=='isDelete' ? dataId.nisn : ''" required>
+                        <small x-show="modalAction != 'isDelete'" class="text-xs text-error-500">*NISN 10 karakter</small>
                     </div>
                     <div class="input-group">
                         <label class="input-label" for="">NIS</label>
                         <input name="nis" class="input" type="text" placeholder="Masukkan NIS"
                             :disabled="modalAction == 'isDelete'"
                             :value="modalAction == 'isEdit' || modalAction=='isDelete' ? dataId.nis : ''" required>
+                        <small x-show="modalAction != 'isDelete'" class="text-xs text-error-500">*NIS 4 karakter</small>
                     </div>
                     <div class="input-group">
                         <label class="input-label" for="">Jenis Kelamin</label>
                         <input type="hidden" name="gender" x-model="selectedGender">
-                        <div>
+                        <div x-show="modalAction!='isDelete'">
                             <button @click.prevent="optionGender=!optionGender" class="input input-select w-full"
                                 :disabled="modalAction == 'isDelete'">
                                 <span x-text="selectedGender"
@@ -159,11 +161,16 @@
                                 </ul>
                             </div>
                         </div>
+                        <div x-show="modalAction=='isDelete'">
+                            <input class="input w-full" type="text"
+                                :value="modalAction == 'isDelete' ? (dataId.gender == 'men' ? 'Laki-Laki' : 'Perempuan') : ''"
+                                disabled>
+                        </div>
                     </div>
                     <div class="input-group">
                         <label class="input-label" for="">Jurusan</label>
                         <input type="hidden" name="department_id" x-model="selected">
-                        <div>
+                        <div x-show="modalAction!='isDelete'">
                             <button @click.prevent="option=!option" class="input input-select w-full"
                                 :disabled="modalAction == 'isDelete'">
                                 <span x-text="selected"
@@ -184,12 +191,18 @@
                                 </ul>
                             </div>
                         </div>
+                        <div x-show="modalAction=='isDelete'">
+                            <input class="input w-full" type="text"
+                                :value="modalAction == 'isDelete' ? dataId.department.name : ''" disabled>
+                        </div>
                     </div>
                     <div class="input-group">
                         <label class="input-label" for="">Tahun Ajaran</label>
                         <input name="year" class="input" type="text" placeholder="Masukkan Tahun"
                             :disabled="modalAction == 'isDelete'"
                             :value="modalAction == 'isEdit' || modalAction=='isDelete' ? dataId.year : ''" required>
+                        <small x-show="modalAction != 'isDelete'" class="text-xs text-error-500">*Tahun awal,
+                            misalnya:2024</small>
                     </div>
                     <div class="input-group">
                         <label class="input-label" for="">Username</label>
@@ -210,16 +223,16 @@
                             :disabled="modalAction == 'isDelete'"
                             :value="modalAction == 'isEdit' || modalAction=='isDelete' ? dataId.phone_num : ''" required>
                     </div>
-                    <div class="input-group" :hidden="modalAction == 'isDelete'">
-                        <label class="input-label" for="" :hidden="modalAction == 'isDelete'">Kata Sandi</label>
-                        <input name="password" class="input" type="password" placeholder="Masukkan Kata Sandi"
-                            :hidden="modalAction == 'isDelete'">
+                    <div x-show="modalAction != 'isDelete'" class="input-group">
+                        <label class="input-label" for="">Kata Sandi</label>
+                        <input name="password" class="input" type="password" placeholder="Masukkan Kata Sandi">
+                        <small class="text-xs text-error-500">*Kata sandi 8-12 karakter</small>
                     </div>
-                    <div class="input-group" :hidden="modalAction == 'isDelete'">
-                        <label class="input-label" for="" :hidden="modalAction == 'isDelete'">Ulangi Kata
+                    <div x-show="modalAction != 'isDelete'" class="input-group">
+                        <label class="input-label" for="">Ulangi Kata
                             Sandi</label>
-                        <input name="check_password" class="input" type="password" placeholder="Ulangi Kata Sandi"
-                            :hidden="modalAction == 'isDelete'">
+                        <input name="check_password" class="input" type="password" placeholder="Ulangi Kata Sandi">
+                        <small class="text-xs text-error-500">*Harus sama dengan kata sandi</small>
                     </div>
                 </x-slot>
             </x-form>
@@ -231,7 +244,7 @@
                 <x-slot name="formTitle">Impor Data Peserta Didik</x-slot>
                 <x-slot name="formBody">
                     <div class="input-group">
-                        <label class="input-label" for="">Unggah File</label>
+                        <label class="input-label" for="">Unggah File (Format file: Excel)</label>
                         <input class="input" type="file" name="import_file" id="" required>
                     </div>
                     <div class="flex place-items-center">

@@ -103,7 +103,7 @@ class StudentManagementController extends Controller
                 'username' => 'required',
                 'email' => 'required|unique:users,email',
                 'phone_num' => 'required|string|min:10|max:14|unique:students,phone_num,',
-                'password' => 'required|string|size:8',
+                'password' => 'required|string|min:8|max:12',
             ]);
             // dd($validatedData);
 
@@ -154,7 +154,7 @@ class StudentManagementController extends Controller
                 'username' => 'required',
                 'email' => 'required|unique:users,email,' . $request->user_id,
                 'phone_num' => 'required|string|min:10|max:14|unique:students,phone_num,' . $id,
-                'password' => 'nullable|string|size:8',
+                'password' => 'nullable|string|min:8|max:12',
             ]);
 
             if (!empty($validatedData['password'])) {
@@ -249,7 +249,7 @@ class StudentManagementController extends Controller
                         'username' => 'required',
                         'email' => 'required|unique:users,email',
                         'phone_num' => 'required|string|min:10|max:14|unique:students,phone_num,',
-                        'password' => 'required|string|size:8',
+                        'password' => 'required|string|min:8|max:12',
                     ]);
 
                     $row[4] = $row[4] == 'Laki-Laki' ? 'men' : 'women';

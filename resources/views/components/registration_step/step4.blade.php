@@ -59,7 +59,7 @@
                     @endforeach
                 </div>
                 <div class="flex space-x-3 text-xs-reguler place-items-center">
-                    <h6 class="w-56">Surat Balasan Industri (Bukti Diterima)</h6>
+                    <h6 class="w-56">Surat Balasan Industri (Bukti Diterima) (*PDF)</h6>
                     <span>:</span>
                     @foreach ($registrationData->registrationDocument as $dt)
                         @if ($dt->type == 'surat permohonan')

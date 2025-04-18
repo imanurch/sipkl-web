@@ -6,13 +6,8 @@
 
     <x-guide guideTitle="Monitoring">
         <li>Klik "<span class="text-xs-semibold">Tambah Data</span>" untuk menambahkan data monitoring</li>
-        <li>Setelah data ditambahkan, sistem akan otomatis menghasilkan dokumen untuk guru:
-            <ul class="list-decimal ps-6">
-                <li><span class="text-xs-semibold">Pelepasan PKL</span> : Surat Pengantar, SPPD, Surat Tugas</li>
-                <li><span class="text-xs-semibold">Kunjungan PKL</span> : SPPD, Surat tugas</li>
-                <li><span class="text-xs-semibold">Penarikan PKL</span> : Surat penarikan, SPPD, Surat tugas</li>
-            </ul>
-        </li>
+        <li>Setelah data ditambahkan, silakan menunggu dokumen yang akan digenerate oleh admin</li>
+        <li>Hubungi admin PKL jika membutuhkan informasi lebih lanjut terkait dokumen</li>
     </x-guide>
 
     {{-- <div x-data="{ modalAction: null, option: false, optionInternship: false, selected: 'Pilih Opsi', selectedInternship: 'Pilih Opsi' }"> --}}

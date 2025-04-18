@@ -116,7 +116,8 @@
                                 </button>
                             @endif
                         </td>
-                        <x-table.action_table :data="$dt"></x-table.action_table>
+                        <x-table.action_table :data="$dt" registrationTeamMember=true></x-table.action_table>
+                        {{-- teamMember({{ $dt->group->groupMember->toJson() }}) --}}
                     </tr>
                 @endforeach
             </x-slot>

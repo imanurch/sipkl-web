@@ -312,10 +312,12 @@ class AssessmentAdminController extends Controller
                 ]);
 
                 // test
-                $this->testAssessmentService->updateOrCreate([
-                    'assessment_id' => $id,
-                    'score' => $request->final_test,
-                ]);
+                if($request->final_test != null){
+                    $this->testAssessmentService->updateOrCreate([
+                        'assessment_id' => $id,
+                        'score' => $request->final_test,
+                    ]);
+                }
             });
 
             Toastr::addSuccess('Penilaian berhasil ditambahkan!');

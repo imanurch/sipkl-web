@@ -51,7 +51,7 @@ class AdminManagementController extends Controller
                 'username' => 'required|string',
                 'email' => 'required|unique:users,email|email',
                 'phone_num' => 'required|unique:admins,phone_num|string|min:10|max:14',
-                'password' => 'required|string|size:8',
+                'password' => 'required|string|min:8|max:12',
             ]);
             $validatedData['password'] = Hash::make($validatedData['password']);
             DB::transaction(function () use ($validatedData) {
@@ -85,7 +85,7 @@ class AdminManagementController extends Controller
                 'username' => 'required|string',
                 'email' => 'required|email|unique:users,email,' . $request->input('user_id'),
                 'phone_num' => 'required|string|min:10|max:14|unique:admins,phone_num,' . $id,
-                'password' => 'nullable|string|size:8',
+                'password' => 'nullable|string|min:8|max:12',
             ]);
 
             if (!empty($validatedData['password'])) {
@@ -95,7 +95,7 @@ class AdminManagementController extends Controller
                 }
                 $validatedData['password'] = Hash::make($validatedData['password']);
             }
-            
+
             DB::transaction(function () use ($validatedData, $id) {
                 $this->adminService->updateAdmin($id, [
                     'name' => $validatedData['name'],
