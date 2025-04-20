@@ -10,19 +10,22 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\LogbookService;
 use App\Services\StudentService;
 use App\Services\IndustryService;
+use App\Services\SignatureService;
 use Illuminate\Support\Facades\DB;
 use App\Services\AssessmentService;
 use App\Services\DepartmentService;
 use App\Services\InternshipService;
 use App\Http\Controllers\Controller;
 use App\Models\RegistrationDocument;
+use App\Notifications\RegistrationDocumentNotification;
 use Illuminate\Support\Facades\Hash;
 use App\Services\RegistrationService;
-use App\Services\InternDocumentService;
-use Flasher\Toastr\Laravel\Facade\Toastr;
-use App\Services\RegistrationDocumentService;
-use App\Services\SignatureService;
 use App\Services\SchoolProfileService;
+use App\Services\InternDocumentService;
+use Illuminate\Support\Facades\Storage;
+use Flasher\Toastr\Laravel\Facade\Toastr;
+use Illuminate\Support\Facades\Notification;
+use App\Services\RegistrationDocumentService;
 
 class RegistrationAdminController extends Controller
 {
@@ -348,6 +351,21 @@ class RegistrationAdminController extends Controller
 
         try {
             $this->registrationDocumentService->updateRegistrationDocument($request->registration_id, 'surat permohonan', $filename);
+
+            $registrationDocumentData = $this->registrationDocumentService->getRegistrationDocumentByRegistrationId($request->registration_id);
+            $users = [];
+            foreach ($registrationDocumentData as $dt) {
+                foreach ($dt->registration->group->groupMember as $member) {
+                    $user = $member->student->user;
+                    $users[] = $user;
+                }
+            }
+            foreach ($users as $user) {
+                if ($user->email_verified_at != null) {
+                    Notification::send($user, new RegistrationDocumentNotification());
+                }
+            }
+
             Toastr::addSuccess('Surat Permohonan berhasil dibuat. Silahkan refresh halaman!');
         } catch (\Exception $e) {
             Toastr::addError('Surat Permohonan gagal dibuat. Silahkan refresh halaman!');
@@ -357,6 +375,15 @@ class RegistrationAdminController extends Controller
 
     public function destroy($id)
     {
+        $doc = $this->registrationDocumentService->getRegistrationDocumentByRegistrationId($id);
+        foreach ($doc as $dt) {
+            $filename = $dt->url;
+            if ($dt->type == "surat permohonan") {
+                Storage::delete('registration_document/surat_permohonan/' . $filename);
+            } elseif ($dt->type == "surat balasan") {
+                Storage::delete('registration_document/surat_balasan/' . $filename);
+            }
+        }
         try {
             $registrationData = $this->registrationService->getRegistrationById($id);
             DB::transaction(function () use ($registrationData, $id) {

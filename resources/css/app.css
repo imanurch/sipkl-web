@@ -179,7 +179,7 @@
         SIDEBAR 
     */
     .sidebar {
-        @apply flex flex-col;
+        @apply flex flex-col pb-8;
     }
     .sidebar-head {
         @apply h-14 flex place-items-center justify-center border-b border-neutral-100 text-sm-semibold;

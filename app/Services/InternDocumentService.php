@@ -14,6 +14,11 @@ class InternDocumentService
         $this->internDocumentRepository = $internDocumentRepository;
     }
 
+    public function getInternDocumentByInternshipId($internship_id)
+    {
+        return $this->internDocumentRepository->getInternDocumentByInternshipId($internship_id);
+    }
+
     public function getInternDocumentByStudentId($student_id, $type)
     {
         return $this->internDocumentRepository->getInternDocumentByStudentId($student_id, $type);

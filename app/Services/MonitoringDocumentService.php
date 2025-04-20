@@ -39,6 +39,11 @@ class MonitoringDocumentService
         return $this->monitoringDocumentRepository->getByMonitoringIdAndType($monitoring_id, $type);
     }
 
+    public function getMonitoringDocumentByMonitoringId($monitoring_id)
+    {
+        return $this->monitoringDocumentRepository->getMonitoringDocumentByMonitoringId($monitoring_id);
+    }
+
     public function updateMonitoringDocument($id, $data)
     {
         return $this->monitoringDocumentRepository->updateMonitoringDocument($id, $data);

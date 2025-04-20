@@ -2,12 +2,14 @@
 
 namespace App\Http\Controllers\Admin;
 
+use Log;
 use Illuminate\Http\Request;
 use App\Services\UserService;
 use App\Services\AdminService;
 use Illuminate\Support\Facades\DB;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
+use Illuminate\Auth\Events\Registered;
 use Flasher\Toastr\Laravel\Facade\Toastr;
 
 class AdminManagementController extends Controller
@@ -54,7 +56,7 @@ class AdminManagementController extends Controller
                 'password' => 'required|string|min:8|max:12',
             ]);
             $validatedData['password'] = Hash::make($validatedData['password']);
-            DB::transaction(function () use ($validatedData) {
+            DB::transaction(function () use (&$newUser, $validatedData) {
                 $newUser = $this->userService->addUser([
                     'username' => $validatedData['username'],
                     'email' => $validatedData['email'],
@@ -67,6 +69,10 @@ class AdminManagementController extends Controller
                     'phone_num' => $validatedData['phone_num'],
                 ]);
             });
+            
+            if ($newUser && !$newUser->hasVerifiedEmail()) {
+                $newUser->sendEmailVerificationNotification();
+            }
             Toastr::addSuccess('Data admin berhasil disimpan!');
         } catch (\Exception $e) {
             Toastr::addError('Data admin gagal disimpan!');

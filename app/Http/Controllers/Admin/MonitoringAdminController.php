@@ -13,6 +13,7 @@ use App\Services\MonitoringService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use App\Services\SchoolProfileService;
+use Illuminate\Support\Facades\Storage;
 use Flasher\Toastr\Laravel\Facade\Toastr;
 use App\Services\MonitoringDocumentService;
 
@@ -116,7 +117,21 @@ class MonitoringAdminController extends Controller
                 $this->monitoringService->updateMonitoring($id, $validatedData);
 
                 // harusnya generate ulang document tapi sementara hapus dulu aja biar diulang dr awal generate
-                // seharusnya dokumen yang lama dihapus biar ga beban memori
+                // hapus doc lama
+                $doc = $this->monitoringDocumentService->getMonitoringDocumentByMonitoringId($id);
+                foreach ($doc as $dt) {
+                    $filename = $dt->url;
+                    // dd($filename, $dt->type == "surat penarikan");
+                    if ($dt->type == "surat pengantar") {
+                        Storage::delete('monitoring_documents/surat_pengantar/' . $filename);
+                    } elseif ($dt->type == "surat penarikan") {
+                        Storage::delete('monitoring_documents/surat_penarikan/' . $filename);
+                    } elseif ($dt->type == "surat tugas") {
+                        Storage::delete('monitoring_documents/surat_tugas/' . $filename);
+                    } elseif ($dt->type == "sppd") {
+                        Storage::delete('monitoring_documents/sppd/' . $filename);
+                    }
+                }
 
                 $this->monitoringDocumentService->deleteMonitoringDocument($id);
             });
@@ -129,6 +144,21 @@ class MonitoringAdminController extends Controller
 
     public function destroy($id)
     {
+        $doc = $this->monitoringDocumentService->getMonitoringDocumentByMonitoringId($id);
+        foreach ($doc as $dt) {
+            $filename = $dt->url;
+            // dd($filename, $dt->type == "surat penarikan");
+            if ($dt->type == "surat pengantar") {
+                Storage::delete('monitoring_documents/surat_pengantar/' . $filename);
+            } elseif ($dt->type == "surat penarikan") {
+                Storage::delete('monitoring_documents/surat_penarikan/' . $filename);
+            } elseif ($dt->type == "surat tugas") {
+                Storage::delete('monitoring_documents/surat_tugas/' . $filename);
+            } elseif ($dt->type == "sppd") {
+                Storage::delete('monitoring_documents/sppd/' . $filename);
+            }
+        }
+
         try {
             $this->monitoringService->deleteMonitoring($id);
             Toastr::addSuccess('Data monitoring berhasil dihapus!');

@@ -2,11 +2,14 @@
 
 namespace App\Http\Controllers\Advisor;
 
+use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Services\UserService;
 use App\Services\BatchService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\AdvisorService;
+use App\Models\MonitoringDocument;
 use Illuminate\Support\Facades\DB;
 use App\Services\InternshipService;
 use App\Services\MonitoringService;
@@ -14,6 +17,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Flasher\Toastr\Laravel\Facade\Toastr;
 use App\Services\MonitoringDocumentService;
+use Illuminate\Support\Facades\Notification;
+use App\Notifications\MonitoringDocumentRequestNotification;
 
 class MonitoringAdvisorController extends Controller
 {
@@ -21,7 +26,8 @@ class MonitoringAdvisorController extends Controller
         $batchService,
         $internshipService,
         $monitoringDocumentService,
-        $advisorService;
+        $advisorService,
+        $userService;
 
     // Constructor Injection
     public function __construct(
@@ -29,13 +35,15 @@ class MonitoringAdvisorController extends Controller
         BatchService $batchService,
         InternshipService $internshipService,
         MonitoringDocumentService $monitoringDocumentService,
-        AdvisorService $advisorService
+        AdvisorService $advisorService,
+        UserService $userService
     ) {
         $this->monitoringService = $monitoringService;
         $this->batchService = $batchService;
         $this->internshipService = $internshipService;
         $this->monitoringDocumentService = $monitoringDocumentService;
         $this->advisorService = $advisorService;
+        $this->userService = $userService;
     }
 
     public function index(Request $request)
@@ -96,7 +104,15 @@ class MonitoringAdvisorController extends Controller
                 'note' => 'nullable|string',
             ]);
 
-            $this->monitoringService->addMonitoring($validatedData);
+            // dd($monitoringData->internship->advisor->name);
+            // $user = User::where('username', 'verif2')->first();
+            // $user->notify(new MonitoringDocumentRequest($advisorName));
+            $monitoringData = $this->monitoringService->addMonitoring($validatedData);
+
+            $advisorName = $monitoringData->internship->advisor->name;
+            $users = $this->userService->getVerifiedAdminUser();
+            Notification::send($users, new MonitoringDocumentRequestNotification($advisorName)); 
+
             Toastr::addSuccess('Data monitoring berhasil ditambah!');
         } catch (\Exception $e) {
             Toastr::addError('Data monitoring gagal ditambah!');

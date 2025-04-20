@@ -15,13 +15,13 @@
 
 <body>
     <div x-data="{ sidebarSM: false }" class="layout relative">
-        <div class="layout-sidebar sm:fixed sm:block h-screen"
+        <div class="layout-sidebar sm:fixed sm:block h-screen overflow-y-auto"
             :class="sidebarSM == true ? 'fixed z-50 inset-y-0 left-0' : 'hidden'">
             @include('components.sidebar.sidebar')
         </div>
         <div class="w-full max-w-full overflow-x-hidden sm:ms-56">
             <div class="h-14 border-b border-neutral-50 px-9 flex justify-end place-items-center">
-                <div class="sm:hidden cursor-pointer absolute z-50 " :class="sidebarSM == true ? 'start-60' : 'start-8'">
+                <div class="sm:hidden cursor-pointer absolute z-50 " :class="sidebarSM == true ? 'start-64' : 'start-8'">
                     <svg @click="sidebarSM=!sidebarSM" width="24" height="24" viewBox="0 0 24 24" fill="none"
                         xmlns="http://www.w3.org/2000/svg">
                         <path d="M20 7L4 7" stroke="#1C274C" stroke-width="1.5" stroke-linecap="round" />

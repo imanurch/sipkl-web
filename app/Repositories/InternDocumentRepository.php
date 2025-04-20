@@ -6,10 +6,10 @@ use App\Models\InternDocument;
 
 class InternDocumentRepository
 {
-    // public function getAllInternDocument()
-    // {
-    //     return InternDocument::get();
-    // }
+    public function getInternDocumentByInternshipId($internship_id)
+    {
+        return InternDocument::where('internship_id', $internship_id)->get();
+    }
 
     public function getInternDocumentByStudentId($student_id, $type)
     {

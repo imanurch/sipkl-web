@@ -4,7 +4,7 @@
 @section('content')
 
     <div>
-        <div class="flex justify-between space-x-4">
+        <div class="md:flex justify-between space-y-4 md:space-y-0 md:space-x-4">
             <form action="{{ route('admin.account.updateAccount') }}" method="POST" id="accountForm" class="w-full"
                 enctype="multipart/form-data">
                 @csrf
@@ -25,6 +25,22 @@
                                 <span>:</span>
                                 <span>{{ $data->user->email ?? '' }}</span>
                             </div>
+                            <div class="flex space-x-3 text-xs-reguler sm:place-items-center">
+                                <h6 class="min-w-36">Verifikasi Email</h6>
+                                <span>:</span>
+                                @if ($data->user->email_verified_at != null)
+                                    <span class="text-xs text-nowrap py-1 px-2 bg-success-300 text-neutral-0 rounded">Sudah
+                                        Verifikasi</span>
+                                @else
+                                    <div>
+                                        <span class="w-fit text-xs text-nowrap py-1 px-2 bg-error-400 text-neutral-0 rounded">Belum
+                                            Verifikasi</span>
+                                        <a href="{{ route('sipkl.verificationEmail', ['id'=>$data->user->id]) }}" class="text-xs text-nowrap p-1 border border-brand-400 text-brand-700 rounded">Verifikasi
+                                            Sekarang</a>
+                                    </div>
+                                @endif
+                            </div>
+
                             <div class="flex space-x-3 text-xs-reguler place-items-center">
                                 <h6 class="min-w-36">Password</h6>
                                 <span>:</span>

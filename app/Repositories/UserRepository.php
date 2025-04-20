@@ -16,6 +16,11 @@ class UserRepository
         return User::find($id);
     }
 
+    public function getVerifiedAdminUser()
+    {
+        return User::where('role','admin')->whereNotNull('email_verified_at' )->get();
+    }
+
     public function updateUser($id, array $data)
     {
         return User::where('id', $id)->update($data);

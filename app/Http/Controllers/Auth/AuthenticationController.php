@@ -3,23 +3,31 @@
 namespace App\Http\Controllers\Auth;
 
 use Illuminate\Http\Request;
+use App\Services\UserService;
 use App\Services\AdminService;
 use App\Services\AdvisorService;
 use App\Services\StudentService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Session;
+use Flasher\Toastr\Laravel\Facade\Toastr;
 
 class AuthenticationController extends Controller
 {
-    protected $studentService, $advisorService, $adminService;
+    protected $studentService, $advisorService, $adminService, $userService;
 
     // Constructor Injection
-    public function __construct(StudentService $studentService, AdvisorService $advisorService, AdminService $adminService)
-    {
+    public function __construct(
+        StudentService $studentService,
+        AdvisorService $advisorService,
+        AdminService $adminService,
+        UserService $userService
+    ) {
         $this->studentService = $studentService;
         $this->advisorService = $advisorService;
         $this->adminService = $adminService;
+        $this->userService = $userService;
     }
 
     public function index()
@@ -45,6 +53,11 @@ class AuthenticationController extends Controller
                 $request->session()->regenerate();
                 $user_bio = $this->adminService->getAdminByUserId($user->id);
                 Session::put('user_bio', $user_bio);
+                // event(new Registered($user_bio));
+                $user_data = $this->userService->getUserById($user->id);
+                if ($user_data && !$user_data->hasVerifiedEmail()) {
+                    $user_data->sendEmailVerificationNotification();
+                }
                 return redirect()->route('admin.dashboard');
             } else if ($user->role == 'advisor') {
                 $request->session()->regenerate();
@@ -79,5 +92,20 @@ class AuthenticationController extends Controller
         $request->session()->regenerateToken();
 
         return redirect()->route('sipkl');
+    }
+
+    public function verificationEmail($id)
+    {
+        $user_data = $this->userService->getUserById($id);
+
+        try {
+            if ($user_data && !$user_data->hasVerifiedEmail()) {
+                $user_data->sendEmailVerificationNotification();
+            }
+            Toastr::addSuccess('Email verifikasi sudah terkirim. Cek email ya!');
+        } catch (\Exception $e) {
+            Toastr::addError('Email verifikasi gagal terkirim');
+        }
+        return redirect()->back();
     }
 }

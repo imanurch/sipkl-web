@@ -6,6 +6,11 @@ use App\Models\RegistrationDocument;
 
 class RegistrationDocumentRepository
 {
+    public function getRegistrationDocumentByRegistrationId($registration_id)
+    {
+        return RegistrationDocument::where('registration_id',$registration_id)->get();
+    }
+
     public function createRegistrationDocument(array $data)
     {
         return RegistrationDocument::create($data);

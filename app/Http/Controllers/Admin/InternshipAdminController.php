@@ -14,8 +14,9 @@ use App\Services\InternshipService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use App\Services\SchoolProfileService;
-use App\Services\AdvisorDocumentService;
 use App\Services\InternDocumentService;
+use Illuminate\Support\Facades\Storage;
+use App\Services\AdvisorDocumentService;
 use Flasher\Toastr\Laravel\Facade\Toastr;
 
 class InternshipAdminController extends Controller
@@ -93,6 +94,16 @@ class InternshipAdminController extends Controller
 
     public function destroy($id)
     {
+        $doc = $this->internDocumentService->getInternDocumentByInternshipId($id);
+        foreach ($doc as $dt) {
+            $filename = $dt->url;
+            if ($dt->type == "surat jalan") {
+                Storage::delete('intern_documents/surat_jalan/' . $filename);
+            } elseif ($dt->type == "laporan akhir") {
+                Storage::delete('intern_documents/laporan_akhir/' . $filename);
+            }
+        }
+
         try {
             $this->internshipService->deleteInternship($id);
             Toastr::addSuccess('Data PKL berhasil dihapus!');

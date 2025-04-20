@@ -164,4 +164,12 @@
             </a>
         </div>
     </div>
+    <div class="flex justify-center">
+        <div class="bg-neutral-0 border border-error-500 rounded text-center w-48 py-4 px-3 space-y-4">
+            <h6 class="text-xs-bold">Email Belum Diverifikasi!</h6>
+            <p class="text-xs">Segera lakukan verifikasi email agar kamu mendapatkan notifikasi penting dari SIPKL!</p>
+            <a href="{{ auth()->user()->role == 'admin' ? route('admin.account') : (auth()->user()->role == 'advisor' ? route('advisor.account') : route('student.account')) }}"
+                class="btn btn-xs btn-default-fill">Verifikasi Email</a>
+        </div>
+    </div>
 </div>

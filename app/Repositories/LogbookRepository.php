@@ -30,6 +30,10 @@ class LogbookRepository
         })->where('student_id', $student_id)->where('date', $date)->get();
     }
 
+    public function getLogbookByLogbookId($id){
+        return Logbook::find($id);
+    }
+
     public function countLogbookByAdvisorStatus($status, $batch_id, $advisor_id)
     {
         if ($status == 'unconfirmed') {

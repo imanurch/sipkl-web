@@ -1,5 +1,6 @@
 <?php
 
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Admin\OutputController;
@@ -8,6 +9,7 @@ use App\Http\Controllers\Admin\AccountAdminController;
 use App\Http\Controllers\Admin\LogbookAdminController;
 use App\Http\Controllers\Auth\AuthenticationController;
 use App\Http\Controllers\Admin\DashboardAdminController;
+use Illuminate\Foundation\Auth\EmailVerificationRequest;
 use App\Http\Controllers\Admin\AdminManagementController;
 use App\Http\Controllers\Admin\AssessmentAdminController;
 use App\Http\Controllers\Admin\BatchManagementController;
@@ -16,6 +18,7 @@ use App\Http\Controllers\Admin\MonitoringAdminController;
 use App\Http\Controllers\Advisor\InternAdvisorController;
 use App\Http\Controllers\Advisor\AccountAdvisorController;
 use App\Http\Controllers\Advisor\LogbookAdvisorController;
+use App\Http\Controllers\Student\AccountStudentController;
 use App\Http\Controllers\Student\LogbookStudentController;
 use App\Http\Controllers\Admin\AdvisorManagementController;
 use App\Http\Controllers\Admin\RegistrationAdminController;
@@ -30,7 +33,6 @@ use App\Http\Controllers\Advisor\MonitoringAdvisorController;
 use App\Http\Controllers\Student\FinalReportStudentController;
 use App\Http\Controllers\Student\RegistrationStudentController;
 use App\Http\Controllers\Advisor\LogbookDetailAdvisorController;
-use App\Http\Controllers\Student\AccountStudentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -68,7 +70,21 @@ use App\Http\Controllers\Student\AccountStudentController;
 Route::get('', [AuthenticationController::class, 'index'])->name('sipkl');
 Route::post('login', [AuthenticationController::class, 'login'])->name('sipkl.login');
 Route::get('logout', [AuthenticationController::class, 'logout'])->name('sipkl.logout');
-Route::get('account', [AccountController::class, 'index'])->name('sipkl.account');
+// Route::get('account', [AccountController::class, 'index'])->name('sipkl.account');
+
+Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
+    $request->fulfill();
+
+    return redirect('/home');
+})->middleware(['auth', 'signed'])->name('verification.verify');
+
+Route::get('verificationEmail/{id}', [AuthenticationController::class, 'verificationEmail'])->name('sipkl.verificationEmail');
+
+// Route::post('/email/verification-notification', function (Request $request) {
+//     $request->user()->sendEmailVerificationNotification();
+ 
+//     return back()->with('message', 'Verification link sent!');
+// })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
     // dashboard
@@ -224,7 +240,7 @@ Route::prefix('student')->name('student.')->middleware('role:student')->group(fu
     Route::get('final-report', [FinalReportStudentController::class, 'index'])->name('finalReport');
     Route::post('final-report', [FinalReportStudentController::class, 'store'])->name('finalReport.store');
     Route::get('final-report/download/{filename}', [FinalReportStudentController::class, 'downloadLaporanAkhir'])->name('finalReport.downloadLaporanAkhir');
-    
+
     // account
     Route::get('account', [AccountStudentController::class, 'index'])->name('account');
     Route::post('account/updateAccount', [AccountStudentController::class, 'updateAccount'])->name('account.updateAccount');

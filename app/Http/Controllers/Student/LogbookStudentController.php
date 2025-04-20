@@ -4,6 +4,7 @@ namespace App\Http\Controllers\Student;
 
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
+use App\Notifications\Logbook;
 use App\Services\BatchService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\LogbookService;
@@ -13,7 +14,9 @@ use App\Services\MonitoringService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
 use Flasher\Toastr\Laravel\Facade\Toastr;
+use App\Notifications\LogbookNotification;
 use App\Services\MonitoringDocumentService;
+use Illuminate\Support\Facades\Notification;
 
 class LogbookStudentController extends Controller
 {
@@ -44,7 +47,7 @@ class LogbookStudentController extends Controller
 
         $currentBatch = $this->batchService->getBatchByStatus('active');
         $batch_id = $currentBatch != null ? $currentBatch->id : null;
-        
+
         // $studentData = $this->studentService->getStudentById($studentId);
         $data = $this->logbookService->getLogbookByStudentIdAndBatch($batch_id, $student_id);
         // $internshipData = $this->internshipService->getInternshipByInternshipId($internshipId);
@@ -65,8 +68,17 @@ class LogbookStudentController extends Controller
             $validatedData = $request->validate([
                 'activities' => 'required',
             ]);
-            
+
             $this->logbookService->updateLogbook($id, $validatedData);
+
+            $logbookData = $this->logbookService->getLogbookByLogbookId($id);
+            if ($logbookData->internship->advisor->user->email_verified_at != null) {
+                Notification::send($logbookData->internship->advisor->user, new LogbookNotification($logbookData->student->name));
+            }
+
+            // $student = $this->logbookService->getLogbookByLogbookId($id)->student;
+            // Notification::send($student->user, new LogbookNotification($student->name)); 
+
             Toastr::addSuccess('Logbook berhasil disimpan!');
         } catch (\Exception $e) {
             Toastr::addError('Logbook gagal disimpan!');

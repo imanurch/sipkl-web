@@ -38,6 +38,11 @@ class MonitoringDocumentRepository
         return MonitoringDocument::where('monitoring_id', $monitoring_id)->where('type', $type)->first();
     }
 
+    public function getMonitoringDocumentByMonitoringId($monitoring_id)
+    {
+        return MonitoringDocument::where('monitoring_id', $monitoring_id)->get();
+    }
+
     public function updateMonitoringDocument($id, array $data)
     {
         return MonitoringDocument::where('id', $id)->update($data);

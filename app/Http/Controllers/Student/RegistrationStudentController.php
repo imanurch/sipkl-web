@@ -2,8 +2,8 @@
 
 namespace App\Http\Controllers\Student;
 
-use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use App\Services\UserService;
 use App\Services\BatchService;
 use App\Services\GroupService;
 use App\Services\AdvisorService;
@@ -15,9 +15,13 @@ use App\Http\Controllers\Controller;
 use App\Services\GroupMemberService;
 use Illuminate\Support\Facades\Auth;
 use App\Services\RegistrationService;
+use Illuminate\Support\Facades\Route;
 use App\Services\InternDocumentService;
 use Flasher\Toastr\Laravel\Facade\Toastr;
+use App\Notifications\InternshipRegistration;
+use App\Notifications\InternshipRegistrationNotification;
 use App\Services\RegistrationDocumentService;
+use Illuminate\Support\Facades\Notification;
 
 class RegistrationStudentController extends Controller
 {
@@ -31,7 +35,8 @@ class RegistrationStudentController extends Controller
         $groupMemberService,
         $registrationService,
         $registrationDocumentService,
-        $internDocumentService;
+        $internDocumentService,
+        $userService;
 
     // Constructor Injection
     public function __construct(
@@ -44,7 +49,8 @@ class RegistrationStudentController extends Controller
         GroupMemberService $groupMemberService,
         RegistrationService $registrationService,
         RegistrationDocumentService $registrationDocumentService,
-        InternDocumentService $internDocumentService
+        InternDocumentService $internDocumentService,
+        UserService $userService
     ) {
         $this->industryService = $industryService;
         $this->studentService = $studentService;
@@ -56,6 +62,7 @@ class RegistrationStudentController extends Controller
         $this->registrationService = $registrationService;
         $this->registrationDocumentService = $registrationDocumentService;
         $this->internDocumentService = $internDocumentService;
+        $this->userService = $userService;
     }
 
     public function index(Request $request)
@@ -247,6 +254,10 @@ class RegistrationStudentController extends Controller
                 $registrationData = $this->registrationService->getRegistrationById($newRegistration->id);
                 $this->registrationService->updateRegistrationStep($newRegistration->id, '4');
             });
+
+            $users = $this->userService->getVerifiedAdminUser();
+            Notification::send($users, new InternshipRegistrationNotification()); 
+
             Toastr::addSuccess('Data registrasi berhasil disimpan!');
             return redirect()->route('student.registration');
         } catch (\Exception $e) {
@@ -294,6 +305,10 @@ class RegistrationStudentController extends Controller
 
                 $this->registrationService->updateRegistrationStep($registration_id, '5');
             });
+            
+            $users = $this->userService->getVerifiedAdminUser();
+            Notification::send($users, new InternshipRegistrationNotification()); 
+
             Toastr::addSuccess('File Bukti berhasil diunggah!');
             return redirect()->route('student.registration');
         } catch (\Exception $e) {

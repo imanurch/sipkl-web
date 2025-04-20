@@ -24,6 +24,11 @@ class UserService
         return $this->userRepository->getUserById($id);
     }
 
+    public function getVerifiedAdminUser()
+    {
+        return $this->userRepository->getVerifiedAdminUser();
+    }
+
     public function updateUser($id, $data)
     {
         return $this->userRepository->updateUser($id, $data);

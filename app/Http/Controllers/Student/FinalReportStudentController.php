@@ -9,9 +9,12 @@ use Illuminate\Support\Facades\DB;
 use App\Services\AssessmentService;
 use App\Services\InternshipService;
 use App\Http\Controllers\Controller;
+use App\Notifications\FinalReportNotification;
 use Illuminate\Support\Facades\Auth;
 use App\Services\InternDocumentService;
+use Illuminate\Support\Facades\Storage;
 use Flasher\Toastr\Laravel\Facade\Toastr;
+use Illuminate\Support\Facades\Notification;
 
 class FinalReportStudentController extends Controller
 {
@@ -79,11 +82,21 @@ class FinalReportStudentController extends Controller
         $batch_id = $this->batchService->getBatchByStatus('active')->id;
         $internship_id = $this->internshipService->getInternshipByStudentId($batch_id, $student_id)->id;
 
+        $validatedData = $request->validate([
+            'laporan_akhir' => 'required|mimes:pdf',
+        ]);
+
+        // doc lama dihapus
+        $doc = $this->internDocumentService->getInternDocumentByInternshipId($internship_id);
+        foreach ($doc as $dt) {
+            $filename = $dt->url;
+            if ($dt->student_id == $student_id && $dt->type == "laporan akhir") {
+                Storage::delete('intern_documents/laporan_akhir/' . $filename);
+            }
+        }
+
         try {
-            $validatedData = $request->validate([
-                'laporan_akhir' => 'required|mimes:pdf',
-            ]);
-            DB::transaction(function () use ($validatedData, $student_id, $internship_id) {
+            DB::transaction(function () use (&$internDocumentData, $validatedData, $student_id, $internship_id) {
                 $path_file_balasan = $validatedData['laporan_akhir']->store('intern_documents/laporan_akhir');
                 $filename = basename($path_file_balasan);
 
@@ -94,8 +107,13 @@ class FinalReportStudentController extends Controller
                     'url' => $filename,
                 ];
 
-                $this->internDocumentService->addInternDocument($data);
+                $internDocumentData = $this->internDocumentService->addInternDocument($data);
             });
+            
+            if ($internDocumentData->student->user->email_verified_at != null) {
+                Notification::send($internDocumentData->internship->advisor->user, new FinalReportNotification($internDocumentData->student->name));
+            }
+
             Toastr::addSuccess('Laporan Akhir berhasil diunggah!');
         } catch (\Exception $e) {
             Toastr::addError('Laporan Akhir gagal diunggah!');

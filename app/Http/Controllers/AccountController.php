@@ -12,21 +12,14 @@ class AccountController extends Controller
 {
     public function index()
     {
-        $data=[];
-        return view('pages.account_setting',[
-            'data'=>$data,
-            'pages'=>'account',
+        $data = [];
+        return view('pages.account_setting', [
+            'data' => $data,
+            'pages' => 'account',
         ]);
     }
 
-    /**
-     * Show the form for creating a new resource.
-     */
-    public function create()
-    {
-        //
-    }
-
+    
     /**
      * Store a newly created resource in storage.
      */

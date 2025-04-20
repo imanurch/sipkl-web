@@ -77,9 +77,6 @@
                         <td class="whitespace-nowrap">{{ date('d-m-Y', strtotime($dt->start_date)) }} <br>s/d
                             <br>{{ date('d-m-Y', strtotime($dt->end_date)) }}
                         </td>
-                        {{-- @php
-                            $dt->member = $dt->group->groupMember->pluck('student.name')->toArray();
-                        @endphp --}}
                         <td>
                             @if ($dt->advisor)
                                 {{ $dt->advisor->name }}

@@ -14,6 +14,11 @@ class RegistrationDocumentService
         $this->registrationDocumentRepository = $registrationDocumentRepository;
     }
 
+    public function getRegistrationDocumentByRegistrationId($registration_id)
+    {
+        return $this->registrationDocumentRepository->getRegistrationDocumentByRegistrationId($registration_id);
+    }
+
     public function addRegistrationDocument(array $data)
     {
         return $this->registrationDocumentRepository->createRegistrationDocument($data);
