@@ -28,7 +28,6 @@ class IndustryManagementController extends Controller
     public function index(Request $request)
     {
         $activeTab = $request->query('tab', 'partner');
-        // dd($request->all());
 
         // batch data
         $current_batch = $this->batchService->getBatchByStatus('active');
@@ -129,7 +128,6 @@ class IndustryManagementController extends Controller
 
     public function updateStatusIndustry($id, Request $request)
     {
-        // dd($id, $request->all());
         if($request->status == 'reject'){
             return back();
         }
@@ -163,7 +161,6 @@ class IndustryManagementController extends Controller
 
         // Load file Excel
         $spreadsheet = IOFactory::load($file->getPathname());
-        // $worksheet = $spreadsheet->getActiveSheet();
         $worksheet = $spreadsheet->getSheetByName('Data');
         $rows = $worksheet->toArray();
 
@@ -219,7 +216,6 @@ class IndustryManagementController extends Controller
 
     public function export(Request $request)
     {
-        // dd($request->all());
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 

@@ -19,9 +19,6 @@
         <x-table.table>
             <x-slot name="tableTitle">Data Peserta Didik</x-slot>
             <x-slot name="filterActionForm">intern</x-slot>
-            {{-- <x-slot name="btnAdd">
-            <x-table.add_data></x-table.add_data>
-        </x-slot> --}}
             <x-slot name="filter">
                 <div class="flex w-full space-x-2">
                     <div class="space-y-1 w-full">
@@ -70,7 +67,8 @@
                                     @else
                                         <li class="whitespace-nowrap overflow-hidden text-ellipsis block max-w-40">
                                             {{ $loop->iteration }}. {{ $member->student->name ?? '' }}
-                                            ({{ $member->student->department->name ?? '' }})</li>
+                                            ({{ $member->student->department->name ?? '' }})
+                                        </li>
                                     @endif
                                 @endforeach
                             </ul>
@@ -84,11 +82,11 @@
                             @else
                                 <button
                                     @click="setFormAction('isEdit', {{ $dt->id }});modalAction='isEdit';dataId={{ $dt->toJson() }};teamMember({{ $dt->group->groupMember->toJson() }})"
-                                    class="btn btn-xs btn-default-fill">Pilih Guru
+                                    class="btn btn-xs btn-default-fill text-nowrap">Pilih Guru
                                 </button>
                             @endif
                         </td>
-                        <td>{{ $dt->industry->name ?? '' }}</td>
+                        <td class="min-w-48">{{ $dt->industry->name ?? '' }}</td>
                         <td>
                             @if ($dt->surat_jalan)
                                 <div class="flex justify-center space-x-2">
@@ -181,7 +179,6 @@
 
         {{-- generate doc --}}
         <div x-show="generateDocumentModal" class="form-modal ">
-            {{-- <div class="form-modal"> --}}
             <form class="form w-[55%]" action="{{ route('admin.intern.generateDocument') }}" method="POST"
                 @click.away="generateDocumentModal=false">
                 <div class="form-header">
@@ -255,7 +252,7 @@
 
             dataMember.forEach(function(teamMember, index) {
                 const section = document.createElement('div');
-                section.classList.add('md:flex', 'md:space-x-2', 'space-y-2', 'md:space-y-0');
+                section.classList.add('flex', 'space-x-2');
 
                 const div = document.createElement('div');
                 div.classList.add('input-group', 'w-full');

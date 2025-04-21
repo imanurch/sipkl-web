@@ -2,17 +2,13 @@
 
 namespace App\Http\Controllers\Advisor;
 
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Services\BatchService;
-use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\LogbookService;
 use App\Services\StudentService;
 use App\Services\InternshipService;
-use App\Services\MonitoringService;
 use App\Http\Controllers\Controller;
 use Flasher\Toastr\Laravel\Facade\Toastr;
-use App\Services\MonitoringDocumentService;
 
 class LogbookDetailAdvisorController extends Controller
 {
@@ -41,12 +37,10 @@ class LogbookDetailAdvisorController extends Controller
         $logbookData = $this->logbookService->getLogbookByStudentAndInternshipId($studentId, $internshipId);
         $internshipData = $this->internshipService->getInternshipByInternshipId($internshipId);
         $studentData->industry = $internshipData->industry->name;
-        // dd($studentData);
 
         return view('pages.advisor.logbook_detail', [
             'studentData' => $studentData,
             'logbookData' => $logbookData,
-            // 'internshipListData' => $internshipListData,
             'pages' => 'logbook',
         ]);
     }

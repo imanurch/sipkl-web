@@ -86,7 +86,6 @@
             </x-slot>
             <x-slot name="tBody">
                 @foreach ($data as $dt)
-                    {{-- {{ dd($dt) }} --}}
                     <tr>
                         <td class="text-center">{{ $data->firstItem() + $loop->index }}</td>
                         <td>{{ $dt->student->name }}</td>
@@ -107,7 +106,6 @@
                         @else
                             <td class="text-center">Nilai Belum Lengkap</td>
                         @endif
-                        {{-- <x-table.action_table delete="hidden" edit="hidden" :data="$dt"></x-table.action_table> --}}
                         <td>
                             <button
                                 @click="modalAction='isView';dataId={{ $dt->toJson() }};technicalAssessment({{ $dt->toJson() }})"
@@ -187,13 +185,6 @@
                     <div x-show="modalAction=='isEdit'" class="space-y-3">
                         <label class="text-xs" for="">Penilaian Aspek Teknis</label>
                         <div class="space-y-1">
-                            {{-- <div class="flex space-x-2">
-                                <input name="technical_aspect[]" class="input w-2/3" type="text"
-                                    placeholder="Aspek Teknis">
-                                <input name="technical_score[]" class="input w-1/3" type="text" placeholder="Nilai">
-                                <button onclick="removeField(this)" class="btn btn-xs btn-error-fill h-fit">Hapus</button>
-                            </div> --}}
-
                             <div id="technicalAspectFields" class="space-y-2">
                                 {{-- technicalAspectFields --}}
                             </div>
@@ -331,7 +322,6 @@
 
     <script>
         function technicalAssessmentEdit(data) {
-            // Kosongkan container technicalFields jika sebelumnya sudah terisi
             const container = document.getElementById('technicalAspectFields');
             container.innerHTML = '';
 
@@ -342,7 +332,6 @@
                 // Buat input field
                 const btnDelete = document.createElement('button');
                 btnDelete.innerText = 'Hapus';
-                // btnDelete.onclick = removeField(this);
                 btnDelete.setAttribute('onclick', "removeField(this)");
                 btnDelete.classList.add('btn', 'btn-xs', 'btn-error-fill', 'h-fit');
 
@@ -393,7 +382,6 @@
 
     <script>
         function technicalAssessment(data) {
-            // Kosongkan container technicalFields jika sebelumnya sudah terisi
             const container = document.getElementById('technicalViewFields');
             container.innerHTML = '';
 

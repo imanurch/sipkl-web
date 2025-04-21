@@ -42,7 +42,6 @@
                     <span class="p-0 m-0">Ekspor</span>
                 </button>
                 <div x-show="exportModal" class="form-modal">
-                    {{-- <div class="form-modal"> --}}
                     <form class="form" action="{{ route('admin.assessment.export') }}" method="POST"
                         @click.away="generateDocumentModal=false">
                         <div class="form-header">
@@ -97,7 +96,6 @@
                     <span class="text-xs text-neutral-400 w-32">Search</span>
                     <x-table.search value="{{ $filters['search'] ?? '' }}"></x-table.search>
                 </div>
-                {{-- <x-table.search value="{{ $filters['search'] ?? '' }}"></x-table.search> --}}
                 <div class="space-y-1 w-full">
                     <span class="text-xs text-neutral-400 w-32">Search</span>
                     <x-table.select_option_filter optionName="batch"
@@ -126,7 +124,6 @@
             <x-slot name="tBody">
                 @foreach ($data as $dt)
                     <tr>
-                        {{-- {{ dd($dt) }} --}}
                         <td class="text-center">{{ $data->firstItem() + $loop->index }}</td>
                         <td>{{ $dt->student->name }}</td>
                         <td>{{ $dt->internship->industry->name }}</td>
@@ -137,7 +134,6 @@
                         @else
                             <td class="text-center">Nilai Belum Lengkap</td>
                         @endif
-                        {{-- <x-table.action_table delete="hidden" edit="hidden" :data="$dt"></x-table.action_table> --}}
                         <td>
                             <button
                                 @click="modalAction='isView';dataId={{ $dt->toJson() }};technicalAssessment({{ $dt->toJson() }})"
@@ -219,13 +215,6 @@
                     <div x-show="modalAction=='isEdit'" class="space-y-3">
                         <label class="text-xs" for="">Penilaian Aspek Teknis</label>
                         <div class="space-y-1">
-                            {{-- <div class="flex space-x-2">
-                                <input name="technical_aspect[]" class="input w-2/3" type="text"
-                                    placeholder="Aspek Teknis">
-                                <input name="technical_score[]" class="input w-1/3" type="text" placeholder="Nilai">
-                                <button onclick="removeField(this)" class="btn btn-xs btn-error-fill h-fit">Hapus</button>
-                            </div> --}}
-
                             <div id="technicalAspectFields" class="space-y-2">
                                 {{-- technicalAspectFields --}}
                             </div>
@@ -373,7 +362,6 @@
                 // Buat input field
                 const btnDelete = document.createElement('button');
                 btnDelete.innerText = 'Hapus';
-                // btnDelete.onclick = removeField(this);
                 btnDelete.setAttribute('onclick', "removeField(this)");
                 btnDelete.classList.add('btn', 'btn-xs', 'btn-error-fill', 'h-fit');
 
@@ -424,7 +412,6 @@
 
     <script>
         function technicalAssessment(data) {
-            // Kosongkan container technicalFields jika sebelumnya sudah terisi
             const container = document.getElementById('technicalViewFields');
             container.innerHTML = '';
 

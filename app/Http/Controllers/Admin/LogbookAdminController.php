@@ -27,20 +27,13 @@ class LogbookAdminController extends Controller
 
     public function index($batch_id, $id)
     {
-        // $currentBatch = $this->batchService->getBatchByStatus('active');
-        // $batch_id = $request->batch ?? ($currentBatch->id ?? '');
-
         $internData = $this->studentService->getStudentById($id);
         $logbookData = $this->logbookService->getLogbookByStudentIdAndBatch($batch_id, $id);
-        // dd($data);
+
         return view('pages.admin.logbook_detail', [
             'internData' => $internData,
             'logbookData' => $logbookData,
             'pages' => 'logbook',
-            // // 'completeOutput' => $completeOutput,
-            // // 'incompleteOutput' => $incompleteOutput,
-            // 'filters' => $filters,
-            // 'batchData' => $batchData,
         ]);
     }
 }

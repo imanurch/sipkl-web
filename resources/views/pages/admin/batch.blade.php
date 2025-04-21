@@ -38,7 +38,6 @@
                             method="GET" class="form">
                             <div class="form-header">
                                 @csrf
-                                {{-- @method('PATCH') --}}
                                 <h6>Atur Batch Aktif</h6>
                                 <svg @click="modalActiveBatch=false;selected='Pilih Opsi'" class="cursor-pointer"
                                     xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28"

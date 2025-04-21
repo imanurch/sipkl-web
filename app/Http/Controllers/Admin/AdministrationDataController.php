@@ -53,7 +53,6 @@ class AdministrationDataController extends Controller
 
     public function update(Request $request)
     {
-        // dd($request->all());
         $validatedData = $request->validate([
             'email' => 'required|string',
             'phone_num' => 'required|string',
@@ -65,8 +64,6 @@ class AdministrationDataController extends Controller
             'internship_team_decree' => 'nullable|string',
         ]);
 
-        // dd($validatedData);
-
         if (!empty($validatedData['principal_signature'])) {
             $path_principal_signature_file = $validatedData['principal_signature']->store('signatures');
             $validatedData['principal_signature'] = basename($path_principal_signature_file);
@@ -75,8 +72,6 @@ class AdministrationDataController extends Controller
             $path_school_stamp_file = $validatedData['school_stamp']->store('signatures');
             $validatedData['school_stamp'] = basename($path_school_stamp_file);
         }
-
-        // dd($validatedData);
 
         try {
             $this->schoolProfileService->updateSchoolProfile($validatedData);
@@ -88,10 +83,7 @@ class AdministrationDataController extends Controller
     }
 
     public function downloadFile($filename){
-        // dd($filename);
-        // $path = public_path('storage/signatures/' . $filename);
         $path = storage_path('app/signatures/' . $filename);
-        // dd($path);
 
         if (file_exists($path)) {
             // return response()->download($path);
@@ -101,20 +93,4 @@ class AdministrationDataController extends Controller
             return redirect()->back();
         }
     }
-
-    // public function advisorDocumentSearch(Request $request)
-    // {
-    //     $batchData = $this->batchService->getAllBatch('');
-
-    //     $validatedData = $request->validate([
-    //         'advisor_nip' => 'required',
-    //         'batch' => 'required'
-    //     ]);
-    //     $advisorData = $this->advisorService->getAdvisorByNIP($request->advisor_nip, $request->batch);
-    //     return view('pages.admin.administration_data', [
-    //         'batchData' => $batchData,
-    //         'advisorData' => $advisorData,
-    //         'pages' => 'administrationData',
-    //     ]);
-    // }
 }

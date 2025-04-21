@@ -1,6 +1,5 @@
 <div class="sidebar">
     <div class="sidebar-head">
-        {{-- <img src="{{ url('storage/images/logo.png') }}" alt=" "> --}}
         <p>SIPKL SMK N 1 PAJANGAN</p>
     </div>
     <div class="sidebar-body">

@@ -52,19 +52,15 @@ class InternshipAdminController extends Controller
         $currentBatch = $this->batchService->getBatchByStatus('active');
         $batch_id = $request->batch ?? ($currentBatch->id ?? '');
 
-        // dd($batch_id);
         // table filters
         $filters = [
             'search' => $request->searchKeyword ?? '',
             'batch_id' => $request->batch ?? $batch_id,
         ];
-        // dd($filters);
 
         // table data
-        // $data = $this->internshipService->getInternship($filters);
         $data = $this->internshipService->getInternship($filters);
-        // $data = $this->internshipService->getIntern($filters);
-        // dd($data);
+
         foreach($data as $dt){
             $dt->start_date = date('d-m-Y', strtotime($dt->start_date));
             $dt->end_date = date('d-m-Y', strtotime($dt->end_date));
@@ -124,16 +120,12 @@ class InternshipAdminController extends Controller
 
     public function generateDocument(Request $request)
     {
-        // dd($request->all());
-
         $internship = $this->internshipService->getInternshipByInternshipId($request->internship_id);
         $school_profile = $this->schoolProfileService->getSchoolProfile();
-        // dd($request->all());
 
         try {
             DB::transaction(function () use ($request, $internship, $school_profile) {
                 if ($request->memberId != null && $request->letterNum != null) {
-                    // dd($request->all());
                     foreach ($request->memberId as $index => $id) {
                         $intern_id = $id;
                         $letter_num = $request->letterNum[$index];

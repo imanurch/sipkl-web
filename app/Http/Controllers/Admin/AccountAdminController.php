@@ -28,7 +28,6 @@ class AccountAdminController extends Controller
     {
         $user_id = Auth::user()->id;
         $data = $this->adminService->getAdminByUserId($user_id);
-        // dd($data);
 
         return view('pages.admin.account', [
             'data' => $data,
@@ -39,13 +38,11 @@ class AccountAdminController extends Controller
 
     public function updateAccount(Request $request)
     {
-        // dd($request->all());
         $validatedData = $request->validate([
             'user_id' => 'required',
             'password' => 'required',
             'new_password' => 'required|string|size:8'
         ]);
-        // dd($validatedData);
 
         $last_password = $this->userService->getUserById($request->user_id)->password;
         if (Hash::check($validatedData['password'],$last_password) == false) {
@@ -61,7 +58,6 @@ class AccountAdminController extends Controller
             $validatedData['new_password'] = Hash::make($validatedData['new_password']);
         }
 
-        // dd($validatedData);
         try {
             $this->userService->updateUser($request->user_id, ['password' => $validatedData['new_password']]);
             Toastr::addSuccess('Data akun berhasil diubah!');
@@ -77,8 +73,6 @@ class AccountAdminController extends Controller
             'profile_id' => 'required',
             'phone_num' => 'required|string|min:10|max:14|unique:advisors,phone_num,' . $request->profile_id,
         ]);
-
-        // dd($request->all());
 
         try {
             $this->adminService->updateAdmin($request->profile_id, ['phone_num' => $validatedData['phone_num']]);

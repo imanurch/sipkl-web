@@ -42,16 +42,14 @@ class OutputController extends Controller
         $batchData = $this->batchService->getAllBatch('');
         $currentBatch = $this->batchService->getBatchByStatus('active');
         $batch_id = $request->batch ?? ($currentBatch->id ?? '');
-        // // dd($batch_id);
-
+        
         // table filters
         $filters = [
             'search' => $request->searchKeyword ?? '',
             'batch_id' => $request->batch ?? $batch_id,
         ];
-        // dd($filters);
 
-        // // table data
+        // table data
         $data = $this->internshipService->getIntern($filters);
         foreach ($data as $dt) {
             // cek final report
@@ -81,11 +79,9 @@ class OutputController extends Controller
         foreach ($allIntern as $dt) {
             // cek final report
             foreach ($dt->groupMember as $member) {
-                if ($member->group->internship) {
-                    // dd($dt->id);
-                    // dd($member->group);                
+                if ($member->group->internship) {                                  
                     $isCompleteFinalReport = $this->internDocumentService->checkIsCompleteFinalReportByInternshipAndStudentId($member->group->internship->id, $dt->id);
-                    // dd($isCompleteFinalReport);
+                    
                     if ($isCompleteFinalReport == true) {
                         // cek logbook
                         $isCompleteLogbook = $this->logbookService->checkIsCompleteLogbookByInternshipAndStudentId($member->group->internship->id, $dt->id);
@@ -113,7 +109,6 @@ class OutputController extends Controller
 
     public function downloadFinalReport($filename)
     {
-
         $path = storage_path('app/intern_documents/laporan_akhir/' . $filename);
         if (file_exists($path)) {
             // return response()->download($path);

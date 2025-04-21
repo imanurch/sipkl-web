@@ -38,7 +38,6 @@ class DashboardStudentController extends Controller
     public function index(Request $request)
     {
         $user_id = Auth::user()->id;
-        // $student_id = $this->studentService->getStudentIdByUserId($user_id);
         $student_id = session('user_bio')->id;
 
         $currentBatch = $this->batchService->getBatchByStatus('active');
@@ -51,7 +50,7 @@ class DashboardStudentController extends Controller
             $isAssessed = ($assessment->advisor_score != null && $assessment->industry_score != null && $assessment->final_test_score != null ? 'true' : false);
             $internshipData->status = $isAssessed == true ? 'Selesai' : 'Aktif';
         }
-        // dd($internshipData);
+        
         return view('pages.student.dashboard', [
             'studentData' => $studentData,
             'internshipData' => $internshipData,

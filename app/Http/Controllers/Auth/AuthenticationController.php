@@ -9,7 +9,6 @@ use App\Services\AdvisorService;
 use App\Services\StudentService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Auth\Events\Registered;
 use Illuminate\Support\Facades\Session;
 use Flasher\Toastr\Laravel\Facade\Toastr;
 
@@ -42,8 +41,6 @@ class AuthenticationController extends Controller
             'password' => 'required',
         ]);
 
-        // dd($credentials);
-
         if (
             Auth::attempt(['email' => $credentials['username'], 'password' => $credentials['password']]) ||
             Auth::attempt(['username' => $credentials['username'], 'password' => $credentials['password']])
@@ -53,7 +50,6 @@ class AuthenticationController extends Controller
                 $request->session()->regenerate();
                 $user_bio = $this->adminService->getAdminByUserId($user->id);
                 Session::put('user_bio', $user_bio);
-                // event(new Registered($user_bio));
                 $user_data = $this->userService->getUserById($user->id);
                 if ($user_data && !$user_data->hasVerifiedEmail()) {
                     $user_data->sendEmailVerificationNotification();
@@ -71,12 +67,6 @@ class AuthenticationController extends Controller
                 return redirect()->route('student.dashboard');
             }
         }
-
-        // if (Auth::attempt($credentials)) {
-        //     $request->session()->regenerate();
-
-        //     return redirect()->intended('dashboard');
-        // }
 
         return back()->withErrors([
             'email' => 'The provided credentials do not match our records.',

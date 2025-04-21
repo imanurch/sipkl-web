@@ -9,12 +9,6 @@ class LogbookRepository
 {
     public function getLogbookByStudentIdAndBatch($batch_id, $student_id)
     {
-        // dd($batch_id, $student_id);
-        // dd(
-        //     Logbook::whereHas('internship', function ($query) use ($batch_id) {
-        //         $query->where('batch_id', $batch_id);
-        //     })->where('student_id', $student_id)->with('student:id,name,department_id,nisn')->get()
-        // );
         return Logbook::whereHas('internship', function ($query) use ($batch_id) {
             $query->where('batch_id', $batch_id);
         })->where('student_id', $student_id)->get()->groupBy(function ($log) {
@@ -51,14 +45,6 @@ class LogbookRepository
         }
     }
 
-    // baru cuma cek 1 student
-    // public function checkIsCompleteLogbook($student_id, $batch_id)
-    // {
-    //     return Logbook::whereHas('internship', function ($query) use ($batch_id) {
-    //         $query->where('batch_id', $batch_id);
-    //     })->where('student_id', $student_id)->whereIn('status', [0, 2])->exists();
-    // }
-
     public function checkIsCompleteLogbookByInternshipAndStudentId($internship_id, $student_id)
     {
         $incomplete = Logbook::where('student_id', $student_id)->where('internship_id', $internship_id)->whereIn('status', ['0', '2'])->count();
@@ -76,7 +62,6 @@ class LogbookRepository
 
     public function getLogbookByStudentAndInternshipId($student_id, $internship_id)
     {
-        // return Logbook::where('student_id', $student_id)->where('internship_id', $internship_id)->get();
         return Logbook::where('student_id', $student_id)->where('internship_id', $internship_id)->get()->groupBy(function ($log) {
             $datetime = new DateTime($log->start_date);
             // Format: Nama Bulan dan Tahun (misalnya "February 2025")
@@ -88,14 +73,4 @@ class LogbookRepository
     {
         return Logbook::where('id', $id)->update($data);
     }
-
-    // public function updateStatusLogbook($id, $status)
-    // {
-    //     return Logbook::where('id', $id)->update(['status' => $status]);
-    // }
-
-    // public function deleteLogbook($id)
-    // {
-    //     return Logbook::where('id', $id)->delete();
-    // }
 }

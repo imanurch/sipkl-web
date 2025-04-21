@@ -147,8 +147,6 @@
 
                 checkPassword.classList.remove('hidden');
             } else if (editAccountBtn.innerText == 'Simpan') {
-                // editAccountCancelBtn.classList.add('hidden');
-                // checkPassword.classList.add('hidden');
                 accountForm.submit();
             }
         }
@@ -181,7 +179,6 @@
                 inputProfilField.disabled = false;
                 inputProfilField.classList.add('input');
             } else if (editProfilBtn.innerText == 'Simpan') {
-                // editProfilCancelBtn.classList.add('hidden');
                 profileForm.submit();
             }
         }

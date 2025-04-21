@@ -1,10 +1,7 @@
 <?php
 
-use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\AccountController;
 use App\Http\Controllers\Admin\OutputController;
-use App\Http\Controllers\GenerateTestingController;
 use App\Http\Controllers\Admin\AccountAdminController;
 use App\Http\Controllers\Admin\LogbookAdminController;
 use App\Http\Controllers\Auth\AuthenticationController;
@@ -49,28 +46,9 @@ use App\Http\Controllers\Advisor\LogbookDetailAdvisorController;
 //     return view('welcome');
 // });
 
-// Route::get('content', function () {
-//     return view('components.content');
-// });
-
-// Route::get('sipkl-admin', function () {
-//     return view('pages.admin.home');
-// });
-
-
-// Route::get('testing', [GenerateTestingController::class, 'index'])->name('testing');
-// Route::get('testing/generate', [GenerateTestingController::class, 'create'])->name('testing.generate');
-
-
-// Route::get('doc', function () {
-//     // return view('document_templates/surat_pengantar_template');
-//     return view('document_templates/surat_tugas');
-// });
-
 Route::get('', [AuthenticationController::class, 'index'])->name('sipkl');
 Route::post('login', [AuthenticationController::class, 'login'])->name('sipkl.login');
 Route::get('logout', [AuthenticationController::class, 'logout'])->name('sipkl.logout');
-// Route::get('account', [AccountController::class, 'index'])->name('sipkl.account');
 
 Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $request) {
     $request->fulfill();
@@ -79,12 +57,6 @@ Route::get('/email/verify/{id}/{hash}', function (EmailVerificationRequest $requ
 })->middleware(['auth', 'signed'])->name('verification.verify');
 
 Route::get('verificationEmail/{id}', [AuthenticationController::class, 'verificationEmail'])->name('sipkl.verificationEmail');
-
-// Route::post('/email/verification-notification', function (Request $request) {
-//     $request->user()->sendEmailVerificationNotification();
- 
-//     return back()->with('message', 'Verification link sent!');
-// })->middleware(['auth', 'throttle:6,1'])->name('verification.send');
 
 Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function () {
     // dashboard
@@ -170,7 +142,6 @@ Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function
 
     // administration data
     Route::get('administrationData', [AdministrationDataController::class, 'index'])->name('administrationData');
-    // Route::post('administrationData/advisorDocumentSearch', [DocumentController::class, 'advisorDocumentSearch'])->name('document.advisorSearch');
     Route::post('administrationData', [AdministrationDataController::class, 'update'])->name('administrationData.update');
     Route::get('administrationData/{filename}', [AdministrationDataController::class, 'downloadFile'])->name('administrationData.downloadFile');
 

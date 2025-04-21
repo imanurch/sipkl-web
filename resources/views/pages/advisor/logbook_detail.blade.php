@@ -30,7 +30,6 @@
                 <x-logbook.content_group_logbook month="{{ $month }}">
                     <x-slot name="logbookContent">
                         @foreach ($logs as $log)
-                            {{-- <x-logbook.content_logbook id="{{ $log->id }}" submission="{{ $log->activities ? 'complete' : 'incomplete' }}"> --}}
                             <x-logbook.content_logbook :data="$log">
                                 <x-slot name="period">{{ $log->start_date }} s/d {{ $log->end_date }}</x-slot>
                                 <x-slot name="content">{{ $log->activities }}</x-slot>

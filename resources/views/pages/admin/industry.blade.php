@@ -44,9 +44,6 @@
     <div x-data="{ tabs: '{{ $activeTab }}' }" class="space-y-4">
         {{-- tabs --}}
         <div class="flex w-full justify-between border-b border-neutral-100">
-            {{-- <div>
-                <h6 class="py-3 text-sm-medium">Data Industri</h6>
-            </div> --}}
             <div class="flex">
                 <button @click="window.location.href = '/admin/industryManagement?tab=unconfirmed'" class="text-sm-medium py-3 px-6"
                     :class="tabs == 'unconfirmed' ? 'text-brand-500 border-b border-brand-500 hover:text-brand-500' :
@@ -492,64 +489,6 @@
                     </div>
                 </form>
             </div>
-            {{-- <div x-show="modalAction != null" action="{{ route('admin.industryManagement.updateStatusRejectedIndustry') }}" class="form-modal">
-                <x-form>
-                    <x-slot name="formTitle">Status Industri</x-slot>
-                    <x-slot name="formBody">
-
-                        <div class="input-group">
-                            <label class="input-label" for="">Nama</label>
-                            <input name="name" class="input" type="text" placeholder="Masukkan Nama"
-                                :value="modalAction != null ? dataId.name : ''" disabled>
-                        </div>
-                        <div class="input-group">
-                            <label class="input-label" for="">Alamat</label>
-                            <input name="address" class="input" type="text" placeholder="Masukkan Alamat"
-                                :value="modalAction != null ? dataId.address : ''" disabled>
-                        </div>
-                        <div class="input-group">
-                            <label class="input-label" for="">Email</label>
-                            <input name="email" class="input" type="text" placeholder="Masukkan Email"
-                                :value="modalAction != null ? dataId.email : ''" disabled>
-                        </div>
-                        <div class="input-group">
-                            <label class="input-label" for="">Nomor Telepon</label>
-                            <input name="phone_num" class="input" type="text" placeholder="Masukkan Nomor Telepon"
-                                :value="modalAction != null ? dataId.phone_num : ''" disabled>
-                        </div>
-                        <div class="input-group">
-                            <label class="input-label" for="">Nama Pimpinan</label>
-                            <input name="leader_name" class="input" type="text" placeholder="Masukkan Nama Pimpinan"
-                                :value="modalAction != null ? dataId.leader_name : ''" disabled>
-                        </div>
-                        <div class="input-group">
-                            <label class="input-label" for="">Status</label>
-                            <input type="hidden" name="status" x-model="valueSelected">
-                            <div>
-                                <button @click.prevent="option=!option" class="input input-select w-full">
-                                    <span x-text="selected" class="text-neutral-800"></span>
-                                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
-                                        viewBox="0 0 20 20" fill="none">
-                                        <path d="M5 7.5L10 12.5L15 7.5" stroke="#667085" stroke-width="0.933333"
-                                            stroke-linecap="round" stroke-linejoin="round"
-                                            :hidden="modalAction == 'isDelete'" />
-                                    </svg>
-                                </button>
-                                <div x-show="option" @click.away="option=false">
-                                    <ul class="border border-brand-600 rounded py-2 my-2 max-h-32 overflow-auto">
-                                        <li @click="option=false;selected='Diterima';valueSelected='accept'"
-                                            class="text-xs-reguler px-4 py-2 hover:bg-brand-600 hover:text-neutral-0 hover:text-xs-medium">
-                                            Diterima</li>
-                                        <li @click="option=false;selected='Ditolak';valueSelected='reject'"
-                                            class="text-xs-reguler px-4 py-2 hover:bg-brand-600 hover:text-neutral-0 hover:text-xs-medium">
-                                            Ditolak</li>
-                                    </ul>
-                                </div>
-                            </div>
-                        </div>
-                    </x-slot>
-                </x-form>
-            </div> --}}
 
             {{-- empty state --}}
             @if (count($rejectedIndustryData) == 0)

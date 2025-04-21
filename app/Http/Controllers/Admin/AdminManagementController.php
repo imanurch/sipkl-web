@@ -27,9 +27,7 @@ class AdminManagementController extends Controller
     {
         // table filters
         $searchFilter =  $request->searchKeyword ?? '';
-        // dd($searchFilter);
 
-        // table data
         $data = $this->adminService->getAdmin($searchFilter);
 
         return view('pages.admin.admin', [

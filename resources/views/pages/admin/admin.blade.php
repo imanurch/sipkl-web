@@ -24,7 +24,6 @@
                 @foreach ($data as $dt)
                     <tr>
                         <td class="text-center">{{ $data->firstItem() + $loop->index }}</td>
-                        {{-- <td>{{ $dt->id }}</td> --}}
                         <td class="left whitespace-nowrap">{{ $dt->name }}</td>
                         <td class="whitespace-nowrap">{{ $dt->user->username }}</td>
                         <td class="whitespace-nowrap">{{ $dt->user->email }}</td>

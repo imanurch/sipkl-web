@@ -1,4 +1,4 @@
-<form class="form" method="POST" id="modalForm" @click.away="modalAction=null" action="{{ $action ?? '' }}" enctype="multipart/form-data">
+<form class="form" method="POST" id="modalForm" @click.away="modalAction=null" action="{{ $action ?? '' }}" enctype="multipart/form-data" @keydown.enter.prevent>
     <div class="form-header">
         @csrf
         <template x-if="modalAction=='isEdit'">

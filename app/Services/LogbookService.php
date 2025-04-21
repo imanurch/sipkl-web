@@ -29,11 +29,6 @@ class LogbookService
         return $this->logbookRepository->getLogbookByLogbookId($id);
     }
 
-    // public function isCompleteLogbook($student_id, $batch_id)
-    // {
-    //     return $this->logbookRepository->checkIsCompleteLogbook($student_id, $batch_id);
-    // }
-
     public function checkIsCompleteLogbookByInternshipAndStudentId($internship_id, $student_id)
     {
         return $this->logbookRepository->checkIsCompleteLogbookByInternshipAndStudentId($internship_id, $student_id);

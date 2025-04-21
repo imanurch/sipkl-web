@@ -2,17 +2,12 @@
 
 namespace App\Http\Controllers\Advisor;
 
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Services\BatchService;
-use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\AdvisorService;
 use App\Services\LogbookService;
 use App\Services\InternshipService;
-use App\Services\MonitoringService;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use App\Services\MonitoringDocumentService;
 
 class LogbookAdvisorController extends Controller
 {
@@ -37,8 +32,6 @@ class LogbookAdvisorController extends Controller
 
     public function index(Request $request)
     {
-        // $user_id = Auth::user()->id;
-        // $advisor_id = $this->advisorService->getAdvisorIdByUserId($user_id);
         $advisor_id = session('user_bio')->id;
 
         $currentBatch = $this->batchService->getBatchByStatus('active');
@@ -50,7 +43,6 @@ class LogbookAdvisorController extends Controller
         $filters = [
             'batch_id' => $request->batch ?? $batch_id,
             'search' => $request->searchKeyword ?? '',
-            // 'type' => $request->type ?? '',
         ];
 
         $data = $this->internshipService->getInternByAdvisor($filters, $advisor_id);
@@ -66,11 +58,7 @@ class LogbookAdvisorController extends Controller
         $unconfirmedCount = $this->logbookService->countLogbookByAdvisorStatus('unconfirmed', $batch_id, $advisor_id);
         $acceptedCount = $this->logbookService->countLogbookByAdvisorStatus('accepted', $batch_id, $advisor_id);
         $revisedCount = $this->logbookService->countLogbookByAdvisorStatus('revised', $batch_id, $advisor_id);
-        // dd($data);
-        // $internshipListData = $this->internshipService->getInternshipListByAdvisor($advisor_id, $batch_id);
-
-
-
+        
         return view('pages.advisor.logbook', [
             'data' => $data,
             'unconfirmedCount' => $unconfirmedCount,
@@ -92,42 +80,5 @@ class LogbookAdvisorController extends Controller
     //         // 'filters' => $filters,
     //         // 'internshipListData' => $internshipListData,
     //     ]);
-    // }
-
-    // public function downloadFile($type, $filename)
-    // {
-    //     $formattedString = Str::slug($type, '_');
-    //     $path = storage_path('app/monitoring_documents/' . $formattedString . '/' . $filename);
-
-    //     if (file_exists($path)) {
-    //         return response()->download($path);
-    //     } else {
-    //         return response()->json(['message' => 'File tidak ditemukan'], 404);
-    //     }
-    // }
-
-    // public function store(Request $request)
-    // {
-    //     // dd($request->all());
-    //     $data = $request->except(['_token']);
-    //     // dd($request->all());
-    //     $validatedData = $request->validate([
-    //         'internship_id' => 'required',
-    //         'type' => 'required',
-    //         'date' => 'required',
-    //         'note' => 'nullable|string',
-    //     ]);
-
-    //     $newMonitoring = $this->monitoringService->addMonitoring($validatedData);
-
-    //     return back();
-    // }
-
-
-
-    // public function destroy($id)
-    // {
-    //     $this->monitoringService->deleteMonitoring($id);
-    //     return back();
     // }
 }

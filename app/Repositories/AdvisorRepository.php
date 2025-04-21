@@ -83,21 +83,13 @@ class AdvisorRepository
         return Advisor::find($id);
     }
 
-    // public function getAdvisorIdByUserId($user_id)
-    // {
-    //     return Advisor::where('user_id', $user_id)->select('id')->first();
-    // }
-
     public function getAdvisorByUserId($user_id)
     {
-        // dd(Advisor::where('user_id', $user_id)->first());
-        // return Advisor::with('advisorDocument')->where('user_id', $user_id)->first();
         return Advisor::where('user_id', $user_id)->first();
     }
 
     public function getAdvisorByNIP($advisor_nip, $batch)
     {
-        // return Advisor::with('advisorDocument')->where('nip', $advisor_nip)->first();
         return Advisor::where('nip', $advisor_nip)->first();
     }
 

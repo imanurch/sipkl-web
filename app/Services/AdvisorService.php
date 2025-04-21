@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Repositories\AdvisorDocumentRepository;
 use App\Repositories\AdvisorRepository;
 
 class AdvisorService
@@ -44,11 +43,6 @@ class AdvisorService
     {
         return $this->advisorRepository->getAdvisorByUserId($user_id);
     }
-
-    // public function getAdvisorDocumentByAdvisorIdAndBatchId($advisor_id, $batch_id)
-    // {
-    //     return $this->advisorDocumentRepository->getAdvisorDocumentByAdvisorIdAndBatchId($advisor_id, $batch_id);
-    // }
 
     public function getAdvisorByStatusCount($batch_id, $status)
     {

@@ -31,9 +31,6 @@
         <x-table.table>
             <x-slot name="tableTitle">Pendaftaran PKL</x-slot>
             <x-slot name="filterActionForm">registration</x-slot>
-            {{-- <x-slot name="btnAdd">
-                <x-table.add_data></x-table.add_data>
-            </x-slot> --}}
             <x-slot name="filter">
                 <div class="space-y-1 w-full">
                     <span class="text-xs text-neutral-400 w-32">Search</span>
@@ -254,7 +251,6 @@
 
         {{-- generate doc --}}
         <div x-show="generateDocumentModal" class="form-modal">
-            {{-- <div class="form-modal"> --}}
             <form class="form" action="{{ route('admin.registration.generateDocument') }}" method="POST"
                 @click.away="generateDocumentModal=false">
                 <div class="form-header">
@@ -268,11 +264,8 @@
                     </svg>
                 </div>
                 <div class="form-body space-y-0">
-                    {{-- <div class="space-y-2 w-full"> --}}
                     <input class="input h-full w-full" type="hidden" name="registration_id"
                         :value="generateDocumentModal ? dataId.id : ''">
-                    {{-- <input class="input h-full w-full" type="" name="document_type"
-                        :value="generateDocumentModal ? document_type : ''"> --}}
                     <div class="input-group">
                         <label class="input-label" for="">Nomor Surat</label>
                         <input class="input h-full w-full" name="letter_num" type="text"

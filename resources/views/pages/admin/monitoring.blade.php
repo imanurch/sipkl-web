@@ -15,7 +15,6 @@
         </x-card>
     </div> --}}
 
-    {{-- <div x-data="{ modalAction: null, option: false, optionInternship: false, selected: 'Pilih Opsi', selectedInternship: 'Pilih Opsi' }"> --}}
     <div x-data="{ modalAction: null, option: false, optionInternship: false, selected: 'Pilih Opsi', selectedInternship: 'Pilih Opsi', selectedValueInternship: null, generateDocumentModal: false }">
         <x-table.table>
             <x-slot name="tableTitle">Data Monitoring</x-slot>
@@ -207,7 +206,6 @@
                     </svg>
                 </div>
                 <div class="form-body">
-                    {{-- <div class="space-y-2 w-full"> --}}
                     <div class="input-group">
                         <input type="hidden" name="monitoring_id" :value="generateDocumentModal ? dataId.id : ''">
                         <label class="input-label" for="">Jenis Dokumen</label>

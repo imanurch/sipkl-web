@@ -2,7 +2,6 @@
 
 namespace App\Services;
 
-use App\Models\Assessment;
 use App\Repositories\AssessmentRepository;
 
 class AssessmentService
@@ -138,11 +137,6 @@ class AssessmentService
     {
         return $this->assessmentRepository->createAssessment($data);
     }
-
-    // public function updateScoreAssessment($id, array $data)
-    // {
-    //     return $this->assessmentRepository->updateScoreAssessment($id, $data);
-    // }
 
     public function getAssessmentByBatch($batch_id)
     {

@@ -3,22 +3,17 @@
 namespace App\Http\Controllers\Admin;
 
 use DateTime;
-use App\Models\Logbook;
 use Illuminate\Http\Request;
 use App\Services\BatchService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\LogbookService;
 use App\Services\StudentService;
-use App\Services\IndustryService;
 use App\Services\SignatureService;
 use Illuminate\Support\Facades\DB;
 use App\Services\AssessmentService;
-use App\Services\DepartmentService;
 use App\Services\InternshipService;
 use App\Http\Controllers\Controller;
-use App\Models\RegistrationDocument;
 use App\Notifications\RegistrationDocumentNotification;
-use Illuminate\Support\Facades\Hash;
 use App\Services\RegistrationService;
 use App\Services\SchoolProfileService;
 use App\Services\InternDocumentService;
@@ -182,39 +177,6 @@ class RegistrationAdminController extends Controller
                             $logbook_start_date = clone $current_end;
                             $logbook_start_date->modify('+1 day');
                         }
-
-                        // buat document intern (surat jalan)
-                        // // $principal_data = $this->signatureService->getPrincipalSignature();
-                        // $school_profile = $this->schoolProfileService->getSchoolProfile();
-                        // $data = [
-                        //     'principal_name' => $school_profile->principal_name,
-                        //     'principal_nip' => $school_profile->principal_nip,
-                        //     'principal_signature'  => $school_profile->principal_signature,
-                        //     'intern_name' => $newIntern->name,
-                        //     'intern_nis' => $newIntern->nis,
-                        //     // 'batch' => $principal_data->nip,
-                        //     'internship_start_date' => $newInternship->start_date,
-                        //     'internship_end_date' => $newInternship->end_date,
-                        //     'industry_name' => $newInternship->industry->name,
-                        //     'industry_address' => $newInternship->industry->address,
-                        //     // 'intern_transport' => $principal_data->nip,
-                        //     'create_date'  => date('d-m-Y'),
-                        // ];
-
-                        // $pdf = Pdf::loadView('document_templates/surat_jalan', $data);
-                        // $filename = 'surat_jalan_' . time() . '.pdf';
-
-                        // $path = storage_path('app/intern_documents/surat_jalan/' . $filename);
-                        // $pdf->save($path);
-
-                        // // return $pdf->stream('dokumen.pdf');
-
-                        // $this->internDocumentService->addInternDocument([
-                        //     'student_id' => $newInternId,
-                        //     'internship_id' => $newInternship->id,
-                        //     'type' => 'surat jalan',
-                        //     'url' => $filename,
-                        // ]);
                     }
                 }
             });
@@ -227,10 +189,9 @@ class RegistrationAdminController extends Controller
 
     public function updateStatusRegistration(Request $request, $registrationId)
     {
-        // dd($request->status, $registrationId);
         $newStatus = $request->status == 'accept' ? '1' : '2';
         $registrationData = $this->registrationService->getRegistrationById($registrationId);
-        // dd($registrationData);
+        
         try {
             DB::transaction(function () use ($registrationId, $registrationData, $newStatus) {
                 if ($registrationData->status != $newStatus) {
@@ -283,26 +244,7 @@ class RegistrationAdminController extends Controller
 
                                 $logbook_start_date = clone $current_end;
                                 $logbook_start_date->modify('+1 day');
-                            }
-
-                            // // buat document intern (surat jalan)
-                            // $data = [
-                            //     'title' => 'Contoh Dokumen Surat Jalan',
-                            //     'date'  => date('d-m-Y'),
-                            // ];
-
-                            // $pdf = Pdf::loadView('document_templates/surat_pengantar_template', $data);
-                            // $filename = 'surat_jalan_' . time() . '.pdf';
-
-                            // $path = storage_path('app/intern_documents/surat_jalan/' . $filename);
-                            // $pdf->save($path);
-
-                            // $this->internDocumentService->addInternDocument([
-                            //     'student_id' => $newInternId,
-                            //     'internship_id' => $newInternship->id,
-                            //     'type' => 'surat jalan',
-                            //     'url' => $filename,
-                            // ]);
+                            }                           
                         }
                     } elseif ($newStatus == '2') {
                         // update status registration
@@ -321,10 +263,8 @@ class RegistrationAdminController extends Controller
         return redirect()->back();
     }
 
-    // public function generateSuratPermohonan($registration_id)
     public function generateDocument(Request $request)
     {
-        // dd($request->all());
         $registration_data = $this->registrationService->getRegistrationById($request->registration_id);
         $school_profile = $this->schoolProfileService->getSchoolProfile();
 

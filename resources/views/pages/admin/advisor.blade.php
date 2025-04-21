@@ -57,7 +57,6 @@
                     </button>
 
                     <div x-show="exportModal" class="form-modal">
-                        {{-- <div class="form-modal"> --}}
                         <form class="form" action="{{ route('admin.advisorManagement.export') }}" method="POST"
                             @click.away="generateDocumentModal=false">
                             <div class="form-header">
@@ -233,7 +232,6 @@
                         <div x-show="modalAction!='isDelete'">
                             <button @click.prevent="levelOption=!levelOption" class="input input-select w-full"
                                 :disabled="modalAction == 'isDelete'" required>
-                                {{-- <span x-text="selected" :class="selected=='Pilih Opsi' ? 'text-neutral-300' : 'text-neutral-800'"></span> --}}
                                 <span x-text="levelSelected" class="text-neutral-800"></span>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
                                     viewBox="0 0 20 20" fill="none">
@@ -264,7 +262,6 @@
                         <div x-show="modalAction!='isDelete'">
                             <button @click.prevent="option=!option" class="input input-select w-full"
                                 :disabled="modalAction == 'isDelete'" required>
-                                {{-- <span x-text="selected" :class="selected=='Pilih Opsi' ? 'text-neutral-300' : 'text-neutral-800'"></span> --}}
                                 <span x-text="selected" class="text-neutral-800"></span>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
                                     viewBox="0 0 20 20" fill="none">

@@ -104,11 +104,7 @@ class AdvisorManagementController extends Controller
                 'password' => 'required|string|min:8|max:12',
             ]);
             $validatedData['password'] = Hash::make($validatedData['password']);
-            // $validatedData['position_id'] = $validatedData['position_id'] == 'Guru Pertama' ? '1' : ($validatedData['position_id'] == 'Guru Muda' ? '2' : ($validatedData['position_id'] == 'Guru Madya' ? '3' : ($validatedData['position_id'] == 'Guru Utama' ? '4' : '')));
-            // $validatedData['level_id'] = $validatedData['level_id'] == 'I/a' ? '1' : ($validatedData['level_id'] == 'I/b' ? '2' : ($validatedData['level_id'] == 'I/c' ? '3' : ($validatedData['level_id'] == 'I/d' ? '4' : ($validatedData['level_id'] == 'II/a' ? '5' : ($validatedData['level_id'] == 'II/b' ? '6' : ($validatedData['level_id'] == 'II/c' ? '7' : ($validatedData['level_id'] == 'II/d' ? '8' : ($validatedData['level_id'] == 'III/a' ? '9' : ($validatedData['level_id'] == 'III/b' ? '10' : ($validatedData['level_id'] == 'III/c' ? '11' : ($validatedData['level_id'] == 'III/d' ? '12' : ($validatedData['level_id'] ==  'IV/a' ? '13' : ($validatedData['level_id'] == 'IV/b' ? '14' : ($validatedData['level_id'] == 'IV/c' ? '15' : ($validatedData['level_id'] == 'IV/d' ? '16' : ($validatedData['level_id'] == 'IV/e' ? '17' : ''))))))))))))))));
             $validatedData['department_id'] = $validatedData['department_id'] == 'K3R' ? '1' : ($validatedData['department_id'] == 'DPIB' ? '2' : ($validatedData['department_id'] == 'RPL' ? '3' : ''));
-
-            // dd($validatedData);
 
             DB::transaction(function () use ($validatedData) {
                 $newUser = $this->userService->addUser([
@@ -161,9 +157,6 @@ class AdvisorManagementController extends Controller
             }
 
             $validatedData['department_id'] = $validatedData['department_id'] == 'K3R' ? '1' : ($validatedData['department_id'] == 'DPIB' ? '2' : ($validatedData['department_id'] == 'RPL' ? '3' : ''));
-            // $validatedData['position_id'] = $validatedData['position_id'] == 'Guru Pertama' ? '1' : ($validatedData['position_id'] == 'Guru Muda' ? '2' : ($validatedData['position_id'] == 'Guru Madya' ? '3' : ($validatedData['position_id'] == 'Guru Utama' ? '4' : '')));
-            // $validatedData['level_id'] = $validatedData['level_id'] == 'I/a' ? '1' : ($validatedData['level_id'] == 'I/b' ? '2' : ($validatedData['level_id'] == 'I/c' ? '3' : ($validatedData['level_id'] == 'I/d' ? '4' : ($validatedData['level_id'] == 'II/a' ? '5' : ($validatedData['level_id'] == 'II/b' ? '6' : ($validatedData['level_id'] == 'II/c' ? '7' : ($validatedData['level_id'] == 'II/d' ? '8' : ($validatedData['level_id'] == 'III/a' ? '9' : ($validatedData['level_id'] == 'III/b' ? '10' : ($validatedData['level_id'] == 'III/c' ? '11' : ($validatedData['level_id'] == 'III/d' ? '12' : ($validatedData['level_id'] ==  'IV/a' ? '13' : ($validatedData['level_id'] == 'IV/b' ? '14' : ($validatedData['level_id'] == 'IV/c' ? '15' : ($validatedData['level_id'] == 'IV/d' ? '16' : ($validatedData['level_id'] == 'IV/e' ? '17' : ''))))))))))))))));
-
             DB::transaction(function () use ($id, $validatedData) {
                 $this->advisorService->updateAdvisor($id, [
                     'name' => $validatedData['name'],
@@ -213,9 +206,7 @@ class AdvisorManagementController extends Controller
 
         $file = $request->file('import_file');
 
-        // Load file Excel
         $spreadsheet = IOFactory::load($file->getPathname());
-        // $worksheet = $spreadsheet->getActiveSheet();
         $worksheet = $spreadsheet->getSheetByName('Data');
         $rows = $worksheet->toArray();
 
@@ -261,7 +252,7 @@ class AdvisorManagementController extends Controller
                         'password' => $row[9],
                         'role' => 'advisor',
                     ];
-                    // dd($userData);
+                    
                     $newUser = $this->userService->addUser($userData);
 
                     $advisorData = [
@@ -273,10 +264,8 @@ class AdvisorManagementController extends Controller
                         'level_id' => $row[5],
                         'phone_num' => $row[8],
                     ];
-                    // dd($advisorData);
 
                     $this->advisorService->addAdvisor($advisorData);
-                    // dd($advisorData);
                 }
             });
             Toastr::addSuccess('Impor data guru berhasil!');

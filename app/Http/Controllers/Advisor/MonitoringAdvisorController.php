@@ -2,19 +2,15 @@
 
 namespace App\Http\Controllers\Advisor;
 
-use App\Models\User;
 use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Services\UserService;
 use App\Services\BatchService;
-use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\AdvisorService;
-use App\Models\MonitoringDocument;
 use Illuminate\Support\Facades\DB;
 use App\Services\InternshipService;
 use App\Services\MonitoringService;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use Flasher\Toastr\Laravel\Facade\Toastr;
 use App\Services\MonitoringDocumentService;
 use Illuminate\Support\Facades\Notification;
@@ -48,8 +44,6 @@ class MonitoringAdvisorController extends Controller
 
     public function index(Request $request)
     {
-        // $user_id = Auth::user()->id;
-        // $advisor_id = $this->advisorService->getAdvisorIdByUserId($user_id);
         $advisor_id = session('user_bio')->id;
 
         $currentBatch = $this->batchService->getBatchByStatus('active');
@@ -65,7 +59,6 @@ class MonitoringAdvisorController extends Controller
         ];
 
         $data = $this->monitoringService->getMonitoringByAdvisorIdAndBatch($advisor_id, $batch_id, $filters);
-        // dd($data);
         $internshipListData = $this->internshipService->getInternshipListByAdvisor($advisor_id, $batch_id);
 
 
@@ -104,9 +97,6 @@ class MonitoringAdvisorController extends Controller
                 'note' => 'nullable|string',
             ]);
 
-            // dd($monitoringData->internship->advisor->name);
-            // $user = User::where('username', 'verif2')->first();
-            // $user->notify(new MonitoringDocumentRequest($advisorName));
             $monitoringData = $this->monitoringService->addMonitoring($validatedData);
 
             $advisorName = $monitoringData->internship->advisor->name;
@@ -132,9 +122,7 @@ class MonitoringAdvisorController extends Controller
             ]);
 
             $lastMonitoringData = $this->monitoringService->getById($id);
-            // $lastMonitoringDocumentType = $lastMonitoringData->type == 'pelepasan' ? 'surat pengantar' : ($lastMonitoringData->type == 'penarikan' ? 'surat penarikan' : 'surat tugas');
-            // $lastMonitoringDocumentId = $this->monitoringDocumentService->getByMonitoringIdAndType($id, $lastMonitoringDocumentType)->id;
-
+            
             DB::transaction(function () use ($validatedData, $id) {
                 // update data monitoring
                 $this->monitoringService->updateMonitoring($id, $validatedData);

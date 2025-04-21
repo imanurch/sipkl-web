@@ -29,11 +29,6 @@ class InternDocumentService
         return $this->internDocumentRepository->checkIsCompleteFinalReportByInternshipAndStudentId($internship_id, $student_id);
     }
 
-    // public function getIsCompleteFinalReportByBatchCount($batch_id)
-    // {
-    //     return $this->internDocumentRepository->getIsCompleteFinalReportByBatchCount($batch_id);
-    // }
-
     public function addInternDocument(array $data)
     {
         return $this->internDocumentRepository->createInternDocument($data);

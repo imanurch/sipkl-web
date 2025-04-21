@@ -14,20 +14,10 @@ class MonitoringDocumentService
         $this->monitoringDocumentRepository = $monitoringDocumentRepository;
     }
 
-    // public function getMonitoringDocumentByAdvisorIdAndBatch($advisor_id, $batch_id, $filters)
-    // {
-    //     return $this->monitoringDocumentRepository->getMonitoringDocumentByAdvisorIdAndBatch($advisor_id, $batch_id, $filters);
-    // }
-
     public function getMonitoringByTypeAndMonitoringId($monitoring_id, $type)
     {
         return $this->monitoringDocumentRepository->getMonitoringByTypeAndMonitoringId($monitoring_id, $type);
     }
-
-    // public function addMonitoringDocument($data)
-    // {
-    //     return $this->monitoringDocumentRepository->createMonitoringDocument($data);
-    // }
 
     public function updateOrCreateMonitoringDocument($data)
     {

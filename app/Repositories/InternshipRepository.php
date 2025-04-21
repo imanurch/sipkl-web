@@ -21,7 +21,6 @@ class InternshipRepository
         );
 
         // filter search
-
         if ($filters['search'] != null) {
             $query->whereHas('group', function ($subQuery) use ($filters) {
                 $subQuery->where('name', 'like', '%' . $filters['search'] . '%');
@@ -81,12 +80,6 @@ class InternshipRepository
             $query->where('batch_id', $batch_id);
         })->count();
     }
-
-    // public function getInternByAdvisor($batch_id, $advisor_id){
-    //     return Student::whereHas('groupMember.group.internship', function ($query) use ($advisor_id, $batch_id) {
-    //         $query->where('advisor_id', $advisor_id)->where('batch_id', $batch_id);
-    //     })->with('groupMember.group.internship.industry:id,name')->get();
-    // }
 
     public function getInternByAdvisor($filters = [], $advisor_id)
     {

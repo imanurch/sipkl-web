@@ -6,7 +6,7 @@
             <div class="input-group">
                 <label class="input-label" for="">Pilih Anggota Kelompok yang tersedia</label>
                 <div x-data="{ option: false, selected: 'Pilih Opsi', valueSelected: '' }" class="space-y-4">
-                    <div class="flex place-items space-x-2 w-96">
+                    <div class="flex place-items space-x-2 w-80">
                         <div class="w-full">
                             <button @click.prevent="option=!option" class="input input-select w-full"
                                 :disabled="isDelete" required>
@@ -28,7 +28,8 @@
                                 </ul>
                             </div>
                         </div>
-                        <button x-show="selected!='Pilih Opsi'" @click.prevent="addMember(selected, valueSelected);selected='Pilih Opsi'"
+                        <button x-show="selected!='Pilih Opsi'"
+                            @click.prevent="addMember(selected, valueSelected);selected='Pilih Opsi'"
                             class="btn btn-xs btn-default-fill h-fit text-nowrap">Tambah Anggota</button>
                     </div>
                     <div id="memberFields" class="space-y-2">

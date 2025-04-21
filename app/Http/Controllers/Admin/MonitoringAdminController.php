@@ -45,10 +45,6 @@ class MonitoringAdminController extends Controller
 
     public function index(Request $request)
     {
-        // $user_id = Auth::user()->id;
-        // $advisor_id = $this->advisorService->getAdvisorIdByUserId($user_id);
-        // $advisor_id = session('user_bio')->id;
-
         $currentBatch = $this->batchService->getBatchByStatus('active');
         $batch_id = $request->batch ?? ($currentBatch->id ?? '');
 
@@ -62,10 +58,7 @@ class MonitoringAdminController extends Controller
         ];
 
         $data = $this->monitoringService->getMonitoring($batch_id, $filters);
-        // dd($data);
         $internshipListData = $this->internshipService->getAllInternshipList($batch_id);
-        // dd($internshipListData);
-
 
         return view('pages.admin.monitoring', [
             'data' => $data,
@@ -99,8 +92,6 @@ class MonitoringAdminController extends Controller
     {
         $data = $request->except(['_token', '_method']);
 
-        // dd($request->all(),$id);
-
         try {
             $validatedData = $request->validate([
                 'type' => 'required',
@@ -109,8 +100,6 @@ class MonitoringAdminController extends Controller
             ]);
 
             $lastMonitoringData = $this->monitoringService->getById($id);
-            // $lastMonitoringDocumentType = $lastMonitoringData->type == 'pelepasan' ? 'surat pengantar' : ($lastMonitoringData->type == 'penarikan' ? 'surat penarikan' : 'surat tugas');
-            // $lastMonitoringDocumentId = $this->monitoringDocumentService->getByMonitoringIdAndType($id, $lastMonitoringDocumentType)->id;
 
             DB::transaction(function () use ($validatedData, $id) {
                 // update data monitoring
@@ -121,7 +110,7 @@ class MonitoringAdminController extends Controller
                 $doc = $this->monitoringDocumentService->getMonitoringDocumentByMonitoringId($id);
                 foreach ($doc as $dt) {
                     $filename = $dt->url;
-                    // dd($filename, $dt->type == "surat penarikan");
+
                     if ($dt->type == "surat pengantar") {
                         Storage::delete('monitoring_documents/surat_pengantar/' . $filename);
                     } elseif ($dt->type == "surat penarikan") {
@@ -147,7 +136,7 @@ class MonitoringAdminController extends Controller
         $doc = $this->monitoringDocumentService->getMonitoringDocumentByMonitoringId($id);
         foreach ($doc as $dt) {
             $filename = $dt->url;
-            // dd($filename, $dt->type == "surat penarikan");
+
             if ($dt->type == "surat pengantar") {
                 Storage::delete('monitoring_documents/surat_pengantar/' . $filename);
             } elseif ($dt->type == "surat penarikan") {
@@ -171,9 +160,7 @@ class MonitoringAdminController extends Controller
 
     public function generateSurat(Request $request)
     {
-        // dd($request->all());
         $monitoring_data = $this->monitoringService->getById($request->monitoring_id);
-        // dd($monitoring_data);
         $school_profile = $this->schoolProfileService->getSchoolProfile();
 
         // generate dokumen
@@ -228,7 +215,7 @@ class MonitoringAdminController extends Controller
                 $intern_data[] = $member->student;
                 $department = $member->student->department->name;
             }
-            // dd($intern_data);
+            
             $data = [
                 'school_phone_num'  => $school_profile->phone_num,
                 'school_website'  => $school_profile->website,
@@ -284,8 +271,6 @@ class MonitoringAdminController extends Controller
             $path = storage_path('app/monitoring_documents/surat_penarikan/' . $filename);
             $pdf->save($path);
         }
-
-        // return $pdf->stream('dokumen.pdf');
 
         // save dokumen ke db
         $monitoringDocumentData = [

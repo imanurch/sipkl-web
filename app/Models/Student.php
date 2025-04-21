@@ -39,11 +39,4 @@ class Student extends Model
     {
         return $this->hasMany(Assessment::class, 'id');
     }
-
-    // public function internship()
-    // {
-    //     return $this->hasOne(GroupMember::class)
-    //         ->whereHas('group.internship')
-    //         ->with('group.internship');
-    // }
 }

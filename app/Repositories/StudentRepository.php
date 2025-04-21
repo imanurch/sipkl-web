@@ -8,7 +8,6 @@ class StudentRepository
 {
     public function getStudent(array $filters = [])
     {
-        // return Student::get();
         $query = Student::query();
 
         // filter department
@@ -16,10 +15,6 @@ class StudentRepository
             $department_id = ($filters['department'] == 'RPL' ? '1' : ($filters['department'] == 'DPIB' ? '2' : '3'));
             $query->where('department_id', $department_id);
         }
-
-        // if ($filters['year'] != null) {
-        //     $query->where('year', $filters['year']);
-        // }
 
         // filter status
         if ($filters['status'] != null) {
@@ -53,13 +48,6 @@ class StudentRepository
         $data->appends($filters);
         return $data;
     }
-
-    // public function getNonInternStudentList($activeBatch_id)
-    // {
-    //     return Student::whereDoesntHave('groupMember.group.internship', function ($query) use ($activeBatch_id) {
-    //         $query->where('batch_id', $activeBatch_id);
-    //     })->select('id', 'name', 'nisn')->get();
-    // }
 
     public function getNonRegisteredInternList($activeBatch_id, $student_department)
     {
@@ -99,11 +87,6 @@ class StudentRepository
     {
         return Student::find($id);
     }
-
-    // public function getStudentIdByUserId($user_id)
-    // {
-    //     return Student::where('user_id', $user_id)->select('id')->first();
-    // }
 
     public function getStudentByUserId($user_id)
     {

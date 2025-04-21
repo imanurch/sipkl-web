@@ -6,7 +6,6 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class Advisor extends Model
 {
@@ -29,10 +28,6 @@ class Advisor extends Model
     {
         return $this->belongsTo(AdvisorLevel::class, 'level_id');
     }
-    // public function advisorDocument(): HasMany
-    // {
-    //     return $this->hasMany(AdvisorDocument::class, 'advisor_id', 'id');
-    // }
     public function internship(): HasMany
     {
         return $this->hasMany(Internship::class, 'advisor_id', 'id');

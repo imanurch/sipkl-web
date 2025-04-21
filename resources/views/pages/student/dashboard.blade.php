@@ -88,5 +88,4 @@
         </div>
     @endif
 
-    @include('components.contact')
 @endsection

@@ -23,18 +23,13 @@ class InternDocumentRepository
     public function checkIsCompleteFinalReportByInternshipAndStudentId($internship_id, $student_id)
     {
         $complete = InternDocument::where('student_id', $student_id)->where('internship_id', $internship_id)->where('type', 'laporan akhir')->count();
-        // dd($complete);
+        
         if ($complete == 1) {
             return true;
         } else {
             return false;
         }
     }
-
-    // public function getIsCompleteFinalReportByBatchCount($batch_id)
-    // {
-    //     return InternDocument::where('batch_id', $batch_id)->where('type', 'laporan akhir')->whereNotNull('url')->count();
-    // }
 
     public function createInternDocument(array $data)
     {

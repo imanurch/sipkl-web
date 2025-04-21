@@ -46,19 +46,16 @@ class RegistrationService
 
     public function updateStatusRegistration($id, $status)
     {
-        // dd($id, $status);
         return $this->registrationRepository->updateStatusRegistration($id, $status);
     }
 
     public function updateRegistrationStep($id, $step)
     {
-        // dd($id, $step);
         return $this->registrationRepository->updateRegistrationStep($id, $step);
     }
 
     public function deleteRegistration($id)
     {
-        // dd($id);
         return $this->registrationRepository->deleteRegistration($id);
     }
 }

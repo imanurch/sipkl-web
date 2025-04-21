@@ -105,13 +105,10 @@ class StudentManagementController extends Controller
                 'phone_num' => 'required|string|min:10|max:14|unique:students,phone_num,',
                 'password' => 'required|string|min:8|max:12',
             ]);
-            // dd($validatedData);
 
             $validatedData['password'] = Hash::make($validatedData['password']);
             $validatedData['department_id'] = $validatedData['department_id'] == 'K3R' ? '1' : ($validatedData['department_id'] == 'DPIB' ? '2' : ($validatedData['department_id'] == 'RPL' ? '3' : ''));
             $validatedData['gender'] = $validatedData['gender'] == 'Laki-Laki' ? 'men' : 'women';
-
-            // dd($validatedData);
 
             DB::transaction(function () use ($validatedData) {
                 $newUser = $this->userService->addUser([
@@ -218,7 +215,6 @@ class StudentManagementController extends Controller
 
         // Load file Excel
         $spreadsheet = IOFactory::load($file->getPathname());
-        // $worksheet = $spreadsheet->getActiveSheet();
         $worksheet = $spreadsheet->getSheetByName('Data');
         $rows = $worksheet->toArray();
 
@@ -275,8 +271,6 @@ class StudentManagementController extends Controller
                         'year' => $row[6],
                         'phone_num' => $row[9],
                     ];
-
-                    // dd($userData, $studentData);
 
                     $this->studentService->addStudent($studentData);
                 }

@@ -13,12 +13,9 @@ use Illuminate\Support\Facades\DB;
 use App\Services\InternshipService;
 use App\Http\Controllers\Controller;
 use App\Services\GroupMemberService;
-use Illuminate\Support\Facades\Auth;
 use App\Services\RegistrationService;
-use Illuminate\Support\Facades\Route;
 use App\Services\InternDocumentService;
 use Flasher\Toastr\Laravel\Facade\Toastr;
-use App\Notifications\InternshipRegistration;
 use App\Notifications\InternshipRegistrationNotification;
 use App\Services\RegistrationDocumentService;
 use Illuminate\Support\Facades\Notification;
@@ -163,7 +160,6 @@ class RegistrationStudentController extends Controller
 
     public function step3(Request $request)
     {
-
         try {
             $validatedData = $request->validate([
                 'teamMember' => 'required',
@@ -288,7 +284,7 @@ class RegistrationStudentController extends Controller
                 'registration_id' => 'required',
                 'surat_balasan' => 'required',
             ]);
-            // dd('halo');
+            
             $path_file_balasan = $validatedData['surat_balasan']->store('registration_document/surat_balasan');
             $filename = basename($path_file_balasan);
 
@@ -327,7 +323,7 @@ class RegistrationStudentController extends Controller
 
         $student_id = session('user_bio')->id;
         $surat_jalan = $this->internDocumentService->getInternDocumentByStudentId($student_id, 'surat jalan');
-        // dd($surat_jalan);
+        
         $registrationData->surat_jalan = $surat_jalan != null ? $surat_jalan->url : 'Belum Tersedia';
 
         return view('pages.student.registration', [

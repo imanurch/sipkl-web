@@ -4,7 +4,6 @@
 @section('profil', 'Admin')
 @section('content')
 
-{{-- {{ dd(Auth::user()) }} --}}
 {{-- card --}}
 <div class="layout-card">
     <x-card title="Peserta PKL" data="{{ $intern ?? '' }}" class="bg-icon-default">

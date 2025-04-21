@@ -139,65 +139,9 @@ class AssessmentAdminController extends Controller
                 }
             }
 
-
-            // hitung nilai akhir internship
-            // if (count($dt->technical_assessment) > 0 && count($dt->non_technical_assessment) > 0 && count($dt->final_report_assessment) > 0 && $dt->test_assessment) {
-            //     if (
-            //         $this->technicalAssessmentService->isTechnicalAssessmentComplete($dt->id) == true &&
-            //         $this->nonTechnicalAssessmentService->isNonTechnicalAssessmentComplete($dt->id) == true &&
-            //         $this->finalReportAssessmentService->isFinalReportAssessmentComplete($dt->id) == true &&
-            //         $this->testAssessmentService->isTestAssessmentComplete($dt->id) == true
-            //     ) {
-            //         $technical_score = 0;
-            //         $non_technical_score = 0;
-            //         $final_report_score = 0;
-            //         $technical_aspect = [];
-            //         $technical_aspect_score = [];
-            //         foreach ($dt->technical_assessment as $aspect_score) {
-            //             $technical_score += $aspect_score->score;
-            //             $technical_aspect[] = $aspect_score->aspect;
-            //             $technical_aspect_score[] = $aspect_score->score;
-            //             $dt->technical_aspect = $technical_aspect;
-            //             $dt->technical_aspect_score = $technical_aspect_score;
-            //         }
-            //         $technical_score_average = $technical_score / count($dt->technical_assessment);
-            //         $dt->technical_score_average = $technical_score_average;
-            //         // $dt->technical_aspect = $technical_aspect;
-            //         // $technicalAspectCount = count($technical_aspect);
-
-            //         foreach ($dt->non_technical_assessment as $aspect_score) {
-            //             $non_technical_score += $aspect_score->score;
-            //             $aspect = str_replace(' ', '_', $aspect_score->aspect);
-            //             // dd($aspect);
-            //             $dt->$aspect = $aspect_score->score;
-            //             // dd($dt->non_technical_assessment->Kedisiplinan);
-            //         }
-            //         // dd($dt->non_technical_assessment->Kedisiplinan);
-            //         $non_technical_score_average = $non_technical_score / count($dt->non_technical_assessment);
-            //         $dt->non_technical_score_average = $non_technical_score_average;
-
-            //         foreach ($dt->final_report_assessment as $aspect_score) {
-            //             $final_report_score += $aspect_score->score;
-            //             $aspect = str_replace(' ', '_', $aspect_score->aspect);
-            //             // dd($aspect);
-            //             $dt->$aspect = $aspect_score->score;
-            //         }
-            //         $final_report_score_average = $final_report_score / count($dt->final_report_assessment);
-            //         $dt->final_report_score_average = $final_report_score_average;
-
-            //         $dt->internship_score = round((($technical_score_average + $non_technical_score_average + $final_report_score_average + $dt->test_assessment->score) / 4), 2);
-            //         // cek kelulusan
-            //         if ($dt->internship_score >= 75) {
-            //             $dt->internship_status = 'Lulus';
-            //         } else {
-            //             $dt->internship_status = 'Tidak Lulus';
-            //         }
-            //     }
-            // }
-
             // cek final report
             $isCompleteFinalReport = $this->internDocumentService->checkIsCompleteFinalReportByInternshipAndStudentId($dt->internship_id, $dt->student_id);
-            // dd($isCompleteFinalReport);
+            
             if ($isCompleteFinalReport == true) {
                 // cek logbook
                 $isCompleteLogbook = $this->logbookService->checkIsCompleteLogbookByInternshipAndStudentId($dt->internship_id, $dt->student_id);
@@ -224,8 +168,6 @@ class AssessmentAdminController extends Controller
 
     public function update(Request $request, $id)
     {
-        // dd($request->all());
-        // $data = $request->except(['_token', '_method']);
         try {
             DB::transaction(function () use ($request, $id) {
                 $validatedData = $request->validate([
@@ -366,7 +308,6 @@ class AssessmentAdminController extends Controller
                 }
                 $technical_score_average = $technical_score / count($dt->technical_assessment);
 
-
                 // non technical
                 foreach ($dt->non_technical_assessment as $aspect_score) {
                     $non_technical_score += $aspect_score->score;
@@ -397,7 +338,6 @@ class AssessmentAdminController extends Controller
         $num = 1;
 
         foreach ($data as $dt) {
-            // dd($dt->student);
             $sheet->setCellValue('A' . $row, $num);
             $sheet->setCellValue('B' . $row, $dt->student->name);
             $sheet->setCellValue('C' . $row, $dt->student->nis);

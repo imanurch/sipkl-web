@@ -23,8 +23,6 @@ class IndustryAdvisorController extends Controller
 
     public function index(Request $request)
     {
-        // $user_id = Auth::user()->id;
-        // $advisor_id = $this->advisorService->getAdvisorIdByUserId($user_id);
         $advisor_id = session('user_bio')->id;
 
         // batch data

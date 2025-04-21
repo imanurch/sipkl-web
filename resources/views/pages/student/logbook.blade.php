@@ -60,7 +60,6 @@
                         </svg>
                     </div>
                     <div class="form-body">
-                        {{-- <input type="text" :value="modalAction != null ? id : ''"> --}}
                         <div class="input-group">
                             <label class="input-label" for="">Tanggal</label>
                             <input class="input" type="text"
@@ -71,7 +70,7 @@
                             <textarea class="input" name="activities" id="" rows="8"
                                 :value="modalAction != 'isAdd' ? dataId.activities : ''" required></textarea>
                         </div>
-                        <div x-show="modalAction == 'isEdit'" class="input-group">
+                        <div x-show="modalAction == 'isEdit' && dataId.feedback != null" class="input-group">
                             <label class="input-label" for="">Komentar Guru Pembimbing</label>
                             <textarea class="input resize-none" id="" rows="8"
                                 :value="modalAction != 'isAdd' ? dataId.feedback : ''" disabled></textarea>

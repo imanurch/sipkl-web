@@ -43,7 +43,6 @@ class FinalReportStudentController extends Controller
     public function index(Request $request)
     {
         $user_id = Auth::user()->id;
-        // $student_id = $this->studentService->getStudentIdByUserId($user_id);
         $student_id = session('user_bio')->id;
 
         $currentBatch = $this->batchService->getBatchByStatus('active');
@@ -109,9 +108,11 @@ class FinalReportStudentController extends Controller
 
                 $internDocumentData = $this->internDocumentService->addInternDocument($data);
             });
-            
-            if ($internDocumentData->student->user->email_verified_at != null) {
-                Notification::send($internDocumentData->internship->advisor->user, new FinalReportNotification($internDocumentData->student->name));
+
+            if ($internDocumentData->internship->advisor != null) {
+                if ($internDocumentData->internship->advisor->user->email_verified_at != null) {
+                    Notification::send($internDocumentData->internship->advisor->user, new FinalReportNotification($internDocumentData->student->name));
+                }
             }
 
             Toastr::addSuccess('Laporan Akhir berhasil diunggah!');

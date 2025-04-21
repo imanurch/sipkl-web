@@ -58,10 +58,8 @@ class RegistrationRepository
 
     public function findRegistrationById($id)
     {
-        // return Registration::find($id);
         return Registration::with(
             'group',
-            // 'group.groupMember:student_id',
             'group.groupMember.student:id,nisn,name,department_id',
             'group.groupMember.student.department:id,name',
             'industry:id,name,address',
@@ -95,7 +93,6 @@ class RegistrationRepository
 
     public function updateStatusRegistration($id, $status)
     {
-        // dd($id, $status);
         if ($status == 'accept') {
             return Registration::where('id', $id)->update(['status' => '1']);
         } else if ($status == 'reject') {

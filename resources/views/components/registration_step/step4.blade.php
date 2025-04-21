@@ -1,6 +1,5 @@
 <div class="space-y-4">
     <h6 class="text-xs-medium">Lengkapi Hasil Pendaftaran</h6>
-    {{-- <form action="{{ route('student.registration.step5') }}" method="POST" enctype="multipart/form-data"> --}}
     <form action="{{ route('student.registration.step5') }}" method="POST" enctype="multipart/form-data">
         @csrf
         <div class="space-y-4">
@@ -25,12 +24,12 @@
                 <div class="flex space-x-3 text-xs-reguler place-items-center">
                     <h6 class="w-56">Waktu Mulai</h6>
                     <span>:</span>
-                    <span>{{ $registrationData->start_date }}</span>
+                    <span>{{ date('d-m-Y', strtotime($registrationData->start_date)) }}</span>
                 </div>
                 <div class="flex space-x-3 text-xs-reguler place-items-center">
                     <h6 class="w-56">Waktu Selesai</h6>
                     <span>:</span>
-                    <span>{{ $registrationData->end_date }}</span>
+                    <span>{{ date('d-m-Y', strtotime($registrationData->end_date)) }}</span>
                 </div>
                 <div class="flex space-x-3 text-xs-reguler place-items-center">
                     <h6 class="w-56">Surat Permohonan PKL</h6>

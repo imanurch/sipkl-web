@@ -14,11 +14,6 @@ class TechnicalAssessmentService
         $this->technicalAssessmentRepository = $technicalAssessmentRepository;
     }
 
-    // public function updateOrCreate($data)
-    // {
-    //     return $this->technicalAssessmentRepository->updateOrCreate($data);
-    // }
-
     public function addTechnicalAssessment($data)
     {
         return $this->technicalAssessmentRepository->createTechnicalAssessment($data);

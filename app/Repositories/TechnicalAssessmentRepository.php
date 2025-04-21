@@ -7,18 +7,6 @@ use PDO;
 
 class TechnicalAssessmentRepository
 {
-    // public function updateOrCreate(array $data)
-    // {
-    //     // return TechnicalAssessment::updateOrCreate($data);
-    //     return TechnicalAssessment::updateOrCreate(
-    //         [
-    //             'assessment_id' => $data['assessment_id'],
-    //             'aspect' => $data['aspect'],
-    //         ],
-    //         ['score' => $data['score']]
-    //     );
-    // }
-
     public function createTechnicalAssessment(array $data)
     {
         return TechnicalAssessment::create($data);

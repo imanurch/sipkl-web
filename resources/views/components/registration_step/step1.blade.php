@@ -4,7 +4,7 @@
         <form action="{{ route('student.registration.step2') }}" method="POST">
             @csrf
             <div class="space-y-4">
-                <div class="input-group">
+                <div class="input-group w-80">
                     <label class="input-label" for="">Pilih Lokasi PKL yang Tersedia</label>
                     <div x-data="{ option: false, selected: 'Pilih Opsi', valueSelected: '' }">
                         <input type="hidden" name="internshipLocation" x-model="valueSelected">
@@ -30,7 +30,7 @@
                     </div>
                 </div>
                 <p class="text-xs-reguler"><span class="text-error-600">Tidak Menemukan Lokasi PKL yang dicari?</span>
-                    Ajukan industri baru dengan menekan tombol Ajukan Lokasi di bawah ini ya! (Cek pengajuan lokasi agar tidak diajukan kembali)</p>
+                    <br>Ajukan industri baru dengan menekan tombol Ajukan Lokasi di bawah ini ya! (Cek pengajuan lokasi agar tidak diajukan kembali)</p>
                 <div>
                     <button @click.prevent="currentStep='newIndustry'" class="btn btn-xs btn-success-outline">
                         <span>Ajukan Lokasi Baru</span>

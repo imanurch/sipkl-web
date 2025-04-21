@@ -49,10 +49,6 @@
             </div>
         </div>
         <div class="relative col-span-12 md:col-span-8">
-            {{-- <div class="absolute max-w-md inset-0 translate-y-[10%] translate-x-16 space-y-4">
-                <p class="text-2xl font-bold text-neutral-0 italic font-ibm">"Orang sukses adalah mereka yang terus belajar, <br>tidak pernah berhenti."</p>
-                <p class="text-md text-neutral-0">- Bill Gates -</p>
-            </div> --}}
             <div class="absolute inset-0 translate-y-[10%] translate-x-[4%]">
                 <div class="w-full max-w-2xl space-y-3 ">
                     <p class="text-xl md:text-2xl font-bold text-neutral-0 italic font-ibm">

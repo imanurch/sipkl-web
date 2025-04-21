@@ -2,17 +2,13 @@
 
 namespace App\Http\Controllers\Advisor;
 
-use Log;
 use Illuminate\Http\Request;
-use App\Services\AdminService;
 use App\Services\BatchService;
 use App\Services\AdvisorService;
 use App\Services\LogbookService;
 use Illuminate\Support\Facades\DB;
 use App\Services\AssessmentService;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use App\Services\InternDocumentService;
 use App\Services\TestAssessmentService;
 use Flasher\Toastr\Laravel\Facade\Toastr;
@@ -57,15 +53,13 @@ class AssessmentAdvisorController extends Controller
 
     public function index(Request $request)
     {
-        // $user_id = Auth::user()->id;
-        // $advisor_id = $this->advisorService->getAdvisorIdByUserId($user_id);
         $advisor_id = session('user_bio')->id;
 
         // batch data
         $currentBatch = $this->batchService->getBatchByStatus('active');
         $batch_id = $request->batch ?? ($currentBatch->id ?? '');
 
-        // // table filters
+        // table filters
         $batchData = $this->batchService->getAllBatch('');
         $filters = [
             'search' => $request->searchKeyword ?? '',
@@ -73,9 +67,6 @@ class AssessmentAdvisorController extends Controller
         ];
 
         // card
-        // $countAssessed = 0;
-        // $countNotAssessed = 0;
-
         $countNotAssessed = $this->assessmentService->getNotAssessedCountByAdvisor($advisor_id);
         $countPass = $this->assessmentService->getAssessedCountByAdvisor($advisor_id, 'pass');
         $countNotPass = $this->assessmentService->getAssessedCountByAdvisor($advisor_id, 'notPass');
@@ -91,25 +82,6 @@ class AssessmentAdvisorController extends Controller
             $dt->isCompleteLogbook = $isCompleteLogbook == true ? 'Lengkap' : 'Tidak Lengkap';
             $isCompleteFinalReport = $this->internDocumentService->checkIsCompleteFinalReportByInternshipAndStudentId($dt->internship_id, $dt->student_id);
             $dt->isCompleteFinalReport = $isCompleteFinalReport == true ? 'Lengkap' : 'Tidak Lengkap';
-
-
-            // if ($dt->advisor_score != null) {
-            //     $countAssessed += 1;
-            // } else {
-            //     $countNotAssessed += 1;
-            // }
-            // // dd($isCompleteFinalReport);
-            // if ($isCompleteLogbook == true) {
-            //     $isCompleteFinalReport = $this->internDocumentService->checkIsCompleteFinalReportByInternshipAndStudentId($dt->internship_id, $dt->student_id);
-
-            //     if ($isCompleteFinalReport == true) {
-            //         $dt->isCompleteOutput = 'Lengkap';
-            //     } else {
-            //         $dt->isCompleteOutput = 'Tidak Lengkap';
-            //     }
-            // } else {
-            //     $dt->isCompleteOutput = 'Tidak Lengkap';
-            // }
 
             $technical_score = 0;
             $non_technical_score = 0;
@@ -135,9 +107,7 @@ class AssessmentAdvisorController extends Controller
                 foreach ($dt->non_technical_assessment as $aspect_score) {
                     $non_technical_score += $aspect_score->score;
                     $aspect = str_replace(' ', '_', $aspect_score->aspect);
-                    // dd($aspect);
                     $dt->$aspect = $aspect_score->score;
-                    // dd($dt->non_technical_assessment->Kedisiplinan);
                 }
                 if ($this->nonTechnicalAssessmentService->isNonTechnicalAssessmentComplete($dt->id) == true) {
                     $non_technical_score_average = ($non_technical_score / count($dt->non_technical_assessment));
@@ -150,7 +120,6 @@ class AssessmentAdvisorController extends Controller
                 foreach ($dt->final_report_assessment as $aspect_score) {
                     $final_report_score += $aspect_score->score;
                     $aspect = str_replace(' ', '_', $aspect_score->aspect);
-                    // dd($aspect);
                     $dt->$aspect = $aspect_score->score;
                 }
                 if ($this->finalReportAssessmentService->isFinalReportAssessmentComplete($dt->id) == true) {
@@ -190,11 +159,6 @@ class AssessmentAdvisorController extends Controller
 
     public function update(Request $request, $id)
     {
-        // dd($request->all());
-        // dd($id);
-        // $data = $request->except(['_token', '_method']);
-        // dd($request->all());
-        // dd($data);
         try {
             DB::transaction(function () use ($request, $id) {
                 $validatedData = $request->validate([

@@ -10,7 +10,6 @@
         <li>Hubungi admin PKL jika membutuhkan informasi lebih lanjut terkait dokumen</li>
     </x-guide>
 
-    {{-- <div x-data="{ modalAction: null, option: false, optionInternship: false, selected: 'Pilih Opsi', selectedInternship: 'Pilih Opsi' }"> --}}
     <div x-data="{ modalAction: null, option: false, optionInternship: false, selected: 'Pilih Opsi', selectedInternship: 'Pilih Opsi', selectedValueInternship: null }">
         <x-table.table>
             <x-slot name="tableTitle">Data Monitoring</x-slot>
@@ -185,23 +184,6 @@
                             :disabled="modalAction == 'isView' || modalAction == 'isDelete'"
                             :value="modalAction != null ? dataId.note : ''">
                     </div>
-                    {{-- <div class="input-group">
-                        <label class="input-label" for="">Label</label>
-                        <div class="space-y-2">
-                            <div class="checkbox-option">
-                                <input class="checkbox" type="checkbox">
-                                <span>Option 1</span>
-                            </div>
-                            <div class="checkbox-option">
-                                <input class="checkbox" type="checkbox">
-                                <span>Option 2</span>
-                            </div>
-                            <div class="checkbox-option">
-                                <input class="checkbox" type="checkbox">
-                                <span>Option 3</span>
-                            </div>
-                        </div>
-                    </div> --}}
                 </x-slot>
             </x-form>
         </div>
@@ -230,6 +212,4 @@
             }
         }
     </script>
-
-    {{-- <script src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script> --}}
 @endsection

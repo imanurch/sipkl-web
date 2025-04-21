@@ -34,14 +34,6 @@
                     <span>Simpan Pengajuan</span>
                 </button>
             </div>
-            {{-- <div>
-                <button @click="currentStep=1" class="btn btn-xs btn-success-outline">
-                    <span>Kembali</span>
-                </button>
-                <button type="submit" @click="currentStep=2" class="btn btn-xs btn-success-fill">
-                    <span>Simpan Pengajuan</span>
-                </button>
-            </div> --}}
         </div>
     </form>
 </div>

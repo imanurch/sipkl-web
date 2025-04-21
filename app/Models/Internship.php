@@ -41,8 +41,4 @@ class Internship extends Model
     {
         return $this->hasMany(Logbook::class, 'id');
     }
-    // public function internship(): HasOne
-    // {
-    //     return $this->hasOne(Internship::class, 'id');
-    // }
 }
