@@ -201,9 +201,8 @@ class RegistrationStudentController extends Controller
             ]);
 
             // create group
-            // NAMA GROUP DARIMANA?
             $groupData = [
-                'name' => 'Group Testing'
+                'name' => 'PKL' . date('YmdHis')
             ];
 
             DB::transaction(function () use ($validatedData, $groupData) {
@@ -256,7 +255,7 @@ class RegistrationStudentController extends Controller
             });
 
             $users = $this->userService->getVerifiedAdminUser();
-            Notification::send($users, new InternshipRegistrationNotification()); 
+            Notification::send($users, new InternshipRegistrationNotification());
 
             Toastr::addSuccess('Data registrasi berhasil disimpan!');
             return redirect()->route('student.registration');
@@ -305,9 +304,9 @@ class RegistrationStudentController extends Controller
 
                 $this->registrationService->updateRegistrationStep($registration_id, '5');
             });
-            
+
             $users = $this->userService->getVerifiedAdminUser();
-            Notification::send($users, new InternshipRegistrationNotification()); 
+            Notification::send($users, new InternshipRegistrationNotification());
 
             Toastr::addSuccess('File Bukti berhasil diunggah!');
             return redirect()->route('student.registration');

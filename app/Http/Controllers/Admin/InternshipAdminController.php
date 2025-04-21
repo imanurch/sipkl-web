@@ -65,6 +65,15 @@ class InternshipAdminController extends Controller
         $data = $this->internshipService->getInternship($filters);
         // $data = $this->internshipService->getIntern($filters);
         // dd($data);
+        foreach($data as $dt){
+            $dt->start_date = date('d-m-Y', strtotime($dt->start_date));
+            $dt->end_date = date('d-m-Y', strtotime($dt->end_date));
+            foreach($dt->internDocument as $doc){
+                if($doc->type == 'surat jalan'){
+                    $dt->surat_jalan = true;
+                }
+            }
+        }
         $intern = $this->internshipService->getInternCount($batch_id);
         $advisorListData = $this->advisorService->getAdvisorList();
 

@@ -93,8 +93,8 @@
                                 @endforeach
                             </ul>
                         </td>
-                        <td class="whitespace-nowrap">{{ date('d-m-Y', strtotime($dt->start_date)) }} <br>s/d
-                            <br>{{ date('d-m-Y', strtotime($dt->end_date)) }}
+                        <td class="whitespace-nowrap">{{ $dt->start_date }} <br>s/d
+                            <br>{{ $dt->end_date }}
                         </td>
                         <td>{{ $dt->industry->name ?? '' }}</td>
 
@@ -267,7 +267,7 @@
                             stroke-width="1.03704" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                 </div>
-                <div class="form-body">
+                <div class="form-body space-y-0">
                     {{-- <div class="space-y-2 w-full"> --}}
                     <input class="input h-full w-full" type="hidden" name="registration_id"
                         :value="generateDocumentModal ? dataId.id : ''">

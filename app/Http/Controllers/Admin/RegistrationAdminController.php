@@ -83,6 +83,9 @@ class RegistrationAdminController extends Controller
         // table data
         $data = $this->registrationService->getRegistration($filters);
         foreach ($data as $dt) {
+            $dt->start_date = date('d-m-Y', strtotime($dt->start_date));
+            $dt->end_date = date('d-m-Y', strtotime($dt->end_date));
+
             if ($dt->RegistrationDocument) {
                 foreach ($dt->registrationDocument as $doc) {
                     if ($doc->type == 'surat permohonan') {
@@ -180,7 +183,7 @@ class RegistrationAdminController extends Controller
                             $logbook_start_date->modify('+1 day');
                         }
 
-                        // // buat document intern (surat jalan)
+                        // buat document intern (surat jalan)
                         // // $principal_data = $this->signatureService->getPrincipalSignature();
                         // $school_profile = $this->schoolProfileService->getSchoolProfile();
                         // $data = [

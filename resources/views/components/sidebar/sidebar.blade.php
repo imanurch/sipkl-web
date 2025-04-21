@@ -164,6 +164,7 @@
             </a>
         </div>
     </div>
+    @if(auth()->user()->email_verified_at != null)
     <div class="flex justify-center">
         <div class="bg-neutral-0 border border-error-500 rounded text-center w-48 py-4 px-3 space-y-4">
             <h6 class="text-xs-bold">Email Belum Diverifikasi!</h6>
@@ -172,4 +173,5 @@
                 class="btn btn-xs btn-default-fill">Verifikasi Email</a>
         </div>
     </div>
+    @endif
 </div>

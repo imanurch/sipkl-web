@@ -69,13 +69,14 @@
 
                                     @else
                                         <li class="whitespace-nowrap overflow-hidden text-ellipsis block max-w-40">
-                                            {{ $loop->iteration }}. {{ $member->student->name ?? '' }} ({{ $member->student->department->name ?? '' }})</li>
+                                            {{ $loop->iteration }}. {{ $member->student->name ?? '' }}
+                                            ({{ $member->student->department->name ?? '' }})</li>
                                     @endif
                                 @endforeach
                             </ul>
                         </td>
-                        <td class="whitespace-nowrap">{{ date('d-m-Y', strtotime($dt->start_date)) }} <br>s/d
-                            <br>{{ date('d-m-Y', strtotime($dt->end_date)) }}
+                        <td class="whitespace-nowrap">{{ $dt->start_date }} <br>s/d
+                            <br>{{ $dt->end_date }}
                         </td>
                         <td>
                             @if ($dt->advisor)
@@ -89,8 +90,8 @@
                         </td>
                         <td>{{ $dt->industry->name ?? '' }}</td>
                         <td>
-                            @if (count($dt->internDocument)>0)
-                                <div class="flex space-x-2">
+                            @if ($dt->surat_jalan)
+                                <div class="flex justify-center space-x-2">
                                     @foreach ($dt->internDocument as $doc)
                                         {{-- {{ $doc }} --}}
                                         @if ($doc->type == 'surat jalan')
@@ -193,15 +194,9 @@
                             stroke-width="1.03704" stroke-linecap="round" stroke-linejoin="round" />
                     </svg>
                 </div>
-                <div class="form-body">
-                    {{-- <div class="space-y-2 w-full"> --}}
+                <div class="form-body space-y-0">
                     <input type="hidden" name="internship_id" :value="generateDocumentModal ? dataId.id : ''">
-                    {{-- <div class="input-group">
-                        <label class="input-label" for="">Nomor Surat</label>
-                        <input class="input h-full w-full" name="letter_num" type="text"
-                            placeholder="Masukkan Nomor Surat" required>
-                    </div> --}}
-                    <div id="documentGenerateField" class="space-y-2">
+                    <div id="documentGenerateField" class="space-y-4">
                         {{-- documentGenerateField --}}
                     </div>
                 </div>
@@ -242,7 +237,8 @@
 
             dataMember.forEach(function(teamMember, index) {
                 const member = document.createElement('input');
-                member.value = teamMember.student.name + ' (' + teamMember.student.department.name +  '/NIS ' + teamMember.student.nis + ')';
+                member.value = teamMember.student.name + ' (' + teamMember.student.department.name + '/NIS ' +
+                    teamMember.student.nis + ')';
                 member.disabled = true;
                 member.classList.add('input', 'w-full');
 
@@ -259,7 +255,7 @@
 
             dataMember.forEach(function(teamMember, index) {
                 const section = document.createElement('div');
-                section.classList.add('flex', 'space-x-2');
+                section.classList.add('md:flex', 'md:space-x-2', 'space-y-2', 'md:space-y-0');
 
                 const div = document.createElement('div');
                 div.classList.add('input-group', 'w-full');
@@ -271,7 +267,7 @@
                 const member = document.createElement('input');
                 member.value = teamMember.student.name;
                 member.readOnly = true;
-                member.classList.add('input', 'w-full');
+                member.classList.add('input', 'w-full', 'bg-neutral-50');
 
                 const memberId = document.createElement('input');
                 memberId.value = teamMember.student.id;

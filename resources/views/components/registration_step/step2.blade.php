@@ -6,9 +6,9 @@
             <div class="input-group">
                 <label class="input-label" for="">Pilih Anggota Kelompok yang tersedia</label>
                 <div x-data="{ option: false, selected: 'Pilih Opsi', valueSelected: '' }" class="space-y-4">
-                    <div class="flex space-x-2">
-                        <div>
-                            <button @click.prevent="option=!option" class="input input-select w-80"
+                    <div class="flex place-items space-x-2 w-96">
+                        <div class="w-full">
+                            <button @click.prevent="option=!option" class="input input-select w-full"
                                 :disabled="isDelete" required>
                                 <span x-text="selected"
                                     :class="selected == 'Pilih Opsi' ? 'text-neutral-300' : 'text-neutral-800'"></span>
@@ -28,12 +28,18 @@
                                 </ul>
                             </div>
                         </div>
-                        <button @click.prevent="addMember(selected, valueSelected)"
-                            class="btn btn-xs btn-default-fill h-fit">Tambah Anggota</button>
+                        <button x-show="selected!='Pilih Opsi'" @click.prevent="addMember(selected, valueSelected);selected='Pilih Opsi'"
+                            class="btn btn-xs btn-default-fill h-fit text-nowrap">Tambah Anggota</button>
                     </div>
                     <div id="memberFields" class="space-y-2">
                         {{-- team member --}}
                     </div>
+                    <div class="flex space-x-2">
+                        <input type="checkbox" name="teamMember[]" value="" id="doesntHaveGroup">
+                        <span class="text-xs">Individu/Tidak memiliki anggota kelompok</span>
+                    </div>
+                    <p class="text-xs">* Tidak perlu menambah data diri karena sistem secara otomatis mencatat kamu
+                        sebagai anggota</p>
                 </div>
             </div>
             <div>
@@ -48,6 +54,7 @@
 <script>
     function addMember(selected, valueSelected) {
         const memberFields = document.getElementById('memberFields');
+        const indiv = document.getElementById('doesntHaveGroup');
         const newField = document.createElement('div');
         newField.classList.add('flex', 'space-x-2');
 
@@ -56,6 +63,7 @@
             <button onclick="removeMember(this)" class="btn btn-xs btn-error-fill h-fit">Hapus</button>
             <input type="hidden" name="teamMember[]" value="${valueSelected}" readonly>
         `;
+        indiv.name = '';
 
         memberFields.appendChild(newField);
     }
