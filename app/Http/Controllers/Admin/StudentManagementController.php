@@ -107,7 +107,7 @@ class StudentManagementController extends Controller
             ]);
 
             $validatedData['password'] = Hash::make($validatedData['password']);
-            $validatedData['department_id'] = $validatedData['department_id'] == 'K3R' ? '1' : ($validatedData['department_id'] == 'DPIB' ? '2' : ($validatedData['department_id'] == 'RPL' ? '3' : ''));
+            $validatedData['department_id'] = $validatedData['department_id'] == 'RPL' ? '1' : ($validatedData['department_id'] == 'DPIB' ? '2' : ($validatedData['department_id'] == 'K3R' ? '3' : ''));
             $validatedData['gender'] = $validatedData['gender'] == 'Laki-Laki' ? 'men' : 'women';
 
             DB::transaction(function () use ($validatedData) {
@@ -161,7 +161,7 @@ class StudentManagementController extends Controller
                 $validatedData['password'] = Hash::make($validatedData['password']);
             }
 
-            $validatedData['department_id'] = $validatedData['department_id'] == 'K3R' ? '1' : ($validatedData['department_id'] == 'DPIB' ? '2' : ($validatedData['department_id'] == 'RPL' ? '3' : ''));
+            $validatedData['department_id'] = $validatedData['department_id'] == 'RPL' ? '1' : ($validatedData['department_id'] == 'DPIB' ? '2' : ($validatedData['department_id'] == 'K3R' ? '3' : ''));
             $validatedData['gender'] = $validatedData['gender'] == 'Laki-Laki' ? 'men' : 'women';
 
             DB::transaction(function () use ($id, $validatedData) {
@@ -249,7 +249,7 @@ class StudentManagementController extends Controller
                     ]);
 
                     $row[4] = $row[4] == 'Laki-Laki' ? 'men' : 'women';
-                    $row[5] = $row[5] == 'K3R' ? '1' : ($row[5] == 'DPIB' ? '2' : ($row[5] == 'RPL' ? '3' : ''));
+                    $row[5] = $row[5] == 'RPL' ? '1' : ($row[5] == 'DPIB' ? '2' : ($row[5] == 'K3R' ? '3' : ''));
                     $row[10] = Hash::make($row[10]);
 
                     $userData = [

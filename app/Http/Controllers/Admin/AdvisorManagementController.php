@@ -104,7 +104,7 @@ class AdvisorManagementController extends Controller
                 'password' => 'required|string|min:8|max:12',
             ]);
             $validatedData['password'] = Hash::make($validatedData['password']);
-            $validatedData['department_id'] = $validatedData['department_id'] == 'K3R' ? '1' : ($validatedData['department_id'] == 'DPIB' ? '2' : ($validatedData['department_id'] == 'RPL' ? '3' : ''));
+            $validatedData['department_id'] = $validatedData['department_id'] == 'RPL' ? '1' : ($validatedData['department_id'] == 'DPIB' ? '2' : ($validatedData['department_id'] == 'K3R' ? '3' : ''));
 
             DB::transaction(function () use ($validatedData) {
                 $newUser = $this->userService->addUser([
@@ -156,7 +156,7 @@ class AdvisorManagementController extends Controller
                 $validatedData['password'] = Hash::make($validatedData['password']);
             }
 
-            $validatedData['department_id'] = $validatedData['department_id'] == 'K3R' ? '1' : ($validatedData['department_id'] == 'DPIB' ? '2' : ($validatedData['department_id'] == 'RPL' ? '3' : ''));
+            $validatedData['department_id'] = $validatedData['department_id'] == 'K3R' ? '1' : ($validatedData['department_id'] == 'DPIB' ? '2' : ($validatedData['department_id'] == 'K3R' ? '3' : ''));
             DB::transaction(function () use ($id, $validatedData) {
                 $this->advisorService->updateAdvisor($id, [
                     'name' => $validatedData['name'],
@@ -239,7 +239,7 @@ class AdvisorManagementController extends Controller
                     ]);
 
 
-                    $row[3] = $row[3] == 'K3R' ? '1' : ($row[3] == 'DPIB' ? '2' : ($row[3] == 'RPL' ? '3' : ''));
+                    $row[3] = $row[3] == 'RPL' ? '1' : ($row[3] == 'DPIB' ? '2' : ($row[3] == 'K3R' ? '3' : ''));
                     $row[4] = $row[4] == 'Guru Pertama' ? '1' : ($row[4] == 'Guru Muda' ? '2' : ($row[4] == 'Guru Madya' ? '3' : ($row[4] == 'Guru Utama' ? '4' : '')));
                     $row[5] = $row[5] == 'I/a' ? '1' : ($row[5] == 'I/b' ? '2' : ($row[5] == 'I/c' ? '3' : ($row[5] == 'I/d' ? '4' : ($row[5] == 'II/a' ? '5' : ($row[5] == 'II/b' ? '6' : ($row[5] == 'II/c' ? '7' : ($row[5] == 'II/d' ? '8' : ($row[5] == 'III/a' ? '9' : ($row[5] == 'III/b' ? '10' : ($row[5] == 'III/c' ? '11' : ($row[5] == 'III/d' ? '12' : ($row[5] == 'IV/a' ? '13' : ($row[5] == 'IV/b' ? '14' : ($row[5] == 'IV/c' ? '15' : ($row[5] == 'IV/d' ? '16' : ($row[5] == 'IV/e' ? '17' : ''))))))))))))))));
                     $row[9] = Hash::make($row[9]);
