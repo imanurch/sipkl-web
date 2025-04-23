@@ -141,7 +141,7 @@ class AssessmentAdminController extends Controller
 
             // cek final report
             $isCompleteFinalReport = $this->internDocumentService->checkIsCompleteFinalReportByInternshipAndStudentId($dt->internship_id, $dt->student_id);
-            
+
             if ($isCompleteFinalReport == true) {
                 // cek logbook
                 $isCompleteLogbook = $this->logbookService->checkIsCompleteLogbookByInternshipAndStudentId($dt->internship_id, $dt->student_id);
@@ -254,7 +254,7 @@ class AssessmentAdminController extends Controller
                 ]);
 
                 // test
-                if($request->final_test != null){
+                if ($request->final_test != null) {
                     $this->testAssessmentService->updateOrCreate([
                         'assessment_id' => $id,
                         'score' => $request->final_test,
@@ -275,6 +275,21 @@ class AssessmentAdminController extends Controller
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
+        $sheet->mergeCells('A1:A2');
+        $sheet->mergeCells('B1:B2');
+        $sheet->mergeCells('C1:C2');
+        $sheet->mergeCells('D1:D2');
+        $sheet->mergeCells('E1:E2');
+        $sheet->mergeCells('F1:F2');
+        $sheet->mergeCells('G1:G2');
+        $sheet->mergeCells('H1:H2');
+        $sheet->mergeCells('I1:I2');
+        $sheet->mergeCells('J1:N1');
+        $sheet->mergeCells('O1:S1');
+        $sheet->mergeCells('T1:T2');
+        $sheet->mergeCells('U1:U2');
+        $sheet->mergeCells('V1:V2');
+
         $sheet->setCellValue('A1', 'NO');
         $sheet->setCellValue('B1', 'NAMA');
         $sheet->setCellValue('C1', 'NIS');
@@ -283,8 +298,22 @@ class AssessmentAdminController extends Controller
         $sheet->setCellValue('F1', 'TAHUN AJARAN');
         $sheet->setCellValue('G1', 'INDUSTRI');
         $sheet->setCellValue('H1', 'ALAMAT INDUSTRI');
-        $sheet->setCellValue('I1', 'NILAI PKL');
-        $sheet->setCellValue('J1', 'STATUS PKL');
+        $sheet->setCellValue('I1', 'NILAI TEKNIS');
+        $sheet->setCellValue('J1', 'NILAI NON TEKNIS');
+        $sheet->setCellValue('J2', 'KEDISIPLINAN');
+        $sheet->setCellValue('K2', 'KERJA SAMA');
+        $sheet->setCellValue('L2', 'INISIATIF');
+        $sheet->setCellValue('M2', 'TANGGUNG JAWAB');
+        $sheet->setCellValue('N2', 'JUJUR DAN SANTUN');
+        $sheet->setCellValue('O1', 'NILAI LAPORAN AKHIR');
+        $sheet->setCellValue('O2', 'SIKAP');
+        $sheet->setCellValue('P2', 'TATA TULIS');
+        $sheet->setCellValue('Q2', 'KETEPATAN WAKTU');
+        $sheet->setCellValue('R2', 'KETERTIBAN');
+        $sheet->setCellValue('S2', 'LAPORAN PKL KESELURUHAN');
+        $sheet->setCellValue('T1', 'NILAI UJIAN PKL');
+        $sheet->setCellValue('U1', 'NILAI AKHIR PKL');
+        $sheet->setCellValue('V1', 'STATUS PKL');
 
         $data = $this->assessmentService->getAssessmentByBatch($request->batch_id);
 
@@ -295,6 +324,43 @@ class AssessmentAdminController extends Controller
             $non_technical_score = 0;
             $final_report_score = 0;
 
+            // if (
+            //     count($dt->technical_assessment) > 0 &&
+            //     $this->technicalAssessmentService->isTechnicalAssessmentComplete($dt->id) == true &&
+            //     $this->nonTechnicalAssessmentService->isNonTechnicalAssessmentComplete($dt->id) == true &&
+            //     $this->finalReportAssessmentService->isFinalReportAssessmentComplete($dt->id) == true &&
+            //     $this->testAssessmentService->isTestAssessmentComplete($dt->id) == true
+            // ) {
+            // technical
+            if (count($dt->technical_assessment) > 0) {
+                foreach ($dt->technical_assessment as $aspect_score) {
+                    $technical_score += $aspect_score->score;
+                    $dt->technical_aspect .= "{$aspect_score->aspect}: {$aspect_score->score}\n";
+                }
+                $technical_score_average = $technical_score / count($dt->technical_assessment);
+            }
+
+            // non technical
+            if (count($dt->non_technical_assessment) > 0) {
+                foreach ($dt->non_technical_assessment as $aspect_score) {
+                    $non_technical_score += $aspect_score->score;
+                    $non_technical_aspect_data[$aspect_score->aspect] = $aspect_score->score;
+                }
+                $non_technical_score_average = $non_technical_score / count($dt->non_technical_assessment);
+                $dt->non_technical_aspect = $non_technical_aspect_data;
+            }
+
+            // final report
+            if (count($dt->final_report_assessment) > 0) {
+                foreach ($dt->final_report_assessment as $aspect_score) {
+                    $final_report_score += $aspect_score->score;
+                    $final_report_data[$aspect_score->aspect] = $aspect_score->score;
+                }
+                $final_report_score_average = $final_report_score / count($dt->final_report_assessment);
+                $dt->final_report = $final_report_data;
+            }
+
+            // final score internship
             if (
                 count($dt->technical_assessment) > 0 &&
                 $this->technicalAssessmentService->isTechnicalAssessmentComplete($dt->id) == true &&
@@ -302,25 +368,6 @@ class AssessmentAdminController extends Controller
                 $this->finalReportAssessmentService->isFinalReportAssessmentComplete($dt->id) == true &&
                 $this->testAssessmentService->isTestAssessmentComplete($dt->id) == true
             ) {
-                // technical
-                foreach ($dt->technical_assessment as $aspect_score) {
-                    $technical_score += $aspect_score->score;
-                }
-                $technical_score_average = $technical_score / count($dt->technical_assessment);
-
-                // non technical
-                foreach ($dt->non_technical_assessment as $aspect_score) {
-                    $non_technical_score += $aspect_score->score;
-                }
-                $non_technical_score_average = $non_technical_score / count($dt->non_technical_assessment);
-
-                // final report
-                foreach ($dt->final_report_assessment as $aspect_score) {
-                    $final_report_score += $aspect_score->score;
-                }
-                $final_report_score_average = $final_report_score / count($dt->final_report_assessment);
-
-                // final score internship
                 $dt->internship_score = round((($technical_score_average + $non_technical_score_average + $final_report_score_average + $dt->test_assessment->score) / 4), 2);
                 // cek kelulusan
                 if ($dt->internship_score >= 75) {
@@ -328,16 +375,18 @@ class AssessmentAdminController extends Controller
                 } else {
                     $dt->internship_status = 'Tidak Lulus';
                 }
-            } else {
-                $dt->internship_score = 'Nilai Belum Lengkap';
-                $dt->internship_status = 'Nilai Belum Lengkap';
             }
+            // } else {
+            //     $dt->internship_score = 'Nilai Belum Lengkap';
+            //     $dt->internship_status = 'Nilai Belum Lengkap';
+            // }
         }
 
-        $row = 2;
+        $row = 3;
         $num = 1;
 
         foreach ($data as $dt) {
+            // dd($dt->test_assessment != null ? $dt->test_assessment->score : 'Belum Dinilai');
             $sheet->setCellValue('A' . $row, $num);
             $sheet->setCellValue('B' . $row, $dt->student->name);
             $sheet->setCellValue('C' . $row, $dt->student->nis);
@@ -346,10 +395,27 @@ class AssessmentAdminController extends Controller
             $sheet->setCellValue('F' . $row, $dt->student->year . '/' . $dt->student->year + 1);
             $sheet->setCellValue('G' . $row, $dt->internship->industry->name);
             $sheet->setCellValue('H' . $row, $dt->internship->industry->address);
-            $sheet->setCellValue('I' . $row, $dt->internship_score);
-            $sheet->setCellValue('J' . $row, $dt->internship_status);
+            $sheet->setCellValue('I' . $row, $dt->technical_aspect != null ? rtrim($dt->technical_aspect) : '');
+            $sheet->getStyle('I' . $row)->getAlignment()->setWrapText(true);
+            $sheet->setCellValue('J' . $row, $dt->non_technical_aspect['Kedisiplinan'] ?? '');
+            $sheet->setCellValue('K' . $row, $dt->non_technical_aspect['Kerja Sama'] ?? '');
+            $sheet->setCellValue('L' . $row, $dt->non_technical_aspect['Inisiatif'] ?? '');
+            $sheet->setCellValue('M' . $row, $dt->non_technical_aspect['Tanggung Jawab'] ?? '');
+            $sheet->setCellValue('N' . $row, $dt->non_technical_aspect['Jujur dan Santun'] ?? '');
+            $sheet->setCellValue('O' . $row, $dt->final_report['Sikap'] ?? '');
+            $sheet->setCellValue('P' . $row, $dt->final_report['Tata Tulis'] ?? '');
+            $sheet->setCellValue('Q' . $row, $dt->final_report['Ketepatan Waktu'] ?? '');
+            $sheet->setCellValue('R' . $row, $dt->final_report['Ketertiban'] ?? '');
+            $sheet->setCellValue('S' . $row, $dt->final_report['Keseluruhan Laporan'] ?? '');
+            $sheet->setCellValue('T' . $row, $dt->test_assessment != null ? $dt->test_assessment->score : '');
+            $sheet->setCellValue('U' . $row, $dt->internship_score ?? 'Nilai Belum Lengkap');
+            $sheet->setCellValue('V' . $row, $dt->internship_status ?? 'Nilai Belum Lengkap');
             $row++;
             $num++;
+        }
+
+        foreach (range('A', 'V') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
         }
 
         $filename = "data_assessment_export.xlsx";
@@ -359,6 +425,6 @@ class AssessmentAdminController extends Controller
 
         $writer = new Xlsx($spreadsheet);
         $writer->save('php://output');
-        exit;
+        // exit;
     }
 }
