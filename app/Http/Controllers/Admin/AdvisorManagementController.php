@@ -156,7 +156,7 @@ class AdvisorManagementController extends Controller
                 $validatedData['password'] = Hash::make($validatedData['password']);
             }
 
-            $validatedData['department_id'] = $validatedData['department_id'] == 'K3R' ? '1' : ($validatedData['department_id'] == 'DPIB' ? '2' : ($validatedData['department_id'] == 'K3R' ? '3' : ''));
+            $validatedData['department_id'] = $validatedData['department_id'] == 'RPL' ? '1' : ($validatedData['department_id'] == 'DPIB' ? '2' : ($validatedData['department_id'] == 'K3R' ? '3' : ''));
             DB::transaction(function () use ($id, $validatedData) {
                 $this->advisorService->updateAdvisor($id, [
                     'name' => $validatedData['name'],
@@ -252,7 +252,7 @@ class AdvisorManagementController extends Controller
                         'password' => $row[9],
                         'role' => 'advisor',
                     ];
-                    
+
                     $newUser = $this->userService->addUser($userData);
 
                     $advisorData = [
