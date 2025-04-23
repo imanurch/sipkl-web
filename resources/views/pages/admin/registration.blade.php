@@ -225,9 +225,10 @@
                 </h6>
                 <div class="flex justify-center py-3 space-x-4 border-t border-success-400">
                     <button @click="modalConfirm=null" class="btn btn-xs btn-success-outline">Tidak</button>
-                    <a :href="`{{ route('admin.registration.status.confirm', ['registrationId' => 'id', 'status' => 'accept']) }}`
+                    <button @click="setConfirmAction('accept',id)" class="btn btn-xs btn-success-fill">Ya</button>
+                    {{-- <a :href="`{{ route('admin.registration.status.confirm', ['registrationId' => 'id', 'status' => 'accept']) }}`
                     .replace('id', id)"
-                        class="btn btn-xs btn-success-fill">Ya</a>
+                        class="btn btn-xs btn-success-fill">Ya</a> --}}
                 </div>
             </div>
         </div>
@@ -242,9 +243,10 @@
                 </h6>
                 <div class="flex justify-center py-3 space-x-4 border-t border-error-400">
                     <button @click="modalConfirm=null" class="btn btn-xs btn-error-outline">Tidak</button>
-                    <a :href="`{{ route('admin.registration.status.confirm', ['registrationId' => 'id', 'status' => 'reject']) }}`
+                    <button @click="setConfirmAction('reject',id)" class="btn btn-xs btn-success-fill">Ya</button>
+                    {{-- <a :href="`{{ route('admin.registration.status.confirm', ['registrationId' => 'id', 'status' => 'reject']) }}`
                     .replace('id', id)"
-                        class="btn btn-xs btn-error-fill">Ya</a>
+                        class="btn btn-xs btn-error-fill">Ya</a> --}}
                 </div>
             </div>
         </div>
@@ -298,6 +300,21 @@
                 form.action = `{{ route('admin.registration.destroy', ':id') }}`.replace(':id', id);
             } else if (modalAction === 'isEditStatus' && id) {
                 form.action = `{{ route('admin.registration.update.status', ':id') }}`.replace(':id', id);
+            }
+        }
+    </script>
+
+    <script>
+        function setConfirmAction(status = null, id = null) {
+            console.log(status === "accept" ? 'yes' : 'no');
+
+
+            if (status == 'accept') {
+                console.log("OTW ACC")
+
+                window.location.href = "registration/confirmation/" + id + "/accept"
+            } else if (status === 'reject' && id) {
+                window.location.href = "registration/confirmation/" + id + "/reject"
             }
         }
     </script>

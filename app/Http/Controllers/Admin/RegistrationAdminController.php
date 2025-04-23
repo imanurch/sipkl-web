@@ -8,7 +8,6 @@ use App\Services\BatchService;
 use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\LogbookService;
 use App\Services\StudentService;
-use App\Services\SignatureService;
 use Illuminate\Support\Facades\DB;
 use App\Services\AssessmentService;
 use App\Services\InternshipService;
@@ -33,7 +32,6 @@ class RegistrationAdminController extends Controller
         $studentService,
         $logbookService,
         $internDocumentService,
-        $signatureService,
         $schoolProfileService;
 
     // Constructor Injection
@@ -46,7 +44,6 @@ class RegistrationAdminController extends Controller
         StudentService $studentService,
         LogbookService $logbookService,
         InternDocumentService $internDocumentService,
-        SignatureService $signatureService,
         SchoolProfileService $schoolProfileService
     ) {
         $this->registrationService = $registrationService;
@@ -57,7 +54,6 @@ class RegistrationAdminController extends Controller
         $this->studentService = $studentService;
         $this->logbookService = $logbookService;
         $this->internDocumentService = $internDocumentService;
-        $this->signatureService = $signatureService;
         $this->schoolProfileService = $schoolProfileService;
     }
 
