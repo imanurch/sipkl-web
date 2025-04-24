@@ -271,7 +271,6 @@ class AssessmentAdminController extends Controller
 
     public function export(Request $request)
     {
-        // dd($request->all());
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
@@ -324,14 +323,6 @@ class AssessmentAdminController extends Controller
             $non_technical_score = 0;
             $final_report_score = 0;
 
-            // if (
-            //     count($dt->technical_assessment) > 0 &&
-            //     $this->technicalAssessmentService->isTechnicalAssessmentComplete($dt->id) == true &&
-            //     $this->nonTechnicalAssessmentService->isNonTechnicalAssessmentComplete($dt->id) == true &&
-            //     $this->finalReportAssessmentService->isFinalReportAssessmentComplete($dt->id) == true &&
-            //     $this->testAssessmentService->isTestAssessmentComplete($dt->id) == true
-            // ) {
-            // technical
             if (count($dt->technical_assessment) > 0) {
                 foreach ($dt->technical_assessment as $aspect_score) {
                     $technical_score += $aspect_score->score;
@@ -376,17 +367,12 @@ class AssessmentAdminController extends Controller
                     $dt->internship_status = 'Tidak Lulus';
                 }
             }
-            // } else {
-            //     $dt->internship_score = 'Nilai Belum Lengkap';
-            //     $dt->internship_status = 'Nilai Belum Lengkap';
-            // }
         }
 
         $row = 3;
         $num = 1;
 
         foreach ($data as $dt) {
-            // dd($dt->test_assessment != null ? $dt->test_assessment->score : 'Belum Dinilai');
             $sheet->setCellValue('A' . $row, $num);
             $sheet->setCellValue('B' . $row, $dt->student->name);
             $sheet->setCellValue('C' . $row, $dt->student->nis);

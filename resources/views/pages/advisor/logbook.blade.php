@@ -79,7 +79,7 @@
                             <td>
                                 <x-table.action_btn_table
                                 href="{{ route('advisor.logbook.detail', ['studentId' => $dt->id ?? '', 'internshipId' => $member->group->internship->id]) }}"
-                                name="Lihat"></x-table.action_btn_table>
+                                name="Lihat" target=""></x-table.action_btn_table>
                             </td>
                         @endif
                     @endforeach

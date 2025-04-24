@@ -74,7 +74,7 @@
                                 @if ($doc->type == 'laporan akhir')
                                     <x-table.action_btn_table
                                         href="{{ route('admin.output.download.finalReport', ['filename' => $doc->url]) }}"
-                                        name="Lihat"></x-table.action_btn_table>
+                                        name="Lihat"  target=""></x-table.action_btn_table>
                                     @break
 
                                 @elseif($loop->last)
