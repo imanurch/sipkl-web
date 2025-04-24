@@ -11,30 +11,50 @@ class BatchRepository
         $query = Batch::query();
 
         if ($searchFilters != null) {
-            $query->where('name', 'like', '%' . $searchFilters . '%')->orWhere('year', 'like', '%' . $searchFilters . '%');           
+            $query->where('name', 'like', '%' . $searchFilters . '%')->orWhere('year', 'like', '%' . $searchFilters . '%');
         }
 
         return $query->paginate(5);
     }
 
-    public function getBatchByStatus($status)
+    // public function getBatchByStatus($status)
+    // {
+    //     if ($status == 'active') {
+    //         return Batch::where('status', '1')->first();
+    //     } else {
+    //         return Batch::where('status', '0')->get();
+    //     }
+    // }
+
+    public function getBatchByNonActiveStatus()
     {
-        if ($status == 'active') {
-            return Batch::where('status', '1')->first();
-        } else {
-            return Batch::where('status', '0')->get();
-        }
+        return Batch::where('status', '0')->first();
     }
 
-    public function getActiveOrLastBatch()
+    public function getBatchByActiveStatus()
     {
-        $activeBatch = Batch::where('status', '1')->first();
-        
-        if($activeBatch == null){
-            return Batch::latest('id')->first();
-        }else{
-            return $activeBatch;
-        }
+        return Batch::where('status', '1')->first();
+    }
+
+    // public function getActiveOrLastBatch()
+    // {
+    //     $activeBatch = Batch::where('status', '1')->first();
+
+    //     if ($activeBatch == null) {
+    //         return Batch::latest('id')->first();
+    //     } else {
+    //         return $activeBatch;
+    //     }
+    // }
+
+    public function getActiveBatch()
+    {
+        return Batch::where('status', '1')->first();
+    }
+
+    public function getLastBatch()
+    {
+        return Batch::latest('id')->first();
     }
 
     public function findBatchById($id)
@@ -52,10 +72,20 @@ class BatchRepository
         return Batch::where('id', $id)->update($data);
     }
 
+    // public function setActiveBatch($id)
+    // {
+    //     Batch::where('status', '1')->update(['status' => '0']);
+    //     return Batch::where('id', $id)->update(['status' => '1']);
+    // }
+
+    public function deactivateCurrentActiveBatch()
+    {
+        return Batch::where('status', '1')->update(['status' => '0']);
+    }
+
     public function setActiveBatch($id)
     {
-        Batch::where('status','1')->update(['status'=>'0']);
-        return Batch::where('id', $id)->update(['status'=>'1']);
+        return Batch::where('id', $id)->update(['status' => '1']);
     }
 
     public function deleteBatch($id)
