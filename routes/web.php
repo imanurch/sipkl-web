@@ -21,15 +21,18 @@ use App\Http\Controllers\Admin\AdvisorManagementController;
 use App\Http\Controllers\Admin\RegistrationAdminController;
 use App\Http\Controllers\Admin\StudentManagementController;
 use App\Http\Controllers\Advisor\IndustryAdvisorController;
+use App\Http\Controllers\Student\IndustryRequestController;
 use App\Http\Controllers\Admin\AdministrationDataController;
 use App\Http\Controllers\Admin\IndustryManagementController;
 use App\Http\Controllers\Advisor\DashboardAdvisorController;
 use App\Http\Controllers\Student\DashboardStudentController;
+use App\Http\Controllers\Admin\RegistrationConfirmController;
 use App\Http\Controllers\Advisor\AssessmentAdvisorController;
 use App\Http\Controllers\Advisor\MonitoringAdvisorController;
 use App\Http\Controllers\Student\FinalReportStudentController;
 use App\Http\Controllers\Student\RegistrationStudentController;
 use App\Http\Controllers\Advisor\LogbookDetailAdvisorController;
+use App\Http\Controllers\Student\RegistrationFormStudentController;
 
 /*
 |--------------------------------------------------------------------------
@@ -107,8 +110,8 @@ Route::prefix('admin')->name('admin.')->middleware('role:admin')->group(function
     Route::get('registration', [RegistrationAdminController::class, 'index'])->name('registration');
     Route::delete('registration/{id}', [RegistrationAdminController::class, 'destroy'])->name('registration.destroy');
     Route::get('registration/download/{type}/{filename}', [RegistrationAdminController::class, 'downloadFile'])->name('registration.download.file');
-    Route::get('registration/confirmation/{registrationId}/{status}', [RegistrationAdminController::class, 'confirmStatusRegistration'])->name('registration.status.confirm');
-    Route::post('registration/confirmation/{registrationId}', [RegistrationAdminController::class, 'updateStatusRegistration'])->name('registration.update.status');
+    Route::get('registration/confirmation/{registrationId}/{status}', [RegistrationConfirmController::class, 'confirmStatusRegistration'])->name('registration.status.confirm');
+    Route::post('registration/confirmation/{registrationId}', [RegistrationConfirmController::class, 'updateStatusRegistration'])->name('registration.update.status');
     // Route::get('registration/generateDokumenPermohonan/{registrationId}', [RegistrationAdminController::class, 'generateSuratPermohonan'])->name('registration.generateSuratPermohonan');
     Route::post('registration/generateDokumen', [RegistrationAdminController::class, 'generateDocument'])->name('registration.generateDocument');
 
@@ -192,13 +195,13 @@ Route::prefix('student')->name('student.')->middleware('role:student')->group(fu
 
     // registration
     Route::get('registration', [RegistrationStudentController::class, 'index'])->name('registration');
-    Route::post('registration/industryRequest', [RegistrationStudentController::class, 'newIndustryRequest'])->name('registration.industry.request');
-    Route::post('registration/step2', [RegistrationStudentController::class, 'step2'])->name('registration.step2');
-    Route::post('registration/step3', [RegistrationStudentController::class, 'step3'])->name('registration.step3');
-    Route::post('registration/step4', [RegistrationStudentController::class, 'step4'])->name('registration.step4');
-    Route::get('registration/step4', [RegistrationStudentController::class, 'step4View'])->name('registration.step4');
-    Route::post('registration/step5', [RegistrationStudentController::class, 'step5'])->name('registration.step5');
-    Route::get('registration/step5', [RegistrationStudentController::class, 'step5View'])->name('registration.step5');
+    Route::post('registration/industryRequest', [IndustryRequestController::class, 'newIndustryRequest'])->name('registration.industry.request');
+    Route::post('registration/step2', [RegistrationFormStudentController::class, 'step2'])->name('registration.step2');
+    Route::post('registration/step3', [RegistrationFormStudentController::class, 'step3'])->name('registration.step3');
+    Route::post('registration/step4', [RegistrationFormStudentController::class, 'step4'])->name('registration.step4');
+    Route::get('registration/step4', [RegistrationFormStudentController::class, 'step4View'])->name('registration.step4');
+    Route::post('registration/step5', [RegistrationFormStudentController::class, 'step5'])->name('registration.step5');
+    Route::get('registration/step5', [RegistrationFormStudentController::class, 'step5View'])->name('registration.step5');
     Route::get('registration/download/{type}/{filename}', [RegistrationStudentController::class, 'downloadFile'])->name('registration.download.file');
     Route::get('registration/history', [RegistrationStudentController::class, 'history'])->name('registration.history');
     Route::get('registration/{lastRegistrationId}', [RegistrationStudentController::class, 'repeatRegistration'])->name('registration.newRegistration');

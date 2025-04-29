@@ -2,13 +2,16 @@
 
 namespace App\Repositories;
 
-use App\Models\Student;
-use App\Models\Industry;
 use App\Models\Internship;
-use App\Models\GroupMember;
 
 class InternshipRepository
 {
+    /**
+     * Get paginated list of internships with related data and optional search filters.
+     *
+     * @param array $filters
+     * @return \Illuminate\Contracts\Pagination\LengthAwarePaginator
+     */
     public function getInternship($filters = [])
     {
         $query = Internship::with(
@@ -36,101 +39,13 @@ class InternshipRepository
         return $query->where('batch_id', $filters['batch_id'])->orderBy('created_at', 'desc')->paginate(5);
     }
 
-    public function getIntern($filters = [])
-    {
-        $query = Student::with(
-            'groupMember.group.internship',
-            'groupMember.group.internship.advisor:id,name',
-            'groupMember.group.internship.industry:id,name',
-            'internDocument'
-        )->whereHas('groupMember.group.internship', function ($query) use ($filters) {
-            $query->where('batch_id', $filters['batch_id']);
-        });
-
-        // filter search
-        if ($filters['search'] != null) {
-            $query->where('name', 'like', '%' . $filters['search'] . '%');
-        };
-
-        if ($filters['search'] != null) {
-            $query->where('name', 'like', '%' . $filters['search'] . '%')
-                ->orWhereHas('groupMember.group.internship.industry', function ($subQuery) use ($filters) {
-                    $subQuery->where('name', 'like', '%' . $filters['search'] . '%');
-                });
-        };
-
-        return $query->orderBy('created_at', 'desc')->paginate(10);
-    }
-
-    public function getAllIntern($batch_id)
-    {
-        return Student::with(
-            'groupMember.group.internship',
-            'groupMember.group.internship.advisor:id,name',
-            'groupMember.group.internship.industry:id,name',
-            'internDocument'
-        )->whereHas('groupMember.group.internship', function ($query) use ($batch_id) {
-            $query->where('batch_id', $batch_id);
-        })->get();
-    }
-
-    public function countIntern($batch_id)
-    {
-        return Student::whereHas('groupMember.group.internship', function ($query) use ($batch_id) {
-            $query->where('batch_id', $batch_id);
-        })->count();
-    }
-
-    public function getInternByAdvisor($filters = [], $advisor_id)
-    {
-        $query = Student::query();
-
-        // filter search
-        if ($filters['search'] != null) {
-            $query->where(function ($subQuery) use ($filters) {
-                $subQuery->where('name', 'like', '%' . $filters['search'] . '%')
-                    ->orWhere('nisn', 'like', '%' . $filters['search'] . '%')
-                    ->orWhere('nis', 'like', '%' . $filters['search'] . '%')
-                    ->orWhere('phone_num', 'like', '%' . $filters['search'] . '%')
-                    ->orWhereHas('groupMember.group.internship.industry', function ($query) use ($filters) {
-                        $query->where('name', 'like', '%' . $filters['search'] . '%');
-                    });
-            });
-        }
-
-        return $query->whereHas('groupMember.group.internship', function ($query) use ($advisor_id, $filters) {
-            $query->where('advisor_id', $advisor_id)->where('batch_id', $filters['batch_id']);
-        })->with('groupMember.group.internship.industry:id,name')->paginate(10);
-    }
-
-    public function getIndustryByAdvisor($filters = [], $advisor_id)
-    {
-        $query = Industry::query();
-
-        // filter search
-        if ($filters['search'] != null) {
-            $query->where('name', 'like', '%' . $filters['search'] . '%');
-        }
-
-        return $query->whereHas('internship', function ($query) use ($advisor_id, $filters) {
-            $query->where('advisor_id', $advisor_id)->where('batch_id', $filters['batch_id']);
-        })->paginate(5);
-    }
-
-    public function countInternByAdvisor($batch_id, $advisor_id)
-    {
-        return Student::whereHas('groupMember.group.internship', function ($query) use ($advisor_id, $batch_id) {
-            $query->where('advisor_id', $advisor_id)->where('batch_id', $batch_id);
-        })->count();
-    }
-
-    public function countIndustryByAdvisor($batch_id, $advisor_id)
-    {
-        return Industry::whereHas('internship', function ($query) use ($advisor_id, $batch_id) {
-            $query->where('advisor_id', $advisor_id)->where('batch_id', $batch_id);
-        })->count();
-    }
-
+    /**
+     * Get internship data by student ID and batch ID.
+     *
+     * @param int $batch_id
+     * @param int $student_id
+     * @return \App\Models\Internship|null
+     */
     public function getInternshipByStudentId($batch_id, $student_id)
     {
         return Internship::whereHas('group.groupMember.student', function ($query) use ($student_id, $batch_id) {
@@ -138,36 +53,56 @@ class InternshipRepository
         })->with('industry:id,name,address', 'advisor:id,name,phone_num')->where('batch_id', $batch_id)->first();
     }
 
+    /**
+     * Get all internships by batch ID.
+     *
+     * @param int $batch_id
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
     public function getAllInternshipList($batch_id)
     {
         return Internship::where('batch_id', $batch_id)->get();
     }
 
-    public function getInternshipListByAdvisor($advisor_id, $batch_id)
-    {
-        return Internship::where('advisor_id', $advisor_id)->where('batch_id', $batch_id)->get();
-    }
-
+    /**
+     * Get internship by group ID.
+     *
+     * @param int $group_id
+     * @return \App\Models\Internship|null
+     */
     public function getInternshipByGroupId($group_id)
     {
         return Internship::where('group_id', $group_id)->first();
     }
 
+    /**
+     * Find internship by ID.
+     *
+     * @param int $id
+     * @return \App\Models\Internship|null
+     */
     public function findInternshipById($id)
     {
         return Internship::find($id);
     }
 
+    /**
+     * Create a new internship record.
+     *
+     * @param array $data
+     * @return \App\Models\Internship
+     */
     public function createInternship(array $data)
     {
         return Internship::create($data);
     }
 
-    public function updateInternshipAdvisor($internship_id, $advisor_id)
-    {
-        return Internship::where('id', $internship_id)->update(['advisor_id' => $advisor_id]);
-    }
-
+    /**
+     * Delete internship by ID.
+     *
+     * @param int $id
+     * @return int
+     */
     public function deleteInternship($id)
     {
         return Internship::where('id', $id)->delete();

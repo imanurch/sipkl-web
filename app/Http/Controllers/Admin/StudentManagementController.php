@@ -6,13 +6,19 @@ use Illuminate\Http\Request;
 use App\Services\UserService;
 use App\Services\BatchService;
 use App\Services\StudentService;
+use App\Services\DownloadService;
 use Illuminate\Support\Facades\DB;
 use App\Services\DepartmentService;
+use App\Services\ImportDataService;
+use App\Helpers\PasswordCheckHelper;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Hash;
 use App\Services\RegistrationService;
-use PhpOffice\PhpSpreadsheet\IOFactory;
+use App\Http\Requests\ImportFileRequest;
 use Flasher\Toastr\Laravel\Facade\Toastr;
+use App\Http\Requests\StoreStudentRequest;
+use App\Http\Requests\UpdateStudentRequest;
+use Illuminate\Validation\ValidationException;
 
 class StudentManagementController extends Controller
 {
@@ -20,7 +26,9 @@ class StudentManagementController extends Controller
         $batchService,
         $departmentService,
         $userService,
-        $registrationService;
+        $registrationService,
+        $downloadService,
+        $importDataService;
 
     // Constructor Injection
     public function __construct(
@@ -28,20 +36,23 @@ class StudentManagementController extends Controller
         BatchService $batchService,
         DepartmentService $departmentService,
         UserService $userService,
-        RegistrationService $registrationService
+        RegistrationService $registrationService,
+        DownloadService $downloadService,
+        ImportDataService $importDataService,
     ) {
         $this->studentService = $studentService;
         $this->batchService = $batchService;
         $this->departmentService = $departmentService;
         $this->userService = $userService;
         $this->registrationService = $registrationService;
+        $this->downloadService = $downloadService;
+        $this->importDataService = $importDataService;
     }
 
     public function index(Request $request)
     {
-        $currentBatch = $this->batchService->getBatchByStatus('active');
-        $batch_id = $request->batch ?? ($currentBatch->id ?? '');
-
+        $batch_id = $this->batchService->getRelevantBatch($request->batch);
+        
         $lastYear = $this->studentService->getLastYearStudent()->year;
         $year = $request->year ?? ($currentBatch->year ?? $lastYear);
 
@@ -85,38 +96,16 @@ class StudentManagementController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreStudentRequest $request)
     {
-        if ($request->check_password !== $request->password) {
-            return back()->withErrors(['password' => 'Passwords do not match.']);
-        }
-        $data = $request->except(['_token']);
-
         try {
-            $validatedData = $request->validate([
-                'name' => 'required|string',
-                'nisn' => 'required|size:10|unique:students,nisn',
-                'nis' => 'required|size:4|unique:students,nis',
-                'gender' => 'required',
-                'department_id' => 'required',
-                'year' => 'required',
-                'username' => 'required',
-                'email' => 'required|unique:users,email',
-                'phone_num' => 'required|string|min:10|max:14|unique:students,phone_num,',
-                'password' => 'required|string|min:8|max:12',
-            ]);
-
-            $validatedData['password'] = Hash::make($validatedData['password']);
-            $validatedData['department_id'] = $validatedData['department_id'] == 'RPL' ? '1' : ($validatedData['department_id'] == 'DPIB' ? '2' : ($validatedData['department_id'] == 'K3R' ? '3' : ''));
-            $validatedData['gender'] = $validatedData['gender'] == 'Laki-Laki' ? 'men' : 'women';
+            $validatedData = $request->validated();
+            $validatedData['password'] = PasswordCheckHelper::handlePassword($request->password, $request->check_password);
+            $validatedData['role'] = 'student';
 
             DB::transaction(function () use ($validatedData) {
-                $newUser = $this->userService->addUser([
-                    'username' => $validatedData['username'],
-                    'email' => $validatedData['email'],
-                    'password' => $validatedData['password'],
-                    'role' => 'student',
-                ]);
+                $newUser = $this->userService->addUser($validatedData);
+
                 $this->studentService->addStudent([
                     'user_id' => $newUser->id,
                     'name' => $validatedData['name'],
@@ -129,40 +118,22 @@ class StudentManagementController extends Controller
                 ]);
             });
             Toastr::addSuccess('Data siswa berhasil ditambah!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Toastr::addError($e->errors()['password'][0]);
         } catch (\Exception $e) {
             Toastr::addError('Data siswa gagal ditambah!');
         }
         return redirect()->back();
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateStudentRequest $request, $id)
     {
-        $data = $request->except(['_token', '_method']);
-
         try {
-            $validatedData = $request->validate([
-                'user_id' => 'required',
-                'name' => 'required|string',
-                'nisn' => 'required|size:10|unique:students,nisn,' . $id,
-                'nis' => 'required|size:4|unique:students,nis,' . $id,
-                'gender' => 'required',
-                'department_id' => 'required',
-                'year' => 'required',
-                'username' => 'required',
-                'email' => 'required|unique:users,email,' . $request->user_id,
-                'phone_num' => 'required|string|min:10|max:14|unique:students,phone_num,' . $id,
-                'password' => 'nullable|string|min:8|max:12',
-            ]);
+            $validatedData = $request->validated();
 
             if (!empty($validatedData['password'])) {
-                if ($request->check_password !== $request->password) {
-                    return back()->withErrors(['password' => 'Passwords do not match.']);
-                }
-                $validatedData['password'] = Hash::make($validatedData['password']);
+                $validatedData['password'] = PasswordCheckHelper::handlePassword($request->password, $request->check_password);
             }
-
-            $validatedData['department_id'] = $validatedData['department_id'] == 'RPL' ? '1' : ($validatedData['department_id'] == 'DPIB' ? '2' : ($validatedData['department_id'] == 'K3R' ? '3' : ''));
-            $validatedData['gender'] = $validatedData['gender'] == 'Laki-Laki' ? 'men' : 'women';
 
             DB::transaction(function () use ($id, $validatedData) {
                 $this->studentService->updateStudent($id, [
@@ -187,6 +158,8 @@ class StudentManagementController extends Controller
                 $this->userService->updateUser($validatedData['user_id'], $updateUserData);
             });
             Toastr::addSuccess('Data siswa berhasil diubah!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Toastr::addError($e->errors()['password'][0]);
         } catch (\Exception $e) {
             Toastr::addError('Data siswa gagal diubah!');
         }
@@ -205,71 +178,46 @@ class StudentManagementController extends Controller
         return redirect()->back();
     }
 
-    public function import(Request $request)
+    public function import(ImportFileRequest $request)
     {
-        $validatedData = $request->validate([
-            'import_file' => 'required|mimes:xlsx,xml,xls',
-        ]);
+        $request->validated();
 
         $file = $request->file('import_file');
 
-        // Load file Excel
-        $spreadsheet = IOFactory::load($file->getPathname());
-        $worksheet = $spreadsheet->getSheetByName('Data');
-        $rows = $worksheet->toArray();
+        try {
+            $validData = $this->importDataService->importStudentDataCheck($file);
+        } catch (ValidationException $e) {
+            Toastr::addError(nl2br($e->getMessage()));
+            return redirect()->back();
+        }
 
         try {
-            DB::transaction(function () use ($rows, $request) {
-                foreach ($rows as $index => $row) {
-                    if ($index == 0) continue;
-                    if ($row[1] == null) break;
+            DB::transaction(function () use ($validData) {
+                foreach ($validData as $data) {
+                    $data['password'] = Hash::make($data['password']);
+                    $data['role'] = 'student';
+                    $data['gender'] = match ($data['gender']) {
+                        'Laki-Laki' => 'men',
+                        'Perempuan' => 'women',
+                        default => 'men',
+                    };
+                    $data['department'] = match ($data['department']) {
+                        'RPL' => '1',
+                        'DPIB' => '2',
+                        default => '3',
+                    };
 
-                    $validatedData = $request->validate([
-                        'name' => $row[1],
-                        'nisn' => $row[2],
-                        'nis' => $row[3],
-                        'gender' => $row[4],
-                        'department_id' => $row[5],
-                        'year' => $row[6],
-                        'username' => $row[7],
-                        'email' => $row[8],
-                        'phone_num' => $row[9],
-                        'password' => $row[10],
-                    ], [
-                        'name' => 'required|string',
-                        'nisn' => 'required|size:10|unique:students,nisn',
-                        'nis' => 'required|size:4|unique:students,nis',
-                        'gender' => 'required',
-                        'department_id' => 'required',
-                        'year' => 'required',
-                        'username' => 'required',
-                        'email' => 'required|unique:users,email',
-                        'phone_num' => 'required|string|min:10|max:14|unique:students,phone_num,',
-                        'password' => 'required|string|min:8|max:12',
-                    ]);
-
-                    $row[4] = $row[4] == 'Laki-Laki' ? 'men' : 'women';
-                    $row[5] = $row[5] == 'RPL' ? '1' : ($row[5] == 'DPIB' ? '2' : ($row[5] == 'K3R' ? '3' : ''));
-                    $row[10] = Hash::make($row[10]);
-
-                    $userData = [
-                        'username' => $row[7],
-                        'email' => $row[8],
-                        'password' => $row[10],
-                        'role' => 'student',
-                    ];
-
-                    $newUser = $this->userService->addUser($userData);
+                    $newUser = $this->userService->addUser($data);
 
                     $studentData = [
                         'user_id' => $newUser->id ?? '',
-                        'name' => $row[1],
-                        'nisn' => $row[2],
-                        'nis' => $row[3],
-                        'gender' => $row[4],
-                        'department_id' => $row[5],
-                        'year' => $row[6],
-                        'phone_num' => $row[9],
+                        'name' => $data['name'],
+                        'nisn' => $data['nisn'],
+                        'nis' => $data['nis'],
+                        'gender' => $data['gender'],
+                        'department_id' => $data['department_id'],
+                        'year' => $data['year'],
+                        'phone_num' => $data['phone_num'],
                     ];
 
                     $this->studentService->addStudent($studentData);
@@ -284,54 +232,6 @@ class StudentManagementController extends Controller
 
     public function downloadTemplateFile()
     {
-        $filePath = storage_path('app/public/files/template_import_student.xlsx');
-
-        if (file_exists($filePath)) {
-            return response()->download($filePath);
-        } else {
-            Toastr::addError('File tidak ditemukan');
-        }
+        return $this->downloadService->templateImportDataDownload('template_import_student.xlsx');
     }
-
-    // public function export()
-    // {
-    //     $spreadsheet = new Spreadsheet();
-    //     $sheet = $spreadsheet->getActiveSheet();
-
-    //     $sheet->setCellValue('A1', 'NO');
-    //     $sheet->setCellValue('B1', 'NAMA');
-    //     $sheet->setCellValue('C1', 'NISN');
-    //     $sheet->setCellValue('C1', 'NIS');
-    //     $sheet->setCellValue('C1', 'JENIS KELAMIN');
-    //     $sheet->setCellValue('D1', 'JURUSAN');
-    //     $sheet->setCellValue('D1', 'TAHUN');
-    //     $sheet->setCellValue('E1', 'USERNAME');
-    //     $sheet->setCellValue('F1', 'EMAIL');
-    //     $sheet->setCellValue('G1', 'NOMOR TELEPON');
-
-    //     $data = $this->studentService->getStudent();
-
-    //     $row = 2;
-    //     $num = 1;
-    //     foreach ($data as $dt) {
-    //         $sheet->setCellValue('A' . $row, $num);
-    //         $sheet->setCellValue('B' . $row, $dt->name);
-    //         $sheet->setCellValue('C' . $row, $dt->nip);
-    //         $sheet->setCellValue('D' . $row, $dt->department->name);
-    //         $sheet->setCellValue('E' . $row, $dt->user->username);
-    //         $sheet->setCellValue('F' . $row, $dt->user->email);
-    //         $sheet->setCellValue('G' . $row, $dt->phone_num);
-    //         $row++;
-    //         $num++;
-    //     }
-
-    //     $filename = "data_advisor_export.xlsx";
-    //     header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-    //     header('Content-Disposition: attachment;filename="' . $filename . '"');
-    //     header('Cache-Control: max-age=0');
-
-    //     $writer = new Xlsx($spreadsheet);
-    //     $writer->save('php://output');
-    //     exit;
-    // }
 }

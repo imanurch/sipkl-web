@@ -2,16 +2,21 @@
 
 namespace App\Services;
 
+use App\Repositories\SpecificStudentRepository;
 use App\Repositories\StudentRepository;
 
 class StudentService
 {
-    protected $studentRepository;
+    protected $studentRepository,
+    $specificStudentRepository;
 
     // Constructor Injection
-    public function __construct(StudentRepository $studentRepository)
+    public function __construct(
+        StudentRepository $studentRepository,
+        SpecificStudentRepository $specificStudentRepository)
     {
         $this->studentRepository = $studentRepository;
+        $this->specificStudentRepository = $specificStudentRepository;
     }
 
     public function getStudent(array $filters = [])
@@ -21,17 +26,17 @@ class StudentService
 
     public function getNonRegisteredInternList($activeBatch_id, $student_department)
     {
-        return $this->studentRepository->getNonRegisteredInternList($activeBatch_id, $student_department);
+        return $this->specificStudentRepository->getNonRegisteredInternList($activeBatch_id, $student_department);
     }
 
     public function getStudentById($student_id)
     {
-        return $this->studentRepository->findStudentById($student_id);
+        return $this->specificStudentRepository->findStudentById($student_id);
     }
 
     public function getStudentByUserId($user_id)
     {
-        return $this->studentRepository->getStudentByUserId($user_id);
+        return $this->specificStudentRepository->getStudentByUserId($user_id);
     }
 
     public function getStudentByStatusCount($year, $batch_id, $status)
@@ -41,12 +46,12 @@ class StudentService
 
     public function getStudentYear()
     {
-        return $this->studentRepository->getStudentYear();
+        return $this->specificStudentRepository->getStudentYear();
     }
 
     public function getLastYearStudent()
     {
-        return $this->studentRepository->getLastYearStudent();
+        return $this->specificStudentRepository->getLastYearStudent();
     }
 
     public function addStudent(array $data)

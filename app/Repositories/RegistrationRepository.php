@@ -2,11 +2,16 @@
 
 namespace App\Repositories;
 
-use App\Models\Internship;
 use App\Models\Registration;
 
 class RegistrationRepository
 {
+    /**
+     * Retrieve registrations based on various filters.
+     *
+     * @param array $filters
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
     public function getRegistration($filters = [])
     {
         $query = Registration::with(
@@ -17,7 +22,7 @@ class RegistrationRepository
             'registrationDocument'
         );
 
-        // filter status
+        // Filter by registration status
         if ($filters['status'] != null) {
             if ($filters['status'] == 'unconfirmed') {
                 $query->where('batch_id', $filters['batch_id'])->where('status', '0');
@@ -28,7 +33,7 @@ class RegistrationRepository
             }
         }
 
-        // filter search
+        // Filter by search keyword
         if ($filters['search'] != null) {
             $query->where(function ($subQuery) use ($filters) {
                 $subQuery->whereHas('group', function ($subSubQuery) use ($filters) {
@@ -40,11 +45,18 @@ class RegistrationRepository
                     $subSubQuery->where('name', 'like', '%' . $filters['search'] . '%');
                 });
             });
-        };
+        }
 
         return $query->where('batch_id', $filters['batch_id'])->orderBy('created_at', 'desc')->paginate(10);
     }
 
+    /**
+     * Count the number of registrations by their status.
+     *
+     * @param string $status
+     * @param int $batch_id
+     * @return int
+     */
     public function countRegistrationByStatus($status, $batch_id)
     {
         if ($status == 'unconfirmed') {
@@ -56,6 +68,12 @@ class RegistrationRepository
         }
     }
 
+    /**
+     * Find a registration by its ID with related models.
+     *
+     * @param int $id
+     * @return \App\Models\Registration|null
+     */
     public function findRegistrationById($id)
     {
         return Registration::with(
@@ -67,30 +85,13 @@ class RegistrationRepository
         )->where('id', $id)->first();
     }
 
-    public function getRegistrationByStudentId($batch_id, $student_id)
-    {
-        return Registration::whereHas('group.groupMember.student', function ($query) use ($student_id, $batch_id) {
-            $query->where('id', $student_id);
-        })->with('industry:id,name,address')->where('batch_id', $batch_id)->where('step', '!=', '0')->first();
-    }
-
-    public function getAllHistoryRegistrationByStudentId($student_id)
-    {
-        return Registration::whereHas('group.groupMember.student', function ($query) use ($student_id) {
-            $query->where('id', $student_id);
-        })->with('industry:id,name,address')->paginate(5);
-    }
-
-    public function createRegistration(array $data)
-    {
-        return Registration::create($data);
-    }
-
-    public function updateRegistration($id, array $data)
-    {
-        return Registration::where('id', $id)->update($data);
-    }
-
+    /**
+     * Update the registration status (accept or reject).
+     *
+     * @param int $id
+     * @param string $status
+     * @return int
+     */
     public function updateStatusRegistration($id, $status)
     {
         if ($status == 'accept') {
@@ -100,11 +101,12 @@ class RegistrationRepository
         }
     }
 
-    public function updateRegistrationStep($id, $step)
-    {
-        return Registration::where('id', $id)->update(['step' => $step]);
-    }
-
+    /**
+     * Delete a registration by its ID.
+     *
+     * @param int $id
+     * @return int
+     */
     public function deleteRegistration($id)
     {
         return Registration::where('id', $id)->delete();

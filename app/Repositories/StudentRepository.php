@@ -6,17 +6,23 @@ use App\Models\Student;
 
 class StudentRepository
 {
+    /**
+     * Get a list of students based on filters (department, status, search, etc.).
+     * 
+     * @param array $filters
+     * @return \Illuminate\Pagination\LengthAwarePaginator
+     */
     public function getStudent(array $filters = [])
     {
         $query = Student::query();
 
-        // filter department
+        // Filter by department
         if ($filters['department'] != null) {
             $department_id = ($filters['department'] == 'RPL' ? '1' : ($filters['department'] == 'DPIB' ? '2' : '3'));
             $query->where('department_id', $department_id);
         }
 
-        // filter status
+        // Filter by registration status
         if ($filters['status'] != null) {
             if ($filters['status'] == 'registered') {
                 $query->whereHas('groupMember.group.registration', function ($query) use ($filters) {
@@ -29,7 +35,7 @@ class StudentRepository
             }
         }
 
-        // filter search
+        // Filter by search term
         if ($filters['search'] != null) {
             $query->where(function ($subQuery) use ($filters) {
                 $subQuery->where('name', 'like', '%' . $filters['search'] . '%')
@@ -43,21 +49,20 @@ class StudentRepository
             });
         }
 
-        // belum tambah kolom status
+        // Apply the year filter and paginate the result (10 per page)
         $data = $query->where('year', $filters['year'])->orderBy('created_at', 'desc')->paginate(10);
-        $data->appends($filters);
+        $data->appends($filters);  // Keep filters in pagination links
         return $data;
     }
 
-    public function getNonRegisteredInternList($activeBatch_id, $student_department)
-    {
-        return Student::whereDoesntHave('groupMember.group.internship', function ($query) use ($activeBatch_id) {
-            $query->where('batch_id', $activeBatch_id);
-        })->WhereDoesntHave('groupMember.group.registration', function ($query) {
-            $query->where('status', ['0', '1']);
-        })->where('department_id', $student_department)->select('id', 'name', 'nis')->get();
-    }
-
+    /**
+     * Count the number of students with a specific registration status.
+     * 
+     * @param string $status
+     * @param int $year
+     * @param int $batch_id
+     * @return int
+     */
     public function countStudentByStatus($year, $batch_id, $status)
     {
         if ($status == 'registered') {
@@ -73,36 +78,35 @@ class StudentRepository
         }
     }
 
-    public function getStudentYear()
-    {
-        return Student::select('year')->distinct()->get();
-    }
-
-    public function getLastYearStudent()
-    {
-        return Student::select('year')->latest()->first();
-    }
-
-    public function findStudentById($id)
-    {
-        return Student::find($id);
-    }
-
-    public function getStudentByUserId($user_id)
-    {
-        return Student::where('user_id', $user_id)->first();
-    }
-
+    /**
+     * Create a new student record.
+     * 
+     * @param array $data
+     * @return \App\Models\Student
+     */
     public function createStudent(array $data)
     {
         return Student::create($data);
     }
 
+    /**
+     * Update an existing student record.
+     * 
+     * @param int $id
+     * @param array $data
+     * @return int
+     */
     public function updateStudent($id, array $data)
     {
         return Student::where('id', $id)->update($data);
     }
 
+    /**
+     * Delete a student record.
+     * 
+     * @param int $id
+     * @return int
+     */
     public function deleteStudent($id)
     {
         return Student::where('id', $id)->delete();

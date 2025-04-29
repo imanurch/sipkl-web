@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Illuminate\Http\Request;
 use App\Services\UserService;
 use App\Services\AdminService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Flasher\Toastr\Laravel\Facade\Toastr;
+use App\Http\Requests\UpdateAccountRequest;
+use App\Http\Requests\UpdateAdminProfileRequest;
 
 class AccountAdminController extends Controller
 {
@@ -16,6 +16,7 @@ class AccountAdminController extends Controller
         $adminService,
         $userService;
 
+    // Constructor Injection
     public function __construct(
         AdminService $adminService,
         UserService $userService
@@ -24,6 +25,9 @@ class AccountAdminController extends Controller
         $this->userService = $userService;
     }
 
+    /**
+     * Display the admin account page.
+     */
     public function index()
     {
         $user_id = Auth::user()->id;
@@ -35,44 +39,35 @@ class AccountAdminController extends Controller
         ]);
     }
 
-
-    public function updateAccount(Request $request)
+    /**
+     * Update the account credentials of the admin user.
+     *
+     * @param UpdateAccountRequest $request
+     */
+    public function updateAccount(UpdateAccountRequest $request)
     {
-        $validatedData = $request->validate([
-            'user_id' => 'required',
-            'password' => 'required',
-            'new_password' => 'required|string|size:8'
-        ]);
-
-        $last_password = $this->userService->getUserById($request->user_id)->password;
-        if (Hash::check($validatedData['password'],$last_password) == false) {
-            Toastr::addError('Password Anda salah!');
-            return redirect()->back();
-        }
-
-        if (!empty($validatedData['new_password'])) {
-            if ($request->check_password !== $request->new_password) {
-                Toastr::addError('Password baru tidak konsisten!');
-                return redirect()->back();
-            }
-            $validatedData['new_password'] = Hash::make($validatedData['new_password']);
-        }
+        $request->validated();
 
         try {
-            $this->userService->updateUser($request->user_id, ['password' => $validatedData['new_password']]);
+            $this->userService->updateAccountUser($request);
             Toastr::addSuccess('Data akun berhasil diubah!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $errorMessage = collect($e->errors())->flatten()->first();
+            Toastr::addError($errorMessage);
         } catch (\Exception $e) {
             Toastr::addError('Data akun gagal diubah!');
         }
         return redirect()->back();
     }
 
-    public function updateProfile(Request $request)
+    /**
+     * Update the profile information of the admin user.
+     *
+     * @param UpdateAdminProfileRequest $request
+     */
+    public function updateProfile(UpdateAdminProfileRequest $request)
     {
-        $validatedData = $request->validate([
-            'profile_id' => 'required',
-            'phone_num' => 'required|string|min:10|max:14|unique:advisors,phone_num,' . $request->profile_id,
-        ]);
+        $validatedData = $request->validated();
 
         try {
             $this->adminService->updateAdmin($request->profile_id, ['phone_num' => $validatedData['phone_num']]);

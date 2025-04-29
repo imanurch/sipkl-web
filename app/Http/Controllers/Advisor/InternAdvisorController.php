@@ -25,19 +25,18 @@ class InternAdvisorController extends Controller
         $advisor_id = session('user_bio')->id;
 
         // batch data
-        $currentBatch = $this->batchService->getBatchByStatus('active');
-        $batch_id = $request->batch ?? ($currentBatch->id ?? '');
         $batchData = $this->batchService->getAllBatch('');
+        $batch_id = $this->batchService->getRelevantBatch($request->batch);
 
-        $filters=[
-            'batch_id'=> $batch_id,
-            'search'=> $request->searchKeyword ?? '',
+        $filters = [
+            'batch_id' => $batch_id,
+            'search' => $request->searchKeyword ?? '',
         ];
 
         $data = $this->internshipService->getInternByAdvisor($filters, $advisor_id);
 
         return view('pages.advisor.intern', [
-            'data' => $data,            
+            'data' => $data,
             'batchData' => $batchData,
             'filters' => $filters,
             'pages' => 'intern',

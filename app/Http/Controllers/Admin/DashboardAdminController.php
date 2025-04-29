@@ -8,7 +8,6 @@ use App\Services\AdvisorService;
 use App\Services\IndustryService;
 use App\Services\InternshipService;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use App\Services\RegistrationService;
 
 class DashboardAdminController extends Controller
@@ -25,11 +24,13 @@ class DashboardAdminController extends Controller
         $this->batchService = $batchService;
     }
 
+    /**
+     * Display the admin dashboard with summary data based on selected or active batch.
+     */
     public function index(Request $request)
     {
-        $currentBatch = $this->batchService->getBatchByStatus('active');
-        $batch_id = $request->batch ?? ($currentBatch->id ?? '');
-
+        $batch_id = $this->batchService->getBatchByStatus('active');
+        
         $intern = $this->internshipService->getInternCount($batch_id);
         $advisor = $this->advisorService->getAdvisorByStatusCount($batch_id, 'active');
         $industry = $this->industryService->getIndustryByStatusCount($batch_id, 'active');

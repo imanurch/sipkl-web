@@ -7,7 +7,6 @@ use App\Services\BatchService;
 use App\Services\AdvisorService;
 use App\Services\InternshipService;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 
 class IndustryAdvisorController extends Controller
 {
@@ -26,9 +25,8 @@ class IndustryAdvisorController extends Controller
         $advisor_id = session('user_bio')->id;
 
         // batch data
-        $currentBatch = $this->batchService->getBatchByStatus('active');
-        $batch_id = $request->batch ?? ($currentBatch->id ?? '');
         $batchData = $this->batchService->getAllBatch('');
+        $batch_id = $this->batchService->getRelevantBatch($request->batch);
 
         $filters=[
             'batch_id'=> $batch_id,

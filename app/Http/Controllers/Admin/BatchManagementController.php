@@ -3,31 +3,25 @@
 namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
-use App\Services\AdminService;
 use App\Services\BatchService;
-use App\Services\AdvisorService;
-use App\Services\StudentService;
-use App\Services\IndustryService;
-use App\Services\InternshipService;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Hash;
-use App\Services\RegistrationService;
+use App\Http\Requests\StoreBatchRequest;
+use App\Http\Requests\UpdateBatchRequest;
 use Flasher\Toastr\Laravel\Facade\Toastr;
 
 class BatchManagementController extends Controller
 {
-    protected $internshipService, $advisorService, $industryService, $registrationService, $batchService;
+    protected $batchService;
 
     // Constructor Injection
-    public function __construct(InternshipService $internshipService, AdvisorService $advisorService, IndustryService $industryService, RegistrationService $registrationService, BatchService $batchService)
+    public function __construct(BatchService $batchService)
     {
-        $this->internshipService = $internshipService;
-        $this->advisorService = $advisorService;
-        $this->industryService = $industryService;
-        $this->registrationService = $registrationService;
         $this->batchService = $batchService;
     }
 
+    /**
+     * Display a listing of the batches with optional search filters.
+     */
     public function index(Request $request)
     {
         $searchFilters = $request->searchKeyword;
@@ -40,13 +34,13 @@ class BatchManagementController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    /**
+     * Store a newly created batch in storage.
+     */
+    public function store(StoreBatchRequest $request)
     {
         try {
-            $validatedData = $request->validate([
-                'name' => 'required',
-                'year' => 'required',
-            ]);
+            $validatedData = $request->validated();
 
             $this->batchService->createBatch($validatedData);
             Toastr::addSuccess('Data batch berhasil ditambah!');
@@ -56,13 +50,13 @@ class BatchManagementController extends Controller
         return redirect()->back();
     }
 
-    public function update(Request $request, $id)
+    /**
+     * Update the specified batch in storage.
+     */
+    public function update(UpdateBatchRequest $request, $id)
     {
         try {
-            $validatedData = $request->validate([
-                'name' => 'required',
-                'year' => 'required',
-            ]);
+            $validatedData = $request->validated();
 
             $this->batchService->updateBatch($id, $validatedData);
             Toastr::addSuccess('Data batch berhasil diubah!');
@@ -72,12 +66,18 @@ class BatchManagementController extends Controller
         return redirect()->back();
     }
 
+    /**
+     * Set the specified batch as active.
+     */
     public function setActiveBatch($id)
     {
         $this->batchService->setActiveBatch($id);
         return back();
     }
 
+    /**
+     * Remove the specified batch from storage.
+     */
     public function destroy($id)
     {
         try {

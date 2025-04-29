@@ -10,6 +10,12 @@ use Illuminate\Database\Eloquent\Relations\HasOne;
 class Group extends Model
 {
     use HasFactory;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = ['name'];
     
     public function registration(): HasOne

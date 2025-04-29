@@ -10,6 +10,12 @@ class NonTechnicalAssessment extends Model
 {
     use HasFactory;
     protected $table = 'non_technical_assessment';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = ['assessment_id', 'aspect', 'score'];
 
     public function assessment(): BelongsTo

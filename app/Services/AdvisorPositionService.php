@@ -14,6 +14,11 @@ class AdvisorPositionService
         $this->advisorPositionRepository = $advisorPositionRepository;
     }
 
+    /**
+     * Retrieve all advisor positions.
+     * 
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
     public function getAllPosition()
     {
         return $this->advisorPositionRepository->getAllPosition();

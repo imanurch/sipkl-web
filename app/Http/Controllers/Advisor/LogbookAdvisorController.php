@@ -34,10 +34,8 @@ class LogbookAdvisorController extends Controller
     {
         $advisor_id = session('user_bio')->id;
 
-        $currentBatch = $this->batchService->getBatchByStatus('active');
-        $batch_id = $currentBatch != null ? $currentBatch->id : '';
-
         $batchData = $this->batchService->getAllBatch('');
+        $batch_id = $this->batchService->getRelevantBatch($request->batch);
 
         // filter
         $filters = [
@@ -69,16 +67,4 @@ class LogbookAdvisorController extends Controller
             'pages' => 'logbook',
         ]);
     }
-
-    // public function detailLogbook($studentId, $internshipId)
-    // {
-    //     $logbookData = $this->logbookService->getLogbookByStudentAndInternshipId($studentId, $internshipId);
-    //     // dd($logbookData);
-
-    //     return view('pages.advisor.logbook_detail', [
-    //         'logbookData' => $logbookData,
-    //         // 'filters' => $filters,
-    //         // 'internshipListData' => $internshipListData,
-    //     ]);
-    // }
 }

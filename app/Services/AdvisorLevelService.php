@@ -14,6 +14,11 @@ class AdvisorLevelService
         $this->advisorLevelRepository = $advisorLevelRepository;
     }
 
+    /**
+     * Retrieve all advisor levels.
+     * 
+     * @return \Illuminate\Database\Eloquent\Collection
+     */
     public function getAllLevel()
     {
         return $this->advisorLevelRepository->getAllLevel();

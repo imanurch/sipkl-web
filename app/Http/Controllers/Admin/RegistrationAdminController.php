@@ -2,24 +2,25 @@
 
 namespace App\Http\Controllers\Admin;
 
-use DateTime;
 use Illuminate\Http\Request;
 use App\Services\BatchService;
-use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\LogbookService;
 use App\Services\StudentService;
+use App\Helpers\DateFormatHelper;
+use App\Services\DownloadService;
 use Illuminate\Support\Facades\DB;
 use App\Services\AssessmentService;
 use App\Services\InternshipService;
 use App\Http\Controllers\Controller;
-use App\Notifications\RegistrationDocumentNotification;
 use App\Services\RegistrationService;
 use App\Services\SchoolProfileService;
+use App\Services\DeleteDocumentService;
 use App\Services\InternDocumentService;
-use Illuminate\Support\Facades\Storage;
+use App\Services\DocumentGenerateService;
 use Flasher\Toastr\Laravel\Facade\Toastr;
 use Illuminate\Support\Facades\Notification;
 use App\Services\RegistrationDocumentService;
+use App\Notifications\RegistrationDocumentNotification;
 
 class RegistrationAdminController extends Controller
 {
@@ -32,7 +33,10 @@ class RegistrationAdminController extends Controller
         $studentService,
         $logbookService,
         $internDocumentService,
-        $schoolProfileService;
+        $schoolProfileService,
+        $downloadService,
+        $documentGenerateService,
+        $deleteDocumentService;
 
     // Constructor Injection
     public function __construct(
@@ -44,7 +48,10 @@ class RegistrationAdminController extends Controller
         StudentService $studentService,
         LogbookService $logbookService,
         InternDocumentService $internDocumentService,
-        SchoolProfileService $schoolProfileService
+        SchoolProfileService $schoolProfileService,
+        DownloadService $downloadService,
+        DocumentGenerateService $documentGenerateService,
+        DeleteDocumentService $deleteDocumentService
     ) {
         $this->registrationService = $registrationService;
         $this->registrationDocumentService = $registrationDocumentService;
@@ -55,38 +62,45 @@ class RegistrationAdminController extends Controller
         $this->logbookService = $logbookService;
         $this->internDocumentService = $internDocumentService;
         $this->schoolProfileService = $schoolProfileService;
+        $this->downloadService = $downloadService;
+        $this->documentGenerateService = $documentGenerateService;
+        $this->deleteDocumentService = $deleteDocumentService;
     }
 
     public function index(Request $request)
     {
         // batch data
         $batchData = $this->batchService->getAllBatch('');
-        $currentBatch = $this->batchService->getBatchByStatus('active');
-        $batch_id = $request->batch ?? ($currentBatch->id ?? '');
+        $batch_id = $this->batchService->getRelevantBatch($request->batch);
 
         // table filters
         $filters = [
             'search' => $request->searchKeyword ?? '',
             'status' => $request->status ?? '',
-            'batch_id' => $request->batch ?? $batch_id,
+            'batch_id' => $batch_id,
         ];
 
         // table data
         $data = $this->registrationService->getRegistration($filters);
         foreach ($data as $dt) {
-            $dt->start_date = date('d-m-Y', strtotime($dt->start_date));
-            $dt->end_date = date('d-m-Y', strtotime($dt->end_date));
+            $dt->start_date = DateFormatHelper::dateFormat($dt->start_date);
+            $dt->end_date = DateFormatHelper::dateFormat($dt->end_date);
 
             if ($dt->RegistrationDocument) {
                 foreach ($dt->registrationDocument as $doc) {
+                    $url = ($doc->url != '' ? $doc->url : null);
                     if ($doc->type == 'surat permohonan') {
-                        $dt->surat_permohonan = $doc->url != '' ? $doc->url : null;
+                        $dt->surat_permohonan = $url;
                     } else if ($doc->type == 'surat balasan') {
-                        $dt->surat_balasan = $doc->url != '' ? $doc->url : null;
+                        $dt->surat_balasan = $url;
                     }
                 }
             }
-            $dt->status = $dt->status == '0' ? 'Belum Dikonfirmasi' : ($dt->status == '1' ? 'Diterima' : 'Ditolak');
+            $dt->status = match ($dt->status) {
+                '0' => 'Belum Dikonfirmasi',
+                '1' => 'Diterima',
+                default => 'Ditolak',
+            };
         }
 
         // card data
@@ -107,203 +121,39 @@ class RegistrationAdminController extends Controller
 
     public function downloadFile($type, $filename)
     {
-        $path = ($type == 'suratPermohonan' ? storage_path('app/registration_document/surat_permohonan/' . $filename) : $path = storage_path('app/registration_document/surat_balasan/' . $filename));
-
-        if (file_exists($path)) {
-            // return response()->download($path);
-            return response()->file($path);
-        } else {
-            return response()->json(['message' => 'File tidak ditemukan'], 404);
-        }
-    }
-
-    public function confirmStatusRegistration($registrationId, $status)
-    {
-        try {
-            DB::transaction(function () use ($registrationId, $status) {
-                $this->registrationService->updateStatusRegistration($registrationId, $status);
-
-                $registrationData = $this->registrationService->getRegistrationById($registrationId);
-
-                $data = [
-                    'group_id' => $registrationData->group_id,
-                    'industry_id' => $registrationData->industry_id,
-                    'start_date' => $registrationData->start_date,
-                    'end_date' => $registrationData->end_date,
-                    'batch_id' => $registrationData->batch_id,
-                ];
-
-                if ($status == 'accept') {
-                    // tambah registration to internship data
-                    $newInternship = $this->internshipService->addInternship($data);
-
-                    foreach ($newInternship->group->groupMember as $member) {
-                        $newIntern = $member->student;
-                        $newInternId = $newIntern->id;
-
-                        // buat tempat di assessment
-                        $this->assessmentService->addAssessment([
-                            'student_id' => $newInternId,
-                            'internship_id' => $newInternship->id,
-                        ]);
-
-                        // buat tempat di logbook
-                        $logbook_start_date = new DateTime($newInternship->start_date);
-                        $logbook_end_date = new DateTime($newInternship->end_date);
-
-                        while ($logbook_start_date <= $logbook_end_date) {
-                            $current_start = clone $logbook_start_date;
-
-                            $current_end = clone $logbook_start_date;
-                            $current_end->modify('+6 days');
-
-                            if ($current_end > $logbook_end_date) {
-                                $current_end = clone $logbook_end_date;
-                            }
-
-                            $logbook_data = [
-                                'student_id'    => $newInternId,
-                                'internship_id' => $newInternship->id,
-                                'start_date'    => $current_start->format('Y-m-d'),
-                                'end_date'      => $current_end->format('Y-m-d')
-                            ];
-
-                            $this->logbookService->addLogbook($logbook_data);
-
-                            $logbook_start_date = clone $current_end;
-                            $logbook_start_date->modify('+1 day');
-                        }
-                    }
-                }
-            });
-            Toastr::addSuccess('Registrasi berhasil dikonfirmasi!');
-        } catch (\Exception $e) {
-            Toastr::addError('Registrasi gagal dikonfirmasi!');
-        }
-        return redirect()->back();
-    }
-
-    public function updateStatusRegistration(Request $request, $registrationId)
-    {
-        $newStatus = $request->status == 'accept' ? '1' : '2';
-        $registrationData = $this->registrationService->getRegistrationById($registrationId);
-        
-        try {
-            DB::transaction(function () use ($registrationId, $registrationData, $newStatus) {
-                if ($registrationData->status != $newStatus) {
-                    // dd($newStatus);
-                    if ($newStatus == '1') {
-                        $this->registrationService->updateStatusRegistration($registrationId, 'accept');
-
-                        $data = [
-                            'group_id' => $registrationData->group_id,
-                            'industry_id' => $registrationData->industry_id,
-                            'start_date' => $registrationData->start_date,
-                            'end_date' => $registrationData->end_date,
-                            'batch_id' => $registrationData->batch_id,
-                        ];
-
-                        // tambah registration to internship data
-                        $newInternship = $this->internshipService->addInternship($data);
-
-                        foreach ($newInternship->group->groupMember as $member) {
-                            $newInternId = $member->student->id;
-
-                            // buat tempat di assessment
-                            $this->assessmentService->addAssessment([
-                                'student_id' => $newInternId,
-                                'internship_id' => $newInternship->id,
-                            ]);
-
-                            // buat tempat di logbook
-                            $logbook_start_date = new DateTime($newInternship->start_date);
-                            $logbook_end_date = new DateTime($newInternship->end_date);
-
-                            while ($logbook_start_date <= $logbook_end_date) {
-                                $current_start = clone $logbook_start_date;
-
-                                $current_end = clone $logbook_start_date;
-                                $current_end->modify('+6 days');
-
-                                if ($current_end > $logbook_end_date) {
-                                    $current_end = clone $logbook_end_date;
-                                }
-
-                                $logbook_data = [
-                                    'student_id'    => $newInternId,
-                                    'internship_id' => $newInternship->id,
-                                    'start_date'    => $current_start->format('Y-m-d'),
-                                    'end_date'      => $current_end->format('Y-m-d')
-                                ];
-
-                                $this->logbookService->addLogbook($logbook_data);
-
-                                $logbook_start_date = clone $current_end;
-                                $logbook_start_date->modify('+1 day');
-                            }                           
-                        }
-                    } elseif ($newStatus == '2') {
-                        // update status registration
-                        $this->registrationService->updateStatusRegistration($registrationId, 'reject');
-
-                        // delete internship
-                        $internship_id = $this->internshipService->getInternshipByGroupId($registrationData->group_id)->id;
-                        $this->internshipService->deleteInternship($internship_id);
-                    }
-                }
-            });
-            Toastr::addSuccess('Status berhasil diubah!');
-        } catch (\Exception $e) {
-            Toastr::addError('Status gagal diubah!');
-        }
-        return redirect()->back();
+        return $this->downloadService->monitoringDocumentDownload($type, $filename);
     }
 
     public function generateDocument(Request $request)
     {
         $registration_data = $this->registrationService->getRegistrationById($request->registration_id);
         $school_profile = $this->schoolProfileService->getSchoolProfile();
+        $intern_group_data = $registration_data->group->groupMember;
 
         $data = [
             'school_phone_num'  => $school_profile->phone_num,
             'school_website'  => $school_profile->website,
             'school_email'  => $school_profile->email,
-            'create_date' => date('d F Y'),
+            'create_date' => DateFormatHelper::dateFormat(date('d M Y')),
             'letter_num'  => $request->letter_num,
             'industry_name'  => $registration_data->industry->name,
             'industry_address'  => $registration_data->industry->address,
-            'academic_year'  => $registration_data->batch->year . '/' . $registration_data->batch->year + 1,
-            'internship_start_month'  => date('F', strtotime($registration_data->start_date)),
-            'internship_end_month'  => date('F', strtotime($registration_data->end_date)),
+            'academic_year'  => DateFormatHelper::academicYearFormat($registration_data->batch->year),
+            'internship_start_month'  => DateFormatHelper::monthFormat($registration_data->start_date),
+            'internship_end_month'  => DateFormatHelper::monthFormat($registration_data->end_date),
             'internship_year'  => $registration_data->batch->year,
             'principal_name'  => $school_profile->principal_name,
             'principal_nip'  => $school_profile->principal_nip,
             'principal_signature'  => $school_profile->principal_signature,
-            'intern_group_data' => $registration_data->group->groupMember,
+            'intern_group_data' => $intern_group_data,
         ];
 
-        $pdf = Pdf::loadView('document_templates/surat_permohonan_pkl', $data);
-        $filename = 'surat_permohonan_' . time() . '.pdf';
-        $path = storage_path('app/registration_document/surat_permohonan/' . $filename);
-
-        $pdf->save($path);
+        $filename = $this->documentGenerateService->registrationDocumentGenerate($data);
 
         try {
             $this->registrationDocumentService->updateRegistrationDocument($request->registration_id, 'surat permohonan', $filename);
 
-            $registrationDocumentData = $this->registrationDocumentService->getRegistrationDocumentByRegistrationId($request->registration_id);
-            $users = [];
-            foreach ($registrationDocumentData as $dt) {
-                foreach ($dt->registration->group->groupMember as $member) {
-                    $user = $member->student->user;
-                    $users[] = $user;
-                }
-            }
-            foreach ($users as $user) {
-                if ($user->email_verified_at != null) {
-                    Notification::send($user, new RegistrationDocumentNotification());
-                }
-            }
+            $this->notification($intern_group_data);
 
             Toastr::addSuccess('Surat Permohonan berhasil dibuat. Silahkan refresh halaman!');
         } catch (\Exception $e) {
@@ -312,18 +162,29 @@ class RegistrationAdminController extends Controller
         return redirect()->back();
     }
 
+    private function notification($data)
+    {
+        $users = [];
+        foreach ($data as $dt) {
+            $user = $dt->student->user;
+            $users[] = $user;
+        }
+        foreach ($users as $user) {
+            if ($user->email_verified_at != null) {
+                Notification::send($user, new RegistrationDocumentNotification());
+            }
+        }
+    }
+
     public function destroy($id)
     {
         $doc = $this->registrationDocumentService->getRegistrationDocumentByRegistrationId($id);
-        foreach ($doc as $dt) {
-            $filename = $dt->url;
-            if ($dt->type == "surat permohonan") {
-                Storage::delete('registration_document/surat_permohonan/' . $filename);
-            } elseif ($dt->type == "surat balasan") {
-                Storage::delete('registration_document/surat_balasan/' . $filename);
-            }
-        }
         try {
+            if ($doc != null) {
+                foreach ($doc as $dt) {
+                    $this->deleteDocumentService->deleteRegistrationDocument($dt->type, $dt->url);
+                }
+            }
             $registrationData = $this->registrationService->getRegistrationById($id);
             DB::transaction(function () use ($registrationData, $id) {
                 // delete registration

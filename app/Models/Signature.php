@@ -10,6 +10,12 @@ class Signature extends Model
 {
     use HasFactory;
     protected $table = 'signature';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = ['user_id', 'name', 'position', 'url'];
 
     public function user(): BelongsTo

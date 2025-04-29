@@ -4,38 +4,49 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use App\Services\BatchService;
+use App\Services\DownloadService;
 use App\Services\IndustryService;
 use Illuminate\Support\Facades\DB;
-use App\Services\DepartmentService;
+use App\Services\ImportDataService;
 use App\Http\Controllers\Controller;
-use PhpOffice\PhpSpreadsheet\IOFactory;
+use App\Http\Requests\ImportFileRequest;
+use App\Http\Requests\StoreIndustryRequest;
+use App\Http\Requests\UpdateIndustryRequest;
 use Flasher\Toastr\Laravel\Facade\Toastr;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use Illuminate\Validation\ValidationException;
 
 class IndustryManagementController extends Controller
 {
-    protected $industryService, $batchService, $departmentService;
+    protected $industryService,
+        $batchService,
+        $downloadService,
+        $importDataService;
 
     // Constructor Injection
-    public function __construct(IndustryService $industryService, BatchService $batchService, DepartmentService $departmentService)
-    {
+    public function __construct(
+        IndustryService $industryService,
+        BatchService $batchService,
+        DownloadService $downloadService,
+        ImportDataService $importDataService
+    ) {
         $this->industryService = $industryService;
         $this->batchService = $batchService;
-        $this->departmentService = $departmentService;
+        $this->downloadService = $downloadService;
+        $this->importDataService = $importDataService;
     }
 
+    /**
+     * Display the industry management page with data and filters.
+     */
     public function index(Request $request)
     {
         $activeTab = $request->query('tab', 'partner');
 
         // batch data
         $current_batch = $this->batchService->getBatchByStatus('active');
-        if ($current_batch != null) {
-            $batch_id = $current_batch->id;
-        } else {
-            $batch_id = '';
-        }
+        $batch_id = $current_batch != null ? $current_batch->id : '';
 
         // table filters
         $filters = [
@@ -72,17 +83,13 @@ class IndustryManagementController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    /**
+     * Store a newly created industry record in storage.
+     */
+    public function store(StoreIndustryRequest $request)
     {
-        $data = $request->except(['_token']);
         try {
-            $validatedData = $request->validate([
-                'name' => 'required|string',
-                'address' => 'required|string',
-                'email' => 'required|unique:industries,email|email',
-                'phone_num' => 'required|unique:industries,phone_num|string|min:10|max:14',
-                'leader_name' => 'required|string',
-            ]);
+            $validatedData = $request->validated();
             $validatedData['status'] = '1';
 
             $this->industryService->addIndustry($validatedData);
@@ -93,19 +100,13 @@ class IndustryManagementController extends Controller
         return redirect()->back();
     }
 
-    public function update(Request $request, $id)
+    /**
+     * Update the specified industry record in storage.
+     */
+    public function update(UpdateIndustryRequest $request, $id)
     {
-        $data = $request->except(['_token', '_method']);
-
         try {
-            $validatedData = $request->validate([
-                'name' => 'required|string',
-                'address' => 'required|string',
-                'email' => 'required|email|unique:industries,email,' . $id,
-                'phone_num' => 'required|string|min:10|max:14|unique:industries,phone_num,' . $id,
-                'leader_name' => 'required|string',
-                'status' => 'nullable|string|min:10|max:14|unique:industries,phone_num,' . $id,
-            ]);
+            $validatedData = $request->validated();
 
             $this->industryService->updateIndustry($id, $validatedData);
             Toastr::addSuccess('Data industri berhasil diubah!');
@@ -115,6 +116,9 @@ class IndustryManagementController extends Controller
         return back();
     }
 
+    /**
+     * Confirm or reject an industry registration request.
+     */
     public function confirmStatusIndustry($industryId, $status)
     {
         try {
@@ -126,9 +130,12 @@ class IndustryManagementController extends Controller
         return back();
     }
 
+    /**
+     * Update the status of the specified industry.
+     */
     public function updateStatusIndustry($id, Request $request)
     {
-        if($request->status == 'reject'){
+        if ($request->status == 'reject') {
             return back();
         }
         try {
@@ -140,6 +147,9 @@ class IndustryManagementController extends Controller
         return back();
     }
 
+    /**
+     * Remove the specified industry from storage.
+     */
     public function destroy($id)
     {
         try {
@@ -151,48 +161,25 @@ class IndustryManagementController extends Controller
         return redirect()->back();
     }
 
-    public function import(Request $request)
+    /**
+     * Import industry data from an uploaded file.
+     */
+    public function import(ImportFileRequest $request)
     {
-        $validatedData = $request->validate([
-            'import_file' => 'required|mimes:xlsx,xml,xls',
-        ]);
+        $request->validated();
 
         $file = $request->file('import_file');
 
-        // Load file Excel
-        $spreadsheet = IOFactory::load($file->getPathname());
-        $worksheet = $spreadsheet->getSheetByName('Data');
-        $rows = $worksheet->toArray();
+        try {
+            $validData = $this->importDataService->importIndustryDataCheck($file);
+        } catch (ValidationException $e) {
+            Toastr::addError(nl2br($e->getMessage()));
+            return redirect()->back();
+        }
 
         try {
-            DB::transaction(function () use ($rows, $request) {
-                foreach ($rows as $index => $row) {
-                    if ($index == 0) continue;
-                    if ($row[1] == null) break;
-
-                    $validatedData = $request->validate([
-                        'name' => $row[1],
-                        'address' => $row[2],
-                        'email' => $row[3],
-                        'phone_num' => $row[4],
-                        'leader_name' => $row[5],
-                    ], [
-                        'name' => 'required|string',
-                        'address' => 'required|string',
-                        'email' => 'required|unique:industries,email|email',
-                        'phone_num' => 'required|unique:industries,phone_num|string|min:10|max:14',
-                        'leader_name' => 'required|string',
-                    ]);
-
-                    $data = [
-                        'name' => $row[1],
-                        'address' => $row[2],
-                        'email' => $row[3],
-                        'phone_num' => $row[4],
-                        'leader_name' => $row[5],
-                        'status' => '1',
-                    ];
-
+            DB::transaction(function () use ($validData) {
+                foreach ($validData as $data) {
                     $this->industryService->addIndustry($data);
                 }
             });
@@ -203,17 +190,17 @@ class IndustryManagementController extends Controller
         return redirect()->back();
     }
 
+    /**
+     * Download the industry import template file.
+     */
     public function downloadTemplateFile()
     {
-        $filePath = storage_path('app/public/files/template_import_industry.xlsx');
-
-        if (file_exists($filePath)) {
-            return response()->download($filePath);
-        } else {
-            Toastr::addError('File tidak ditemukan');
-        }
+        return $this->downloadService->templateImportDataDownload('template_import_industry.xlsx');
     }
 
+    /**
+     * Export industry data to an Excel file.
+     */
     public function export(Request $request)
     {
         $spreadsheet = new Spreadsheet();
@@ -227,9 +214,11 @@ class IndustryManagementController extends Controller
         $sheet->setCellValue('F1', 'NAMA PIMPINAN');
 
         $current_batch = $this->batchService->getBatchByStatus('active');
-        $batch_id = $current_batch != null ? $current_batch->id : $batch_id = '';
+        $batch_id = $current_batch != null ? $current_batch->id : '';
 
-        $data = $request->data_type == 'Semua' ? $this->industryService->getPartnerIndustryList() : $this->industryService->getActivePartnerIndustryList($batch_id);
+        $data = $request->data_type == 'Semua'
+            ? $this->industryService->getPartnerIndustryList()
+            : $this->industryService->getActivePartnerIndustryList($batch_id);
 
         $row = 2;
         $num = 1;
@@ -237,20 +226,23 @@ class IndustryManagementController extends Controller
             $sheet->setCellValue('A' . $row, $num);
             $sheet->setCellValue('B' . $row, $dt->name);
             $sheet->setCellValue('C' . $row, $dt->address);
-            $sheet->setCellValue('F' . $row, $dt->email);
-            $sheet->setCellValue('G' . $row, $dt->phone_num);
-            $sheet->setCellValue('D' . $row, $dt->leader_name);
+            $sheet->setCellValue('D' . $row, $dt->email);
+            $sheet->setCellValue('E' . $row, $dt->phone_num);
+            $sheet->setCellValue('F' . $row, $dt->leader_name);
             $row++;
             $num++;
         }
 
         $filename = "data_industry_export.xlsx";
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="' . $filename . '"');
-        header('Cache-Control: max-age=0');
 
-        $writer = new Xlsx($spreadsheet);
-        $writer->save('php://output');
-        exit;
+        try {
+            return response()->streamDownload(function () use ($spreadsheet) {
+                $writer = new Xlsx($spreadsheet);
+                $writer->save('php://output');
+            }, $filename);
+        } catch (\Exception $e) {
+            Toastr::addError('Export gagal!');
+            return redirect()->back();
+        }
     }
 }

@@ -14,9 +14,23 @@ class NonTechnicalAssessmentService
         $this->nonTechnicalAssessmentRepository = $nonTechnicalAssessmentRepository;
     }
 
-    public function updateOrCreate($data)
+    public function updateOrCreate($id, $data)
     {
-        return $this->nonTechnicalAssessmentRepository->updateOrCreate($data);
+        $nonTechnicalAspects = [
+            'Kedisiplinan' => $data->dicipline,
+            'Kerja Sama' => $data->teamwork,
+            'Inisiatif' => $data->initiative,
+            'Tanggung Jawab' => $data->responsibility,
+            'Jujur dan Santun' => $data->honest,
+        ];
+
+        foreach ($nonTechnicalAspects as $aspect => $score) {
+            $this->nonTechnicalAssessmentRepository->updateOrCreate([
+                'assessment_id' => $id,
+                'aspect' => $aspect,
+                'score' => $score,
+            ]);
+        }
     }
 
     public function isNonTechnicalAssessmentComplete($assessment_id)

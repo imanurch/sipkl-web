@@ -9,6 +9,12 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 class Logbook extends Model
 {
     use HasFactory;
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = ['student_id', 'internship_id', 'start_date', 'end_date', 'activities', 'feedback', 'status'];
 
     public function student(): BelongsTo

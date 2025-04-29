@@ -3,30 +3,43 @@
 namespace App\Services;
 
 use App\Repositories\IndustryRepository;
+use App\Repositories\IndustryPartnerRepository;
+use App\Repositories\IndustryRejectedRepository;
+use App\Repositories\IndustryUnconfirmedRepository;
 
 class IndustryService
 {
-    protected $industryRepository;
+    protected $industryRepository,
+        $industryUnconfirmedRepository,
+        $industryPartnerRepository,
+        $industryRejectedRepository;
 
     // Constructor Injection
-    public function __construct(IndustryRepository $industryRepository)
-    {
+    public function __construct(
+        IndustryRepository $industryRepository,
+        IndustryUnconfirmedRepository $industryUnconfirmedRepository,
+        IndustryPartnerRepository $industryPartnerRepository,
+        IndustryRejectedRepository $industryRejectedRepository
+    ) {
         $this->industryRepository = $industryRepository;
+        $this->industryUnconfirmedRepository = $industryUnconfirmedRepository;
+        $this->industryPartnerRepository = $industryPartnerRepository;
+        $this->industryRejectedRepository = $industryRejectedRepository;
     }
 
     public function getUnconfirmedIndustry($filters = [])
     {
-        return $this->industryRepository->getUnconfirmedIndustry($filters);
+        return $this->industryUnconfirmedRepository->getUnconfirmedIndustry($filters);
     }
 
     public function getPartnerIndustry($filters = [], $batch_id)
     {
-        return $this->industryRepository->getPartnerIndustry($filters, $batch_id);
+        return $this->industryPartnerRepository->getPartnerIndustry($filters, $batch_id);
     }
 
     public function getRejectedIndustry($filters = [])
     {
-        return $this->industryRepository->getRejectedIndustry($filters);
+        return $this->industryRejectedRepository->getRejectedIndustry($filters);
     }
 
     public function getIndustryByStatusCount($batch_id, $status)
@@ -41,12 +54,12 @@ class IndustryService
 
     public function getPartnerIndustryList()
     {
-        return $this->industryRepository->getPartnerIndustryList();
+        return $this->industryPartnerRepository->getPartnerIndustryList();
     }
 
     public function getActivePartnerIndustryList($batch_id)
     {
-        return $this->industryRepository->getActivePartnerIndustryList($batch_id);
+        return $this->industryPartnerRepository->getActivePartnerIndustryList($batch_id);
     }
 
     public function getIndustryById($industry_id)
@@ -66,7 +79,7 @@ class IndustryService
 
     public function updateIndustryRequestStatus($industry_id, $status)
     {
-        return $this->industryRepository->updateIndustryRequestStatus($industry_id, $status);
+        return $this->industryUnconfirmedRepository->updateIndustryRequestStatus($industry_id, $status);
     }
 
     public function deleteIndustry($industry_id)

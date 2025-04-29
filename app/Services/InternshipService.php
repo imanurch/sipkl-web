@@ -2,16 +2,23 @@
 
 namespace App\Services;
 
+use App\Repositories\InternRepository;
 use App\Repositories\InternshipRepository;
 
 class InternshipService
 {
-    protected $internshipRepository;
+    protected 
+    $internshipRepository,
+    $internRepository;
 
     // Constructor Injection
-    public function __construct(InternshipRepository $internshipRepository)
+    public function __construct(
+        InternshipRepository $internshipRepository,
+        InternRepository $internRepository
+        )
     {
         $this->internshipRepository = $internshipRepository;
+        $this->internRepository = $internRepository;
     }
 
     public function getInternship($filters = [])
@@ -31,17 +38,17 @@ class InternshipService
 
     public function getIntern($filters = [])
     {
-        return $this->internshipRepository->getIntern($filters);
+        return $this->internRepository->getIntern($filters);
     }
 
     public function getAllIntern($batch_id)
     {
-        return $this->internshipRepository->getAllIntern($batch_id);
+        return $this->internRepository->getAllIntern($batch_id);
     }
 
     public function getInternCount($batch_id)
     {
-        return $this->internshipRepository->countIntern($batch_id);
+        return $this->internRepository->countIntern($batch_id);
     }
 
     public function getInternByAdvisorCount($batch_id, $advisor_id)

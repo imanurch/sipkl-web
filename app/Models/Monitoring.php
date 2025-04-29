@@ -11,6 +11,12 @@ class Monitoring extends Model
 {
     use HasFactory;
     protected $table = 'monitoring';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = ['internship_id', 'type', 'date', 'note'];
 
     public function internship(): BelongsTo

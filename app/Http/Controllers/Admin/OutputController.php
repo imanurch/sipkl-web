@@ -4,73 +4,49 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use App\Services\BatchService;
-use App\Services\IndustryService;
-use App\Services\DepartmentService;
 use App\Http\Controllers\Controller;
-use App\Services\InternDocumentService;
-use Illuminate\Support\Facades\Hash;
+use App\Services\DownloadService;
+use App\Services\InternshipOutputService;
 use App\Services\InternshipService;
-use App\Services\LogbookService;
-use App\Services\StudentService;
 
 class OutputController extends Controller
 {
-    protected $logbookService,
+    protected
         $internshipService,
-        $studentService,
         $batchService,
-        $internDocumentService;
+        $downloadService,
+        $internshipOutputService;
 
     // Constructor Injection
     public function __construct(
-        LogbookService $logbookService,
         InternshipService $internshipService,
-        StudentService $studentService,
         BatchService $batchService,
-        InternDocumentService $internDocumentService
+        DownloadService $downloadService,
+        InternshipOutputService $internshipOutputService
     ) {
-        $this->logbookService = $logbookService;
         $this->internshipService = $internshipService;
-        $this->studentService = $studentService;
         $this->batchService = $batchService;
-        $this->internDocumentService = $internDocumentService;
+        $this->downloadService = $downloadService;
+        $this->internshipOutputService = $internshipOutputService;
     }
 
     public function index(Request $request)
     {
         // batch data
         $batchData = $this->batchService->getAllBatch('');
-        $currentBatch = $this->batchService->getBatchByStatus('active');
-        $batch_id = $request->batch ?? ($currentBatch->id ?? '');
+        $batch_id = $this->batchService->getRelevantBatch($request->batch);
         
         // table filters
         $filters = [
             'search' => $request->searchKeyword ?? '',
-            'batch_id' => $request->batch ?? $batch_id,
+            'batch_id' => $batch_id,
         ];
 
         // table data
         $data = $this->internshipService->getIntern($filters);
-        foreach ($data as $dt) {
-            // cek final report
-            foreach ($dt->groupMember as $member) {
-                if ($member->group->internship) {           
-                    $isCompleteFinalReport = $this->internDocumentService->checkIsCompleteFinalReportByInternshipAndStudentId($member->group->internship->id, $dt->id);
-                    
-                    if ($isCompleteFinalReport == true) {
-                        // cek logbook
-                        $isCompleteLogbook = $this->logbookService->checkIsCompleteLogbookByInternshipAndStudentId($member->group->internship->id, $dt->id);
-                        if ($isCompleteLogbook == true) {
-                            $dt->status = 'Lengkap';
-                        } else {
-                            $dt->status = 'Tidak Lengkap';
-                        }
-                    } else {
-                        $dt->status = 'Tidak Lengkap';
-                    }
-                }
-            }
-        }
+
+        // set status luaran
+        $this->internshipOutputService->OutputInternshipIsCompleteBundleCheck($data);
 
         // card
         $allIntern = $this->internshipService->getAllIntern($batch_id);
@@ -79,19 +55,13 @@ class OutputController extends Controller
         foreach ($allIntern as $dt) {
             // cek final report
             foreach ($dt->groupMember as $member) {
-                if ($member->group->internship) {                                  
-                    $isCompleteFinalReport = $this->internDocumentService->checkIsCompleteFinalReportByInternshipAndStudentId($member->group->internship->id, $dt->id);
-                    
-                    if ($isCompleteFinalReport == true) {
-                        // cek logbook
-                        $isCompleteLogbook = $this->logbookService->checkIsCompleteLogbookByInternshipAndStudentId($member->group->internship->id, $dt->id);
-                        if ($isCompleteLogbook == true) {
-                            $completeOutputCount += 1;
-                        } else {
-                            $incompleteOutputCount += 1;
-                        }
+                if ($member->group->internship) {
+                    // cek luaran lengkap
+                    $status = $this->internshipOutputService->OutputInternshipIsCompleteCheck($member->group->internship->id, $dt->id);
+                    if ($status == 'Lengkap') {
+                        $completeOutputCount++;
                     } else {
-                        $incompleteOutputCount += 1;
+                        $incompleteOutputCount++;
                     }
                 }
             }
@@ -109,12 +79,6 @@ class OutputController extends Controller
 
     public function downloadFinalReport($filename)
     {
-        $path = storage_path('app/intern_documents/laporan_akhir/' . $filename);
-        if (file_exists($path)) {
-            // return response()->download($path);
-            return response()->file($path);
-        } else {
-            return response()->json(['message' => 'File tidak ditemukan'], 404);
-        }
+        return $this->downloadService->internDocumentDownload('laporan akhir', $filename);
     }
 }

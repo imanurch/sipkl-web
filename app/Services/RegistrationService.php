@@ -3,15 +3,21 @@
 namespace App\Services;
 
 use App\Repositories\RegistrationRepository;
+use App\Repositories\StudentRegistrationRepository;
 
 class RegistrationService
 {
-    protected $registrationRepository;
+    protected $registrationRepository,
+    $studentRegistrationRepository;
 
     // Constructor Injection
-    public function __construct(RegistrationRepository $registrationRepository)
+    public function __construct(
+        RegistrationRepository $registrationRepository,
+        StudentRegistrationRepository $studentRegistrationRepository
+        )
     {
         $this->registrationRepository = $registrationRepository;
+        $this->studentRegistrationRepository = $studentRegistrationRepository;
     }
 
     public function getRegistration($filters = [])
@@ -26,7 +32,7 @@ class RegistrationService
 
     public function addRegistration($data)
     {
-        return $this->registrationRepository->createRegistration($data);
+        return $this->studentRegistrationRepository->createRegistration($data);
     }
 
     public function getRegistrationById($id)
@@ -36,12 +42,12 @@ class RegistrationService
 
     public function getRegistrationByStudentId($batch_id, $student_id)
     {
-        return $this->registrationRepository->getRegistrationByStudentId($batch_id, $student_id);
+        return $this->studentRegistrationRepository->getRegistrationByStudentId($batch_id, $student_id);
     }
 
     public function getAllHistoryRegistrationByStudentId($student_id)
     {
-        return $this->registrationRepository->getAllHistoryRegistrationByStudentId($student_id);
+        return $this->studentRegistrationRepository->getAllHistoryRegistrationByStudentId($student_id);
     }
 
     public function updateStatusRegistration($id, $status)
@@ -51,7 +57,7 @@ class RegistrationService
 
     public function updateRegistrationStep($id, $step)
     {
-        return $this->registrationRepository->updateRegistrationStep($id, $step);
+        return $this->studentRegistrationRepository->updateRegistrationStep($id, $step);
     }
 
     public function deleteRegistration($id)

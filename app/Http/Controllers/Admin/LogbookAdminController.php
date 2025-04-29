@@ -2,12 +2,8 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Illuminate\Http\Request;
 use App\Services\BatchService;
-use App\Services\IndustryService;
-use App\Services\DepartmentService;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Hash;
 use App\Services\internshipService;
 use App\Services\LogbookService;
 use App\Services\StudentService;

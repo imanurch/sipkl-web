@@ -8,6 +8,7 @@ use App\Services\AdminService;
 use App\Services\AdvisorService;
 use App\Services\StudentService;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\LogInRequest;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Session;
 use Flasher\Toastr\Laravel\Facade\Toastr;
@@ -34,12 +35,9 @@ class AuthenticationController extends Controller
         return view('auth.login');
     }
 
-    public function login(Request $request)
+    public function login(LogInRequest $request)
     {
-        $credentials = $request->validate([
-            'username' => 'required',
-            'password' => 'required',
-        ]);
+        $credentials = $request->validated();
 
         if (
             Auth::attempt(['email' => $credentials['username'], 'password' => $credentials['password']]) ||

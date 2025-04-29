@@ -9,8 +9,14 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class AdvisorLevel extends Model
 {
     use HasFactory;
-    protected $fillable = ['name'];
+    
     protected $table = "advisor_level";
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = ['name'];
 
     public function advisor(): HasMany
     {

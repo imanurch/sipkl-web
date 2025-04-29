@@ -4,19 +4,17 @@ namespace App\Http\Controllers\Admin;
 
 use Illuminate\Http\Request;
 use App\Services\BatchService;
-use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\AdvisorService;
 use App\Services\StudentService;
-use App\Services\IndustryService;
+use App\Helpers\DateFormatHelper;
+use App\Services\DownloadService;
 use Illuminate\Support\Facades\DB;
-use App\Services\DepartmentService;
 use App\Services\InternshipService;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Hash;
 use App\Services\SchoolProfileService;
 use App\Services\InternDocumentService;
 use Illuminate\Support\Facades\Storage;
-use App\Services\AdvisorDocumentService;
+use App\Services\DocumentGenerateService;
 use Flasher\Toastr\Laravel\Facade\Toastr;
 
 class InternshipAdminController extends Controller
@@ -26,7 +24,9 @@ class InternshipAdminController extends Controller
         $batchService,
         $advisorService,
         $schoolProfileService,
-        $internDocumentService;
+        $internDocumentService,
+        $downloadService,
+        $documentGenerateService;
 
     // Constructor Injection
     public function __construct(
@@ -35,7 +35,9 @@ class InternshipAdminController extends Controller
         BatchService $batchService,
         AdvisorService $advisorService,
         SchoolProfileService $schoolProfileService,
-        InternDocumentService $internDocumentService
+        InternDocumentService $internDocumentService,
+        DownloadService $downloadService,
+        DocumentGenerateService $documentGenerateService
     ) {
         $this->internshipService = $internshipService;
         $this->studentService = $studentService;
@@ -43,27 +45,28 @@ class InternshipAdminController extends Controller
         $this->advisorService = $advisorService;
         $this->schoolProfileService = $schoolProfileService;
         $this->internDocumentService = $internDocumentService;
+        $this->downloadService = $downloadService;
+        $this->documentGenerateService = $documentGenerateService;
     }
 
     public function index(Request $request)
     {
         // batch data
         $batchData = $this->batchService->getAllBatch('');
-        $currentBatch = $this->batchService->getBatchByStatus('active');
-        $batch_id = $request->batch ?? ($currentBatch->id ?? '');
+        $batch_id = $this->batchService->getRelevantBatch($request->batch);
 
         // table filters
         $filters = [
             'search' => $request->searchKeyword ?? '',
-            'batch_id' => $request->batch ?? $batch_id,
+            'batch_id' => $batch_id,
         ];
 
         // table data
         $data = $this->internshipService->getInternship($filters);
 
         foreach($data as $dt){
-            $dt->start_date = date('d-m-Y', strtotime($dt->start_date));
-            $dt->end_date = date('d-m-Y', strtotime($dt->end_date));
+            $dt->start_date = DateFormatHelper::dateFormat($dt->start_date);
+            $dt->end_date = DateFormatHelper::dateFormat($dt->end_date);
             foreach($dt->internDocument as $doc){
                 if($doc->type == 'surat jalan'){
                     $dt->surat_jalan = true;
@@ -148,11 +151,7 @@ class InternshipAdminController extends Controller
 
                         ];
 
-                        $pdf = Pdf::loadView('document_templates/surat_jalan', $data);
-                        $filename = 'surat_jalan_' . $internData->name . '.pdf';
-                        $path = storage_path('app/intern_documents/surat_jalan/' . $filename);
-
-                        $pdf->save($path);
+                        $filename = $this->documentGenerateService->internDocumentGenerate($data, $internData->name);
 
                         $internDocumentData = [
                             'student_id' => $intern_id,
@@ -173,13 +172,6 @@ class InternshipAdminController extends Controller
 
     public function downloadFile($filename)
     {
-        $path = storage_path('app/intern_documents/surat_jalan/' . $filename);
-
-        if (file_exists($path)) {
-            // return response()->download($path);
-            return response()->file($path);
-        } else {
-            return response()->json(['message' => 'File tidak ditemukan'], 404);
-        }
+        return $this->downloadService->internDocumentDownload('surat jalan',$filename);
     }
 }

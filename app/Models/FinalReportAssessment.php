@@ -10,6 +10,12 @@ class FinalReportAssessment extends Model
 {
     use HasFactory;
     protected $table = 'final_report_assessment';
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = ['assessment_id', 'aspect', 'score'];
 
     public function assessment(): BelongsTo

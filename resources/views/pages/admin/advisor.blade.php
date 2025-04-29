@@ -31,7 +31,10 @@
         positionSelectedValue: '',
         levelOption: false,
         levelSelected: 'Pilih Opsi',
-        levelSelectedValue: ''
+        levelSelectedValue: '',
+        departmentOption: false,
+        departmentSelected: 'Pilih Opsi',
+        departmentSelectedValue: ''
     }">
         <x-table.table>
             <x-slot name="tableTitle">Data Guru Pembimbing</x-slot>
@@ -258,11 +261,11 @@
                     </div>
                     <div class="input-group">
                         <label class="input-label" for="">Jurusan</label>
-                        <input type="hidden" name="department_id" x-model="selected">
+                        <input type="hidden" name="department_id" x-model="departmentSelectedValue">
                         <div x-show="modalAction!='isDelete'">
-                            <button @click.prevent="option=!option" class="input input-select w-full"
+                            <button @click.prevent="departmentOption=!departmentOption" class="input input-select w-full"
                                 :disabled="modalAction == 'isDelete'" required>
-                                <span x-text="selected" class="text-neutral-800"></span>
+                                <span x-text="departmentSelected" class="text-neutral-800"></span>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
                                     viewBox="0 0 20 20" fill="none">
                                     <path d="M5 7.5L10 12.5L15 7.5" stroke="#667085" stroke-width="0.933333"
@@ -270,10 +273,10 @@
                                         :hidden="modalAction == 'isDelete'" />
                                 </svg>
                             </button>
-                            <div x-show="option" @click.away="option=false">
+                            <div x-show="departmentOption" @click.away="departmentOption=false">
                                 <ul class="border border-brand-600 rounded py-2 my-2 max-h-32 overflow-auto">
                                     @foreach ($departmentData as $dt)
-                                        <li @click="option=false;selected='{{ $dt->name }}'"
+                                        <li @click="departmentOption=false;departmentSelected='{{ $dt->name }}';departmentSelectedValue='{{ $dt->id }}'"
                                             class="text-xs-reguler px-4 py-2 hover:bg-brand-600 hover:text-neutral-0 hover:text-xs-medium">
                                             {{ $dt->name }}</li>
                                     @endforeach

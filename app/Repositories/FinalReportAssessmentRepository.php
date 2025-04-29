@@ -6,6 +6,12 @@ use App\Models\FinalReportAssessment;
 
 class FinalReportAssessmentRepository
 {
+    /**
+     * Create or update a final report assessment record.
+     *
+     * @param  array  $data
+     * @return \App\Models\FinalReportAssessment
+     */
     public function updateOrCreate(array $data)
     {
         return FinalReportAssessment::updateOrCreate(
@@ -17,10 +23,18 @@ class FinalReportAssessmentRepository
         );
     }
 
-    public function isFinalReportAssessmentComplete($assessment_id){
-        $notComplete = FinalReportAssessment::where('assessment_id',$assessment_id)->whereNull('score')->count();
+    /**
+     * Check if all final report assessments are completed for given assessment ID.
+     *
+     * @param  int  $assessment_id
+     * @return bool
+     */
+    public function isFinalReportAssessmentComplete($assessment_id)
+    {
+        $notComplete = FinalReportAssessment::where('assessment_id', $assessment_id)
+            ->whereNull('score')
+            ->count();
 
-        $isComplete = $notComplete > 0 ? false : true;
-        return $isComplete;
+        return $notComplete === 0;
     }
 }

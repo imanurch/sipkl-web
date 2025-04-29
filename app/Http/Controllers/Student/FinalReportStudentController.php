@@ -5,16 +5,16 @@ namespace App\Http\Controllers\Student;
 use Illuminate\Http\Request;
 use App\Services\BatchService;
 use App\Services\StudentService;
+use App\Services\DownloadService;
 use Illuminate\Support\Facades\DB;
 use App\Services\AssessmentService;
 use App\Services\InternshipService;
 use App\Http\Controllers\Controller;
-use App\Notifications\FinalReportNotification;
-use Illuminate\Support\Facades\Auth;
 use App\Services\InternDocumentService;
-use Illuminate\Support\Facades\Storage;
 use Flasher\Toastr\Laravel\Facade\Toastr;
 use Illuminate\Support\Facades\Notification;
+use App\Notifications\FinalReportNotification;
+use App\Services\DeleteDocumentService;
 
 class FinalReportStudentController extends Controller
 {
@@ -23,7 +23,9 @@ class FinalReportStudentController extends Controller
         $assessmentService,
         $batchService,
         $studentService,
-        $internshipService;
+        $internshipService,
+        $downloadService,
+        $deleteDocumentService;
 
     // Constructor Injection
     public function __construct(
@@ -31,18 +33,21 @@ class FinalReportStudentController extends Controller
         AssessmentService $assessmentService,
         BatchService $batchService,
         StudentService $studentService,
-        InternshipService $internshipService
+        InternshipService $internshipService,
+        DownloadService $downloadService,
+        DeleteDocumentService $deleteDocumentService
     ) {
         $this->internDocumentService = $internDocumentService;
         $this->assessmentService = $assessmentService;
         $this->batchService = $batchService;
         $this->studentService = $studentService;
         $this->internshipService = $internshipService;
+        $this->downloadService = $downloadService;
+        $this->deleteDocumentService = $deleteDocumentService;
     }
 
-    public function index(Request $request)
+    public function index()
     {
-        $user_id = Auth::user()->id;
         $student_id = session('user_bio')->id;
 
         $currentBatch = $this->batchService->getBatchByStatus('active');
@@ -88,9 +93,8 @@ class FinalReportStudentController extends Controller
         // doc lama dihapus
         $doc = $this->internDocumentService->getInternDocumentByInternshipId($internship_id);
         foreach ($doc as $dt) {
-            $filename = $dt->url;
             if ($dt->student_id == $student_id && $dt->type == "laporan akhir") {
-                Storage::delete('intern_documents/laporan_akhir/' . $filename);
+                $this->deleteDocumentService->deleteInternDocument($dt->url);
             }
         }
 
@@ -124,13 +128,6 @@ class FinalReportStudentController extends Controller
 
     public function downloadLaporanAkhir($filename)
     {
-        $path = storage_path('app/intern_documents/laporan_akhir/' . $filename);
-
-        if (file_exists($path)) {
-            return response()->download($path);
-        } else {
-            Toastr::addError('File tidak ditemukan!');
-            return redirect()->back();
-        }
+        return $this->downloadService->internDocumentDownload('laporan akhir', $filename);
     }
 }

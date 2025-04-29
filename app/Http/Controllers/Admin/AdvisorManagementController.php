@@ -6,16 +6,22 @@ use Illuminate\Http\Request;
 use App\Services\UserService;
 use App\Services\BatchService;
 use App\Services\AdvisorService;
+use App\Services\DownloadService;
 use Illuminate\Support\Facades\DB;
 use App\Services\DepartmentService;
+use App\Services\ImportDataService;
+use App\Helpers\PasswordCheckHelper;
 use App\Http\Controllers\Controller;
-use App\Services\AdvisorLevelService;
-use App\Services\AdvisorPositionService;
 use Illuminate\Support\Facades\Hash;
-use PhpOffice\PhpSpreadsheet\IOFactory;
+use App\Services\AdvisorLevelService;
+use App\Http\Requests\ImportFileRequest;
+use App\Services\AdvisorPositionService;
 use Flasher\Toastr\Laravel\Facade\Toastr;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use App\Http\Requests\StoreAdvisorRequest;
+use App\Http\Requests\UpdateAdvisorRequest;
+use Illuminate\Validation\ValidationException;
 
 class AdvisorManagementController extends Controller
 {
@@ -25,7 +31,9 @@ class AdvisorManagementController extends Controller
         $departmentService,
         $userService,
         $advisorPositionService,
-        $advisorLevelService;
+        $advisorLevelService,
+        $downloadService,
+        $importDataService;
 
     // Constructor Injection
     public function __construct(
@@ -34,7 +42,9 @@ class AdvisorManagementController extends Controller
         DepartmentService $departmentService,
         UserService $userService,
         AdvisorPositionService $advisorPositionService,
-        AdvisorLevelService $advisorLevelService
+        AdvisorLevelService $advisorLevelService,
+        DownloadService $downloadService,
+        ImportDataService $importDataService,
     ) {
         $this->advisorService = $advisorService;
         $this->batchService = $batchService;
@@ -42,14 +52,19 @@ class AdvisorManagementController extends Controller
         $this->userService = $userService;
         $this->advisorPositionService = $advisorPositionService;
         $this->advisorLevelService = $advisorLevelService;
+        $this->downloadService = $downloadService;
+        $this->importDataService = $importDataService;
     }
 
+    /**
+     * Display the list of advisors with filters applied.
+     *
+     * @param Request $request
+     */
     public function index(Request $request)
     {
-        // batch data
-        $currentBatch = $this->batchService->getBatchByStatus('active');
-        $batch_id = $request->batch ?? ($currentBatch->id ?? '');
-
+        $batch_id = $this->batchService->getRelevantBatch($request->batch);
+        
         // table filters
         $departmentData = $this->departmentService->getAllDepartment();
         $batchData = $this->batchService->getAllBatch('');
@@ -83,36 +98,21 @@ class AdvisorManagementController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    /**
+     * Store a new advisor record in the database.
+     *
+     * @param StoreAdvisorRequest $request
+     */
+    public function store(StoreAdvisorRequest $request)
     {
-        if ($request->check_password !== $request->password) {
-            Toastr::addError('Password tidak konsisten!');
-            return redirect()->back();
-        }
-        $data = $request->except(['_token']);
-
         try {
-            $validatedData = $request->validate([
-                'name' => 'required|string',
-                'nip' => 'required|size:18',
-                'position_id' => 'required',
-                'level_id' => 'required',
-                'department_id' => 'required',
-                'username' => 'required|string',
-                'email' => 'required|unique:users,email|email',
-                'phone_num' => 'required|unique:advisors,phone_num|string|min:10|max:14',
-                'password' => 'required|string|min:8|max:12',
-            ]);
-            $validatedData['password'] = Hash::make($validatedData['password']);
-            $validatedData['department_id'] = $validatedData['department_id'] == 'RPL' ? '1' : ($validatedData['department_id'] == 'DPIB' ? '2' : ($validatedData['department_id'] == 'K3R' ? '3' : ''));
+            $validatedData = $request->validated();
+            $validatedData['password'] = PasswordCheckHelper::handlePassword($request->password, $request->check_password);
 
             DB::transaction(function () use ($validatedData) {
-                $newUser = $this->userService->addUser([
-                    'username' => $validatedData['username'],
-                    'email' => $validatedData['email'],
-                    'password' => $validatedData['password'],
-                    'role' => 'advisor',
-                ]);
+                $validatedData['role'] = 'advisor';
+                $newUser = $this->userService->addUser($validatedData);
+
                 $this->advisorService->addAdvisor([
                     'user_id' => $newUser->id,
                     'name' => $validatedData['name'],
@@ -124,39 +124,29 @@ class AdvisorManagementController extends Controller
                 ]);
             });
             Toastr::addSuccess('Data guru pembimbing berhasil ditambah!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Toastr::addError($e->errors()['password'][0]);
         } catch (\Exception $e) {
             Toastr::addError('Data guru pembimbing gagal ditambah!');
         }
         return redirect()->back();
     }
 
-    public function update(Request $request, $id)
+    /**
+     * Update the existing advisor record.
+     *
+     * @param UpdateAdvisorRequest $request
+     * @param int $id
+     */
+    public function update(UpdateAdvisorRequest $request, $id)
     {
-        $data = $request->except(['_token', '_method']);
-
         try {
-            $validatedData = $request->validate([
-                'user_id' => 'required',
-                'name' => 'required|string',
-                'nip' => 'required|size:18',
-                'position_id' => 'required',
-                'level_id' => 'required',
-                'department_id' => 'required',
-                'username' => 'required|string',
-                'email' => 'required|email|unique:users,email,' . $request->input('user_id'),
-                'phone_num' => 'required|string|min:10|max:14|unique:advisors,phone_num,' . $id,
-                'password' => 'nullable|string|min:8|max:12',
-            ]);
+            $validatedData = $request->validated();
 
             if (!empty($validatedData['password'])) {
-                if ($request->check_password !== $request->password) {
-                    Toastr::addError('Password tidak konsisten!');
-                    return redirect()->back();
-                }
-                $validatedData['password'] = Hash::make($validatedData['password']);
+                $validatedData['password'] = PasswordCheckHelper::handlePassword($request->password, $request->check_password);
             }
 
-            $validatedData['department_id'] = $validatedData['department_id'] == 'RPL' ? '1' : ($validatedData['department_id'] == 'DPIB' ? '2' : ($validatedData['department_id'] == 'K3R' ? '3' : ''));
             DB::transaction(function () use ($id, $validatedData) {
                 $this->advisorService->updateAdvisor($id, [
                     'name' => $validatedData['name'],
@@ -179,12 +169,19 @@ class AdvisorManagementController extends Controller
                 $this->userService->updateUser($validatedData['user_id'], $updateUserData);
             });
             Toastr::addSuccess('Data guru pembimbing berhasil diubah!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            Toastr::addError($e->errors()['password'][0]);
         } catch (\Exception $e) {
             Toastr::addError('Data guru pembimbing gagal diubah!');
         }
         return redirect()->back();
     }
 
+    /**
+     * Delete the specified advisor record from the database.
+     *
+     * @param int $id
+     */
     public function destroy($id)
     {
         $user_id = $this->advisorService->getAdvisorById($id)->user_id;
@@ -198,71 +195,38 @@ class AdvisorManagementController extends Controller
         return redirect()->back();
     }
 
-    public function import(Request $request)
+    /**
+     * Import advisor data from the uploaded file and store them in the database.
+     *
+     * @param ImportFileRequest $request
+     */
+    public function import(ImportFileRequest $request)
     {
-        $validatedData = $request->validate([
-            'import_file' => 'required|mimes:xlsx,xml,xls',
-        ]);
+        $request->validated();
 
         $file = $request->file('import_file');
 
-        $spreadsheet = IOFactory::load($file->getPathname());
-        $worksheet = $spreadsheet->getSheetByName('Data');
-        $rows = $worksheet->toArray();
+        try {
+            $validData = $this->importDataService->importAdvisorDataCheck($file);
+        } catch (ValidationException $e) {
+            Toastr::addError(nl2br($e->getMessage()));
+            return redirect()->back();
+        }
 
         try {
-            DB::transaction(function () use ($rows, $request) {
-                foreach ($rows as $index => $row) {
-                    if ($index == 0) continue;
-                    if ($row[1] == null) break;
-
-                    $validatedData = $request->validate([
-                        'name' => $row[1],
-                        'nip' => $row[2],
-                        'department_id' => $row[3],
-                        'position_id' => $row[4],
-                        'level_id' => $row[5],
-                        'username' => $row[6],
-                        'email' => $row[7],
-                        'phone_num' => $row[8],
-                        'password' => $row[9],
-                    ], [
-                        'name' => 'required|string',
-                        'nip' => 'required|size:18|unique:advisors,nip',
-                        'department_id' => 'required',
-                        'position_id' => 'required',
-                        'level_id' => 'required',
-                        'username' => 'required|string',
-                        'email' => 'required|email|unique:users,email',
-                        'phone_num' => 'required|string|min:10|max:14|unique:advisors,phone_num',
-                        'password' => 'required|string|min:8|max:12',
-                    ]);
-
-
-                    $row[3] = $row[3] == 'RPL' ? '1' : ($row[3] == 'DPIB' ? '2' : ($row[3] == 'K3R' ? '3' : ''));
-                    $row[4] = $row[4] == 'Guru Pertama' ? '1' : ($row[4] == 'Guru Muda' ? '2' : ($row[4] == 'Guru Madya' ? '3' : ($row[4] == 'Guru Utama' ? '4' : '')));
-                    $row[5] = $row[5] == 'I/a' ? '1' : ($row[5] == 'I/b' ? '2' : ($row[5] == 'I/c' ? '3' : ($row[5] == 'I/d' ? '4' : ($row[5] == 'II/a' ? '5' : ($row[5] == 'II/b' ? '6' : ($row[5] == 'II/c' ? '7' : ($row[5] == 'II/d' ? '8' : ($row[5] == 'III/a' ? '9' : ($row[5] == 'III/b' ? '10' : ($row[5] == 'III/c' ? '11' : ($row[5] == 'III/d' ? '12' : ($row[5] == 'IV/a' ? '13' : ($row[5] == 'IV/b' ? '14' : ($row[5] == 'IV/c' ? '15' : ($row[5] == 'IV/d' ? '16' : ($row[5] == 'IV/e' ? '17' : ''))))))))))))))));
-                    $row[9] = Hash::make($row[9]);
-
-                    // dd($row);
-
-                    $userData = [
-                        'username' => $row[6],
-                        'email' => $row[7],
-                        'password' => $row[9],
-                        'role' => 'advisor',
-                    ];
-
-                    $newUser = $this->userService->addUser($userData);
-
+            DB::transaction(function () use ($validData) {
+                foreach ($validData as $data) {
+                    $newUser = $this->userService->addUser($data);
+                    $data['password'] = Hash::make($data['password']);
+                    $data['role'] = 'advisor';
                     $advisorData = [
                         'user_id' => $newUser->id ?? '',
-                        'name' => $row[1],
-                        'nip' => $row[2],
-                        'department_id' => $row[3],
-                        'position_id' => $row[4],
-                        'level_id' => $row[5],
-                        'phone_num' => $row[8],
+                        'name' => $data['name'],
+                        'nip' => $data['nip'],
+                        'department_id' => $data['department_id'],
+                        'position_id' => $data['position_id'],
+                        'level_id' => $data['level_id'],
+                        'phone_num' => $data['phone_num'],
                     ];
 
                     $this->advisorService->addAdvisor($advisorData);
@@ -275,17 +239,19 @@ class AdvisorManagementController extends Controller
         return redirect()->back();
     }
 
+    /**
+     * Download the template for importing advisor data.
+     */
     public function downloadTemplateFile()
     {
-        $filePath = storage_path('app/public/files/template_import_advisor.xlsx');
-
-        if (file_exists($filePath)) {
-            return response()->download($filePath);
-        } else {
-            Toastr::addError('File tidak ditemukan');
-        }
+        return $this->downloadService->templateImportDataDownload('template_import_advisor.xlsx');
     }
 
+    /**
+     * Export advisor data to an Excel file based on the given filters.
+     *
+     * @param Request $request
+     */
     public function export(Request $request)
     {
         $spreadsheet = new Spreadsheet();
@@ -302,7 +268,7 @@ class AdvisorManagementController extends Controller
         $sheet->setCellValue('I1', 'NOMOR TELEPON');
 
         $current_batch = $this->batchService->getBatchByStatus('active');
-        $batch_id = $current_batch != null ? $current_batch->id : $batch_id = '';
+        $batch_id = $current_batch != null ? $current_batch->id : '';
 
         $data = $request->data_type == 'Semua' ? $this->advisorService->getAdvisorList() : $this->advisorService->getActiveAdvisorList($batch_id);
 
@@ -323,12 +289,14 @@ class AdvisorManagementController extends Controller
         }
 
         $filename = "data_advisor_export.xlsx";
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="' . $filename . '"');
-        header('Cache-Control: max-age=0');
-
-        $writer = new Xlsx($spreadsheet);
-        $writer->save('php://output');
-        exit;
+        try {
+            return response()->streamDownload(function () use ($spreadsheet) {
+                $writer = new Xlsx($spreadsheet);
+                $writer->save('php://output');
+            }, $filename);
+        } catch (\Exception $e) {
+            Toastr::addError('Export gagal!');
+            return redirect()->back();
+        }
     }
 }

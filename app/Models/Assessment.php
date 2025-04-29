@@ -11,7 +11,13 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 class Assessment extends Model
 {
     use HasFactory;
-    protected $fillable = ['student_id', 'internship_id','industry_score', 'advisor_score', 'final_test_score'];
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = ['student_id', 'internship_id', 'industry_score', 'advisor_score', 'final_test_score'];
 
     public function student(): BelongsTo
     {

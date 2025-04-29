@@ -3,16 +3,29 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasManyThrough;
 
 class Student extends Model
 {
     use HasFactory;
-    protected $fillable = ['user_id', 'name', 'nisn', 'nis', 'gender', 'department_id', 'year', 'phone_num'];
+
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'user_id',
+        'name',
+        'nisn',
+        'nis',
+        'gender',
+        'department_id',
+        'year',
+        'phone_num',
+    ];
 
     public function user(): BelongsTo
     {

@@ -99,7 +99,7 @@
                         <td class="text-center">
                             @if ($dt->surat_permohonan != null)
                                 <x-table.action_btn_table name="Lihat File"
-                                    href="{{ route('admin.registration.download.file', ['type' => 'suratPermohonan', 'filename' => $dt->surat_permohonan]) }}"></x-table.action_btn_table>
+                                    href="{{ route('admin.registration.download.file', ['type' => 'surat_permohonan', 'filename' => $dt->surat_permohonan]) }}"></x-table.action_btn_table>
                             @else
                                 <button @click.prevent="generateDocumentModal=true;dataId={{ $dt }}"
                                     class="btn btn-xs btn-success-fill min-w-max">
@@ -118,7 +118,7 @@
                         <td class="text-center">
                             @if ($dt->surat_balasan != null)
                                 <x-table.action_btn_table name="Lihat File"
-                                    href="{{ route('admin.registration.download.file', ['type' => 'suratBalasan', 'filename' => $dt->surat_balasan]) }}"></x-table.action_btn_table>
+                                    href="{{ route('admin.registration.download.file', ['type' => 'surat_balasan', 'filename' => $dt->surat_balasan]) }}"></x-table.action_btn_table>
                             @else
                                 Belum Tersedia
                             @endif

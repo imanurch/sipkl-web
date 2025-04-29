@@ -2,13 +2,13 @@
 
 namespace App\Http\Controllers\Student;
 
-use Illuminate\Http\Request;
 use App\Services\UserService;
 use App\Services\StudentService;
 use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Hash;
 use Flasher\Toastr\Laravel\Facade\Toastr;
+use App\Http\Requests\UpdateAccountRequest;
+use App\Http\Requests\UpdateStudentProfileRequest;
 
 class AccountStudentController extends Controller
 {
@@ -36,43 +36,25 @@ class AccountStudentController extends Controller
     }
 
 
-    public function updateAccount(Request $request)
+    public function updateAccount(UpdateAccountRequest $request)
     {
-        $validatedData = $request->validate([
-            'user_id' => 'required',
-            'password' => 'required',
-            'new_password' => 'required|string|size:8'
-        ]);
-
-        $last_password = $this->userService->getUserById($request->user_id)->password;
-        if (Hash::check($validatedData['password'],$last_password) == false) {
-            Toastr::addError('Password Anda salah!');
-            return redirect()->back();
-        }
-
-        if (!empty($validatedData['new_password'])) {
-            if ($request->check_password !== $request->new_password) {
-                Toastr::addError('Password baru tidak konsisten!');
-                return redirect()->back();
-            }
-            $validatedData['new_password'] = Hash::make($validatedData['new_password']);
-        }
+        $request->validated();
 
         try {
-            $this->userService->updateUser($request->user_id, ['password' => $validatedData['new_password']]);
+            $this->userService->updateAccountUser($request);
             Toastr::addSuccess('Data akun berhasil diubah!');
+        } catch (\Illuminate\Validation\ValidationException $e) {
+            $errorMessage = collect($e->errors())->flatten()->first();
+            Toastr::addError($errorMessage);
         } catch (\Exception $e) {
             Toastr::addError('Data akun gagal diubah!');
         }
         return redirect()->back();
     }
 
-    public function updateProfile(Request $request)
+    public function updateProfile(UpdateStudentProfileRequest $request)
     {
-        $validatedData = $request->validate([
-            'profile_id' => 'required',
-            'phone_num' => 'required|string|min:10|max:14|unique:students,phone_num,' . $request->profile_id,
-        ]);
+        $validatedData = $request->validated();
 
         try {
             $this->studentService->updateStudent($request->profile_id, ['phone_num' => $validatedData['phone_num']]);

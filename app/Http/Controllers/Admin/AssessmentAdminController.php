@@ -2,159 +2,87 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Log;
+use App\Helpers\DateFormatHelper;
 use Illuminate\Http\Request;
-use App\Services\AdminService;
 use App\Services\BatchService;
-use App\Services\LogbookService;
 use Illuminate\Support\Facades\DB;
 use App\Services\AssessmentService;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Hash;
-use App\Services\InternDocumentService;
 use App\Services\TestAssessmentService;
+use App\Services\InternshipOutputService;
 use Flasher\Toastr\Laravel\Facade\Toastr;
 use PhpOffice\PhpSpreadsheet\Spreadsheet;
 use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
 use App\Services\TechnicalAssessmentService;
+use App\Http\Requests\UpdateAssessmentRequest;
 use App\Services\FinalReportAssessmentService;
 use App\Services\NonTechnicalAssessmentService;
+use App\Services\CalculateAssessmentScoreService;
 
 class AssessmentAdminController extends Controller
 {
     protected $assessmentService,
         $batchService,
-        $internDocumentService,
-        $logbookService,
         $technicalAssessmentService,
         $nonTechnicalAssessmentService,
         $finalReportAssessmentService,
-        $testAssessmentService;
+        $testAssessmentService,
+        $calculateAssessmentScoreService,
+        $internshipOutputService;
 
     // Constructor Injection
     public function __construct(
         AssessmentService $assessmentService,
         BatchService $batchService,
-        InternDocumentService $internDocumentService,
-        LogbookService $logbookService,
         TechnicalAssessmentService $technicalAssessmentService,
         NonTechnicalAssessmentService $nonTechnicalAssessmentService,
         FinalReportAssessmentService $finalReportAssessmentService,
-        TestAssessmentService $testAssessmentService
+        TestAssessmentService $testAssessmentService,
+        CalculateAssessmentScoreService $calculateAssessmentScoreService,
+        InternshipOutputService $internshipOutputService
     ) {
         $this->assessmentService = $assessmentService;
         $this->batchService = $batchService;
-        $this->internDocumentService = $internDocumentService;
-        $this->logbookService = $logbookService;
         $this->technicalAssessmentService = $technicalAssessmentService;
         $this->nonTechnicalAssessmentService = $nonTechnicalAssessmentService;
         $this->finalReportAssessmentService = $finalReportAssessmentService;
         $this->testAssessmentService = $testAssessmentService;
+        $this->calculateAssessmentScoreService = $calculateAssessmentScoreService;
+        $this->internshipOutputService = $internshipOutputService;
     }
 
+    /**
+     * Display a list of assessments with filters, counts, and data for the active batch.
+     *
+     * @param Request $request
+     * @return \Illuminate\View\View
+     */
     public function index(Request $request)
     {
-        // batch data
-        $currentBatch = $this->batchService->getBatchByStatus('active');
-        $batch_id = $request->batch ?? ($currentBatch->id ?? '');
+        $batch_id = $this->batchService->getRelevantBatch($request->batch);
 
-        // table filters
+        // Set up table filters for searching and batch selection
         $batchData = $this->batchService->getAllBatch('');
         $filters = [
             'search' => $request->searchKeyword ?? '',
             'batch_id' => $batch_id,
         ];
 
-        // card
+        // Get counts for not assessed, passed, and failed assessments
         $countNotAssessed = $this->assessmentService->getNotAssessedCount();
         $countPass = $this->assessmentService->getAssessedCount('pass');
         $countNotPass = $this->assessmentService->getAssessedCount('notPass');
 
-        // table data
+        // Fetch assessment data based on the filters
         $data = $this->assessmentService->getAssessment($filters);
 
+        // Calculate final internship scores and check for complete internship outputs
         foreach ($data as $dt) {
-            $technical_score = 0;
-            $non_technical_score = 0;
-            $final_report_score = 0;
-            $technical_aspect = [];
-            $technical_aspect_score = [];
-
-            // technical
-            if (count($dt->technical_assessment) > 0) {
-                foreach ($dt->technical_assessment as $aspect_score) {
-                    $technical_score += $aspect_score->score;
-                    $technical_aspect[] = $aspect_score->aspect;
-                    $technical_aspect_score[] = $aspect_score->score;
-                    $dt->technical_aspect = $technical_aspect;
-                    $dt->technical_aspect_score = $technical_aspect_score;
-                }
-                $technical_score_average = $technical_score / count($dt->technical_assessment);
-                $dt->technical_score_average = $technical_score_average;
-            }
-
-            // non technical
-            if (count($dt->non_technical_assessment) > 0) {
-                foreach ($dt->non_technical_assessment as $aspect_score) {
-                    $non_technical_score += $aspect_score->score;
-                    $aspect = str_replace(' ', '_', $aspect_score->aspect);
-                    // dd($aspect);
-                    $dt->$aspect = $aspect_score->score;
-                    // dd($dt->non_technical_assessment->Kedisiplinan);
-                }
-                if ($this->nonTechnicalAssessmentService->isNonTechnicalAssessmentComplete($dt->id) == true) {
-                    $non_technical_score_average = ($non_technical_score / count($dt->non_technical_assessment));
-                    $dt->non_technical_score_average = $non_technical_score_average;
-                }
-            }
-
-            // final report
-            if (count($dt->final_report_assessment) > 0) {
-                foreach ($dt->final_report_assessment as $aspect_score) {
-                    $final_report_score += $aspect_score->score;
-                    $aspect = str_replace(' ', '_', $aspect_score->aspect);
-                    // dd($aspect);
-                    $dt->$aspect = $aspect_score->score;
-                }
-                if ($this->finalReportAssessmentService->isFinalReportAssessmentComplete($dt->id) == true) {
-                    $final_report_score_average = $final_report_score / count($dt->final_report_assessment);
-                    $dt->final_report_score_average = $final_report_score_average;
-                }
-            }
-
-            // final score internship
-            if (
-                count($dt->technical_assessment) > 0 &&
-                $this->technicalAssessmentService->isTechnicalAssessmentComplete($dt->id) == true &&
-                $this->nonTechnicalAssessmentService->isNonTechnicalAssessmentComplete($dt->id) == true &&
-                $this->finalReportAssessmentService->isFinalReportAssessmentComplete($dt->id) == true &&
-                $this->testAssessmentService->isTestAssessmentComplete($dt->id) == true
-            ) {
-                $dt->internship_score = round((($technical_score_average + $non_technical_score_average + $final_report_score_average + $dt->test_assessment->score) / 4), 2);
-                // cek kelulusan
-                if ($dt->internship_score >= 75) {
-                    $dt->internship_status = 'Lulus';
-                } else {
-                    $dt->internship_status = 'Tidak Lulus';
-                }
-            }
-
-            // cek final report
-            $isCompleteFinalReport = $this->internDocumentService->checkIsCompleteFinalReportByInternshipAndStudentId($dt->internship_id, $dt->student_id);
-
-            if ($isCompleteFinalReport == true) {
-                // cek logbook
-                $isCompleteLogbook = $this->logbookService->checkIsCompleteLogbookByInternshipAndStudentId($dt->internship_id, $dt->student_id);
-                if ($isCompleteLogbook == true) {
-                    $dt->isCompleteOutput = 'Lengkap';
-                } else {
-                    $dt->isCompleteOutput = 'Tidak Lengkap';
-                }
-            } else {
-                $dt->isCompleteOutput = 'Tidak Lengkap';
-            }
+            $this->calculateAssessmentScoreService->calculateInternshipScore($dt);
+            $dt->isCompleteOutput = $this->internshipOutputService->OutputInternshipIsCompleteCheck($dt->internship_id, $dt->student_id);
         }
 
+        // Return the assessment view with all necessary data
         return view('pages.admin.assessment', [
             'data' => $data,
             'batchData' => $batchData,
@@ -166,92 +94,36 @@ class AssessmentAdminController extends Controller
         ]);
     }
 
-    public function update(Request $request, $id)
+    /**
+     * Update the assessment for a student.
+     *
+     * @param UpdateAssessmentRequest $request
+     * @param int $id Assessment ID
+     * @return \Illuminate\Http\RedirectResponse
+     */
+    public function update(UpdateAssessmentRequest $request, $id)
     {
+        $request->validated();
+
         try {
             DB::transaction(function () use ($request, $id) {
-                $validatedData = $request->validate([
-                    'technical_aspect[]' => 'nullable|string',
-                    'technical_score[]' => 'nullable|numeric',
-                    'dicipline' => 'nullable|numeric',
-                    'teamwork' => 'nullable|numeric',
-                    'initiative' => 'nullable|numeric',
-                    'responsibility' => 'nullable|numeric',
-                    'honest' => 'nullable|numeric',
-                    'attitude' => 'nullable|numeric',
-                    'writing' => 'nullable|numeric',
-                    'on_time' => 'nullable|numeric',
-                    'orderly' => 'nullable|numeric',
-                    'final_report' => 'nullable|numeric',
-                    'final_test' => 'nullable|numeric',
-                ]);
-
                 // technical
                 $this->technicalAssessmentService->deleteTechnicalAssessment($id);
                 if ($request->technical_aspect != null) {
                     foreach ($request->technical_aspect as $index => $aspect) {
-                        $technical_data = [
+                        $this->technicalAssessmentService->addTechnicalAssessment([
                             'assessment_id' => $id,
                             'aspect' => $aspect,
-                            'score' => $request->technical_score[$index],
-                        ];
-                        $this->technicalAssessmentService->addTechnicalAssessment($technical_data);
+                            'score' => $request->technical_score[$index] ?? null,
+                        ]);
                     }
                 }
 
                 // non technical
-                $this->nonTechnicalAssessmentService->updateOrCreate([
-                    'assessment_id' => $id,
-                    'aspect' => 'Kedisiplinan',
-                    'score' => $request->dicipline,
-                ]);
-                $this->nonTechnicalAssessmentService->updateOrCreate([
-                    'assessment_id' => $id,
-                    'aspect' => 'Kerja Sama',
-                    'score' => $request->teamwork,
-                ]);
-                $this->nonTechnicalAssessmentService->updateOrCreate([
-                    'assessment_id' => $id,
-                    'aspect' => 'Inisiatif',
-                    'score' => $request->initiative,
-                ]);
-                $this->nonTechnicalAssessmentService->updateOrCreate([
-                    'assessment_id' => $id,
-                    'aspect' => 'Tanggung Jawab',
-                    'score' => $request->responsibility,
-                ]);
-                $this->nonTechnicalAssessmentService->updateOrCreate([
-                    'assessment_id' => $id,
-                    'aspect' => 'Jujur dan Santun',
-                    'score' => $request->honest,
-                ]);
+                $this->nonTechnicalAssessmentService->updateOrCreate($id, $request);
 
                 // final_report
-                $this->finalReportAssessmentService->updateOrCreate([
-                    'assessment_id' => $id,
-                    'aspect' => 'Sikap',
-                    'score' => $request->attitude,
-                ]);
-                $this->finalReportAssessmentService->updateOrCreate([
-                    'assessment_id' => $id,
-                    'aspect' => 'Tata Tulis',
-                    'score' => $request->writing,
-                ]);
-                $this->finalReportAssessmentService->updateOrCreate([
-                    'assessment_id' => $id,
-                    'aspect' => 'Ketepatan Waktu',
-                    'score' => $request->on_time,
-                ]);
-                $this->finalReportAssessmentService->updateOrCreate([
-                    'assessment_id' => $id,
-                    'aspect' => 'Ketertiban',
-                    'score' => $request->orderly,
-                ]);
-                $this->finalReportAssessmentService->updateOrCreate([
-                    'assessment_id' => $id,
-                    'aspect' => 'Keseluruhan Laporan',
-                    'score' => $request->final_report,
-                ]);
+                $this->finalReportAssessmentService->updateOrCreate($id, $request);
 
                 // test
                 if ($request->final_test != null) {
@@ -269,11 +141,42 @@ class AssessmentAdminController extends Controller
         return redirect()->back();
     }
 
+    /**
+     * Export the assessment data to an Excel file.
+     *
+     * @param Request $request
+     * @return \Symfony\Component\HttpFoundation\StreamedResponse
+     */
     public function export(Request $request)
     {
         $spreadsheet = new Spreadsheet();
         $sheet = $spreadsheet->getActiveSheet();
 
+        $this->setupSheetExport($sheet);
+
+        $data = $this->assessmentService->getAssessmentByBatch($request->batch_id);
+
+        $this->fillDataExport($sheet, $data);
+
+        $filename = "data_assessment_export.xlsx";
+        try {
+            return response()->streamDownload(function () use ($spreadsheet) {
+                $writer = new Xlsx($spreadsheet);
+                $writer->save('php://output');
+            }, $filename);
+        } catch (\Exception $e) {
+            Toastr::addError('Export gagal!');
+            return redirect()->back();
+        }
+    }
+
+    /**
+     * Setup the sheet for exporting data (merge cells and set column titles)
+     *
+     * @param \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $sheet
+     */
+    private function setupSheetExport($sheet)
+    {
         $sheet->mergeCells('A1:A2');
         $sheet->mergeCells('B1:B2');
         $sheet->mergeCells('C1:C2');
@@ -314,59 +217,22 @@ class AssessmentAdminController extends Controller
         $sheet->setCellValue('U1', 'NILAI AKHIR PKL');
         $sheet->setCellValue('V1', 'STATUS PKL');
 
-        $data = $this->assessmentService->getAssessmentByBatch($request->batch_id);
+        foreach (range('A', 'V') as $col) {
+            $sheet->getColumnDimension($col)->setAutoSize(true);
+        }
+    }
 
-        $internship_score = 0;
-
+    /**
+     * Fill the sheet with the assessment data
+     *
+     * @param \PhpOffice\PhpSpreadsheet\Worksheet\Worksheet $sheet
+     * @param array $data The assessment data to export
+     */
+    private function fillDataExport($sheet, $data)
+    {
         foreach ($data as $dt) {
-            $technical_score = 0;
-            $non_technical_score = 0;
-            $final_report_score = 0;
-
-            if (count($dt->technical_assessment) > 0) {
-                foreach ($dt->technical_assessment as $aspect_score) {
-                    $technical_score += $aspect_score->score;
-                    $dt->technical_aspect .= "{$aspect_score->aspect}: {$aspect_score->score}\n";
-                }
-                $technical_score_average = $technical_score / count($dt->technical_assessment);
-            }
-
-            // non technical
-            if (count($dt->non_technical_assessment) > 0) {
-                foreach ($dt->non_technical_assessment as $aspect_score) {
-                    $non_technical_score += $aspect_score->score;
-                    $non_technical_aspect_data[$aspect_score->aspect] = $aspect_score->score;
-                }
-                $non_technical_score_average = $non_technical_score / count($dt->non_technical_assessment);
-                $dt->non_technical_aspect = $non_technical_aspect_data;
-            }
-
-            // final report
-            if (count($dt->final_report_assessment) > 0) {
-                foreach ($dt->final_report_assessment as $aspect_score) {
-                    $final_report_score += $aspect_score->score;
-                    $final_report_data[$aspect_score->aspect] = $aspect_score->score;
-                }
-                $final_report_score_average = $final_report_score / count($dt->final_report_assessment);
-                $dt->final_report = $final_report_data;
-            }
-
-            // final score internship
-            if (
-                count($dt->technical_assessment) > 0 &&
-                $this->technicalAssessmentService->isTechnicalAssessmentComplete($dt->id) == true &&
-                $this->nonTechnicalAssessmentService->isNonTechnicalAssessmentComplete($dt->id) == true &&
-                $this->finalReportAssessmentService->isFinalReportAssessmentComplete($dt->id) == true &&
-                $this->testAssessmentService->isTestAssessmentComplete($dt->id) == true
-            ) {
-                $dt->internship_score = round((($technical_score_average + $non_technical_score_average + $final_report_score_average + $dt->test_assessment->score) / 4), 2);
-                // cek kelulusan
-                if ($dt->internship_score >= 75) {
-                    $dt->internship_status = 'Lulus';
-                } else {
-                    $dt->internship_status = 'Tidak Lulus';
-                }
-            }
+            // calculate internship score
+            $this->calculateAssessmentScoreService->calculateInternshipScore($dt);
         }
 
         $row = 3;
@@ -378,7 +244,7 @@ class AssessmentAdminController extends Controller
             $sheet->setCellValue('C' . $row, $dt->student->nis);
             $sheet->setCellValue('D' . $row, $dt->student->nisn);
             $sheet->setCellValue('E' . $row, $dt->student->department->name);
-            $sheet->setCellValue('F' . $row, $dt->student->year . '/' . $dt->student->year + 1);
+            $sheet->setCellValue('F' . $row, DateFormatHelper::academicYearFormat($dt->student->year));
             $sheet->setCellValue('G' . $row, $dt->internship->industry->name);
             $sheet->setCellValue('H' . $row, $dt->internship->industry->address);
             $sheet->setCellValue('I' . $row, $dt->technical_aspect != null ? rtrim($dt->technical_aspect) : '');
@@ -399,18 +265,5 @@ class AssessmentAdminController extends Controller
             $row++;
             $num++;
         }
-
-        foreach (range('A', 'V') as $col) {
-            $sheet->getColumnDimension($col)->setAutoSize(true);
-        }
-
-        $filename = "data_assessment_export.xlsx";
-        header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
-        header('Content-Disposition: attachment;filename="' . $filename . '"');
-        header('Cache-Control: max-age=0');
-
-        $writer = new Xlsx($spreadsheet);
-        $writer->save('php://output');
-        // exit;
     }
 }

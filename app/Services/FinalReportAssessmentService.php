@@ -14,9 +14,23 @@ class FinalReportAssessmentService
         $this->finalReportAssessmentRepository = $finalReportAssessmentRepository;
     }
 
-    public function updateOrCreate($data)
+    public function updateOrCreate($id, $data)
     {
-        return $this->finalReportAssessmentRepository->updateOrCreate($data);
+        $finalReportAspects = [
+            'Sikap' => $data->attitude,
+            'Tata Tulis' => $data->writing,
+            'Ketepatan Waktu' => $data->on_time,
+            'Ketertiban' => $data->orderly,
+            'Keseluruhan Laporan' => $data->final_report,
+        ];
+
+        foreach ($finalReportAspects as $aspect => $score) {
+            $this->finalReportAssessmentRepository->updateOrCreate([
+                'assessment_id' => $id,
+                'aspect' => $aspect,
+                'score' => $score,
+            ]);
+        }
     }
 
     public function isFinalReportAssessmentComplete($assessment_id)

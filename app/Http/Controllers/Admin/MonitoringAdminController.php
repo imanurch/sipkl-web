@@ -2,20 +2,22 @@
 
 namespace App\Http\Controllers\Admin;
 
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Services\BatchService;
-use Barryvdh\DomPDF\Facade\Pdf;
 use App\Services\AdvisorService;
+use App\Helpers\DateFormatHelper;
+use App\Services\DownloadService;
 use Illuminate\Support\Facades\DB;
 use App\Services\InternshipService;
 use App\Services\MonitoringService;
 use App\Http\Controllers\Controller;
-use Illuminate\Support\Facades\Auth;
 use App\Services\SchoolProfileService;
-use Illuminate\Support\Facades\Storage;
+use App\Services\DeleteDocumentService;
+use App\Services\DocumentGenerateService;
 use Flasher\Toastr\Laravel\Facade\Toastr;
 use App\Services\MonitoringDocumentService;
+use App\Http\Requests\StoreMonitoringRequest;
+use App\Http\Requests\UpdateMonitoringRequest;
 
 class MonitoringAdminController extends Controller
 {
@@ -24,7 +26,10 @@ class MonitoringAdminController extends Controller
         $internshipService,
         $monitoringDocumentService,
         $advisorService,
-        $schoolProfileService;
+        $schoolProfileService,
+        $downloadService,
+        $documentGenerateService,
+        $deleteDocumentService;
 
     // Constructor Injection
     public function __construct(
@@ -33,7 +38,10 @@ class MonitoringAdminController extends Controller
         InternshipService $internshipService,
         MonitoringDocumentService $monitoringDocumentService,
         AdvisorService $advisorService,
-        SchoolProfileService $schoolProfileService
+        SchoolProfileService $schoolProfileService,
+        DownloadService $downloadService,
+        DocumentGenerateService $documentGenerateService,
+        DeleteDocumentService $deleteDocumentService
     ) {
         $this->monitoringService = $monitoringService;
         $this->batchService = $batchService;
@@ -41,14 +49,15 @@ class MonitoringAdminController extends Controller
         $this->monitoringDocumentService = $monitoringDocumentService;
         $this->advisorService = $advisorService;
         $this->schoolProfileService = $schoolProfileService;
+        $this->downloadService = $downloadService;
+        $this->documentGenerateService = $documentGenerateService;
+        $this->deleteDocumentService = $deleteDocumentService;
     }
 
     public function index(Request $request)
     {
-        $currentBatch = $this->batchService->getBatchByStatus('active');
-        $batch_id = $request->batch ?? ($currentBatch->id ?? '');
-
         $batchData = $this->batchService->getAllBatch('');
+        $batch_id = $this->batchService->getRelevantBatch($request->batch);
 
         // filter
         $filters = [
@@ -69,17 +78,11 @@ class MonitoringAdminController extends Controller
         ]);
     }
 
-    public function store(Request $request)
+    public function store(StoreMonitoringRequest $request)
     {
-        $data = $request->except(['_token']);
-
         try {
-            $validatedData = $request->validate([
-                'internship_id' => 'required',
-                'type' => 'required',
-                'date' => 'required',
-                'note' => 'nullable|string',
-            ]);
+            $validatedData = $request->validated();
+
             $this->monitoringService->addMonitoring($validatedData);
             Toastr::addSuccess('Data monitoring berhasil ditambah!');
         } catch (\Exception $e) {
@@ -88,38 +91,19 @@ class MonitoringAdminController extends Controller
         return redirect()->back();
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateMonitoringRequest $request, $id)
     {
-        $data = $request->except(['_token', '_method']);
-
         try {
-            $validatedData = $request->validate([
-                'type' => 'required',
-                'date' => 'required',
-                'note' => 'nullable|string',
-            ]);
-
-            $lastMonitoringData = $this->monitoringService->getById($id);
+            $validatedData = $request->validated();
 
             DB::transaction(function () use ($validatedData, $id) {
                 // update data monitoring
                 $this->monitoringService->updateMonitoring($id, $validatedData);
 
-                // harusnya generate ulang document tapi sementara hapus dulu aja biar diulang dr awal generate
-                // hapus doc lama
+                // delete previous document
                 $doc = $this->monitoringDocumentService->getMonitoringDocumentByMonitoringId($id);
                 foreach ($doc as $dt) {
-                    $filename = $dt->url;
-
-                    if ($dt->type == "surat pengantar") {
-                        Storage::delete('monitoring_documents/surat_pengantar/' . $filename);
-                    } elseif ($dt->type == "surat penarikan") {
-                        Storage::delete('monitoring_documents/surat_penarikan/' . $filename);
-                    } elseif ($dt->type == "surat tugas") {
-                        Storage::delete('monitoring_documents/surat_tugas/' . $filename);
-                    } elseif ($dt->type == "sppd") {
-                        Storage::delete('monitoring_documents/sppd/' . $filename);
-                    }
+                    $this->deleteDocumentService->deleteMonitoringDocument($dt->type, $dt->url);
                 }
 
                 $this->monitoringDocumentService->deleteMonitoringDocument($id);
@@ -135,17 +119,7 @@ class MonitoringAdminController extends Controller
     {
         $doc = $this->monitoringDocumentService->getMonitoringDocumentByMonitoringId($id);
         foreach ($doc as $dt) {
-            $filename = $dt->url;
-
-            if ($dt->type == "surat pengantar") {
-                Storage::delete('monitoring_documents/surat_pengantar/' . $filename);
-            } elseif ($dt->type == "surat penarikan") {
-                Storage::delete('monitoring_documents/surat_penarikan/' . $filename);
-            } elseif ($dt->type == "surat tugas") {
-                Storage::delete('monitoring_documents/surat_tugas/' . $filename);
-            } elseif ($dt->type == "sppd") {
-                Storage::delete('monitoring_documents/sppd/' . $filename);
-            }
+            $this->deleteDocumentService->deleteMonitoringDocument($dt->type, $dt->url);
         }
 
         try {
@@ -157,120 +131,78 @@ class MonitoringAdminController extends Controller
         return redirect()->back();
     }
 
-
     public function generateSurat(Request $request)
     {
-        $monitoring_data = $this->monitoringService->getById($request->monitoring_id);
+        $monitoring = $this->monitoringService->getById($request->monitoring_id);
         $school_profile = $this->schoolProfileService->getSchoolProfile();
+        $internship = $monitoring->internship;
+        $advisor = $internship->advisor;
+        $industry = $internship->industry;
+
+        $common_data = [
+            'school_phone_num'  => $school_profile->phone_num,
+            'school_website'  => $school_profile->website,
+            'school_email'  => $school_profile->email,
+            'create_date'  => DateFormatHelper::dateFormat(date('d-m-Y')),
+            'letter_num' => $request->letter_num,
+            'activity' => $monitoring->type == 'pelepasan'
+                ? 'Pembimbingan pertama'
+                : ($monitoring->type == 'monitoring' ? 'Monitoring' : 'Pembimbingan kedua'),
+            'academic_year' => DateFormatHelper::academicYearFormat($monitoring->date),
+            'principal_name' => $school_profile->principal_name,
+            'principal_nip' => $school_profile->principal_nip,
+            'principal_signature'  => $school_profile->principal_signature,
+        ];
 
         // generate dokumen
         if ($request->documentGenerateType == 'Surat Tugas') {
-            $data = [
-                'school_phone_num'  => $school_profile->phone_num,
-                'school_website'  => $school_profile->website,
-                'school_email'  => $school_profile->email,
-                'letter_num' => $request->letter_num,
-                'advisor_name' => $monitoring_data->internship->advisor->name,
-                'advisor_nip' => $monitoring_data->internship->advisor->nip,
-                'activity' => $monitoring_data->type == 'pelepasan' ? 'Pembimbingan pertama' : ($monitoring_data->type = 'monitoring' ? 'Monitoring' : 'Pembimbingan kedua'),
-                'create_date'  => date('d-m-Y'),
-                'principal_name' => $school_profile->principal_name,
-                'principal_nip' => $school_profile->principal_nip,
-                'principal_signature'  => $school_profile->principal_signature,
+            $data = array_merge([
+                'advisor_name' => $advisor->name,
+                'advisor_nip' => $advisor->nip,
                 'internship_team_decree'  => $school_profile->internship_team_decree,
-            ];
-
-            $pdf = Pdf::loadView('document_templates/surat_tugas_advisor', $data);
-            $filename = 'surat_tugas_advisor' . time() . '.pdf';
-
-            $path = storage_path('app/monitoring_documents/surat_tugas/' . $filename);
-            $pdf->save($path);
+            ], $common_data);
         } elseif ($request->documentGenerateType == 'SPPD') {
             $data = [
-                'school_phone_num'  => $school_profile->phone_num,
-                'school_website'  => $school_profile->website,
-                'school_email'  => $school_profile->email,
-                'letter_num' => $request->letter_num,
-                'advisor_name' => $monitoring_data->internship->advisor->name,
-                'advisor_position' => $monitoring_data->internship->advisor->position_id,
-                'advisor_level' => $monitoring_data->internship->advisor->level_id,
-                'advisor_nip' => $monitoring_data->internship->advisor->nip,
-                'industry_name' => $monitoring_data->internship->industry->name,
-                'monitoring_date' => date("d/m/Y", strtotime($monitoring_data->date)),
-                'academic_year' => date("Y", strtotime($monitoring_data->date)) . '/' . (date("Y", strtotime($monitoring_data->date)) + 1),
-                'activity' => $monitoring_data->type == 'pelepasan' ? 'Pembimbingan pertama' : ($monitoring_data->type = 'monitoring' ? 'Monitoring' : 'Pembimbingan kedua'),
+                'advisor_name' => $advisor->name,
+                'advisor_position' => $advisor->position_id,
+                'advisor_level' => $advisor->level_id,
+                'advisor_nip' => $advisor->nip,
+                'industry_name' => $industry->name,
+                'monitoring_date' => DateFormatHelper::dateFormat($monitoring->date),
                 'transportation' => $request->transportation,
-                'principal_name' => $school_profile->principal_name,
-                'principal_nip' => $school_profile->principal_nip,
             ];
-
-            $pdf = Pdf::loadView('document_templates/sppd_advisor', $data);
-            $filename = 'SPPD_' . time() . '.pdf';
-
-            $path = storage_path('app/monitoring_documents/sppd/' . $filename);
-            $pdf->save($path);
         } elseif ($request->documentGenerateType == 'Surat Pengantar') {
             $intern_data = [];
-            foreach ($monitoring_data->internship->group->groupMember as $member) {
+            foreach ($internship->group->groupMember as $member) {
                 $intern_data[] = $member->student;
                 $department = $member->student->department->name;
             }
-            
-            $data = [
-                'school_phone_num'  => $school_profile->phone_num,
-                'school_website'  => $school_profile->website,
-                'school_email'  => $school_profile->email,
-                'letter_num' => $request->letter_num,
-                'advisor_name' => $monitoring_data->internship->advisor->name,
-                'advisor_phone_num' => $monitoring_data->internship->advisor->phone_num,
-                'industry_name' => $monitoring_data->internship->industry->name,
-                'industry_address' => $monitoring_data->internship->industry->address,
-                'activity' => $monitoring_data->type == 'pelepasan' ? 'Pembimbingan pertama' : ($monitoring_data->type = 'monitoring' ? 'Monitoring' : 'Pembimbingan kedua'),
-                'academic_year' => date("Y", strtotime($monitoring_data->date)) . '/' . (date("Y", strtotime($monitoring_data->date)) + 1),
-                'internship_start_date' => date("d/m/Y", strtotime($monitoring_data->internship->start_date)),
-                'internship_end_date' => date("d/m/Y", strtotime($monitoring_data->internship->end_date)),
-                'create_date'  => date('d-m-Y'),
+
+            $data = array_merge([
+                'advisor_name' => $advisor->name,
+                'advisor_phone_num' => $advisor->phone_num,
+                'industry_name' => $industry->name,
+                'industry_address' => $industry->address,
+                'internship_start_date' => DateFormatHelper::dateFormat($internship->start_date),
+                'internship_end_date' => DateFormatHelper::dateFormat($internship->end_date),
                 'intern_group_data'  => $intern_data,
-                'department'  => $department,
-                'principal_name' => $school_profile->principal_name,
-                'principal_nip' => $school_profile->principal_nip,
-                'principal_signature'  => $school_profile->principal_signature,
-            ];
-
-            $pdf = Pdf::loadView('document_templates/surat_pelepasan_intern', $data);
-            $filename = 'surat_pengantar_' . time() . '.pdf';
-
-            $path = storage_path('app/monitoring_documents/surat_pengantar/' . $filename);
-            $pdf->save($path);
+                'department'  => $department
+            ], $common_data);
         } elseif ($request->documentGenerateType == 'Surat Penarikan') {
             $intern_data = [];
-            foreach ($monitoring_data->internship->group->groupMember as $member) {
+            foreach ($internship->group->groupMember as $member) {
                 $intern_data[] = $member->student;
                 $department = $member->student->department->name;
             }
-            $data = [
-                'school_phone_num'  => $school_profile->phone_num,
-                'school_website'  => $school_profile->website,
-                'school_email'  => $school_profile->email,
-                'letter_num' => $request->letter_num,
-                'industry_name' => $monitoring_data->internship->industry->name,
-                'industry_address' => $monitoring_data->internship->industry->address,
-                'activity' => $monitoring_data->type == 'pelepasan' ? 'Pembimbingan pertama' : ($monitoring_data->type = 'monitoring' ? 'Monitoring' : 'Pembimbingan kedua'),
-                'academic_year' => date("Y", strtotime($monitoring_data->date)) . '/' . (date("Y", strtotime($monitoring_data->date)) + 1),
-                'create_date'  => date('d-m-Y'),
+            $data = array_merge([
+                'industry_name' => $industry->name,
+                'industry_address' => $industry->address,
                 'intern_group_data'  => $intern_data,
                 'department'  => $department,
-                'principal_name' => $school_profile->principal_name,
-                'principal_nip' => $school_profile->principal_nip,
-                'principal_signature'  => $school_profile->principal_signature,
-            ];
-
-            $pdf = Pdf::loadView('document_templates/surat_penarikan_intern', $data);
-            $filename = 'surat_penarikan_' . time() . '.pdf';
-
-            $path = storage_path('app/monitoring_documents/surat_penarikan/' . $filename);
-            $pdf->save($path);
+            ], $common_data);
         }
+
+        $filename = $this->documentGenerateService->monitoringDocumentGenerate(strtolower($request->documentGenerateType), $data);
 
         // save dokumen ke db
         $monitoringDocumentData = [
@@ -290,15 +222,6 @@ class MonitoringAdminController extends Controller
 
     public function downloadFile($type, $filename)
     {
-        $formattedString = Str::slug($type, '_');
-        $path = storage_path('app/monitoring_documents/' . $formattedString . '/' . $filename);
-
-        if (file_exists($path)) {
-            return response()->file($path);
-            // return response()->download($path);
-        } else {
-            Toastr::addError('File tidak ditemukan!');
-            return redirect()->back();
-        }
+        return $this->downloadService->monitoringDocumentDownload($type, $filename);
     }
 }

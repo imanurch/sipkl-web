@@ -2,19 +2,22 @@
 
 namespace App\Http\Controllers\Advisor;
 
-use Illuminate\Support\Str;
 use Illuminate\Http\Request;
 use App\Services\UserService;
 use App\Services\BatchService;
 use App\Services\AdvisorService;
+use App\Services\DownloadService;
 use Illuminate\Support\Facades\DB;
 use App\Services\InternshipService;
 use App\Services\MonitoringService;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\StoreMonitoringRequest;
+use App\Http\Requests\UpdateMonitoringRequest;
 use Flasher\Toastr\Laravel\Facade\Toastr;
 use App\Services\MonitoringDocumentService;
 use Illuminate\Support\Facades\Notification;
 use App\Notifications\MonitoringDocumentRequestNotification;
+use App\Services\DeleteDocumentService;
 
 class MonitoringAdvisorController extends Controller
 {
@@ -23,7 +26,9 @@ class MonitoringAdvisorController extends Controller
         $internshipService,
         $monitoringDocumentService,
         $advisorService,
-        $userService;
+        $userService,
+        $downloadService,
+        $deleteDocumentService;
 
     // Constructor Injection
     public function __construct(
@@ -32,7 +37,9 @@ class MonitoringAdvisorController extends Controller
         InternshipService $internshipService,
         MonitoringDocumentService $monitoringDocumentService,
         AdvisorService $advisorService,
-        UserService $userService
+        UserService $userService,
+        DownloadService $downloadService,
+        DeleteDocumentService $deleteDocumentService
     ) {
         $this->monitoringService = $monitoringService;
         $this->batchService = $batchService;
@@ -40,16 +47,16 @@ class MonitoringAdvisorController extends Controller
         $this->monitoringDocumentService = $monitoringDocumentService;
         $this->advisorService = $advisorService;
         $this->userService = $userService;
+        $this->downloadService = $downloadService;
+        $this->deleteDocumentService = $deleteDocumentService;
     }
 
     public function index(Request $request)
     {
         $advisor_id = session('user_bio')->id;
 
-        $currentBatch = $this->batchService->getBatchByStatus('active');
-        $batch_id = $request->batch ?? ($currentBatch->id ?? '');
-
         $batchData = $this->batchService->getAllBatch('');
+        $batch_id = $this->batchService->getRelevantBatch($request->batch);
 
         // filter
         $filters = [
@@ -73,35 +80,19 @@ class MonitoringAdvisorController extends Controller
 
     public function downloadFile($type, $filename)
     {
-        $formattedString = Str::slug($type, '_');
-        $path = storage_path('app/monitoring_documents/' . $formattedString . '/' . $filename);
-
-        if (file_exists($path)) {
-            return response()->file($path);
-            // return response()->download($path);
-        } else {
-            Toastr::addError('File tidak ditemukan!');
-            return redirect()->back();
-        }
+        return $this->downloadService->monitoringDocumentDownload($type, $filename);
     }
 
-    public function store(Request $request)
+    public function store(StoreMonitoringRequest $request)
     {
-        $data = $request->except(['_token']);
-
         try {
-            $validatedData = $request->validate([
-                'internship_id' => 'required',
-                'type' => 'required',
-                'date' => 'required',
-                'note' => 'nullable|string',
-            ]);
+            $validatedData = $request->validated();
 
             $monitoringData = $this->monitoringService->addMonitoring($validatedData);
 
             $advisorName = $monitoringData->internship->advisor->name;
             $users = $this->userService->getVerifiedAdminUser();
-            Notification::send($users, new MonitoringDocumentRequestNotification($advisorName)); 
+            Notification::send($users, new MonitoringDocumentRequestNotification($advisorName));
 
             Toastr::addSuccess('Data monitoring berhasil ditambah!');
         } catch (\Exception $e) {
@@ -110,25 +101,22 @@ class MonitoringAdvisorController extends Controller
         return redirect()->back();
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateMonitoringRequest $request, $id)
     {
-        $data = $request->except(['_token', '_method']);
-
         try {
-            $validatedData = $request->validate([
-                'type' => 'required',
-                'date' => 'required',
-                'note' => 'nullable|string',
-            ]);
+            $validatedData = $request->validated();
 
             $lastMonitoringData = $this->monitoringService->getById($id);
-            
+
             DB::transaction(function () use ($validatedData, $id) {
                 // update data monitoring
                 $this->monitoringService->updateMonitoring($id, $validatedData);
 
-                // harusnya generate ulang document tapi sementara hapus dulu aja biar diulang dr awal generate
-                // seharusnya dokumen yang lama dihapus biar ga beban memori
+                // delete previous document
+                $doc = $this->monitoringDocumentService->getMonitoringDocumentByMonitoringId($id);
+                foreach ($doc as $dt) {
+                    $this->deleteDocumentService->deleteMonitoringDocument($dt->type, $dt->url);
+                }
 
                 $this->monitoringDocumentService->deleteMonitoringDocument($id);
             });

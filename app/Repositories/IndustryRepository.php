@@ -6,91 +6,34 @@ use App\Models\Industry;
 
 class IndustryRepository
 {
-    public function getUnconfirmedIndustry($filters = [])
-    {
-        $query = Industry::query();
-
-        if ($filters != null) {
-            // filter search
-            if ($filters['unconfirmedIndustrySearch'] != null) {
-                $query->where('name', 'like', '%' . $filters['unconfirmedIndustrySearch'] . '%');
-            }
-        }
-
-        return $query->where('status', '0')->orderBy('created_at', 'desc')->paginate(10)->appends([
-            'tab' => 'rejected',
-            'unconfirmedIndustrySearch' => $filters['unconfirmedIndustrySearch'] ?? '',
-        ]);
-    }
-
-    public function getPartnerIndustry($filters = [], $batch_id)
-    {
-        $query = Industry::query();
-
-        // filter status
-        if ($filters['status'] != null) {
-            if ($filters['status'] == 'active') {
-                $query->whereHas('internship', function ($query) use ($batch_id) {
-                    $query->where('batch_id', $batch_id);
-                });
-            } elseif ($filters['status'] == 'inactive') {
-                $query->whereDoesntHave('internship', function ($query) use ($batch_id) {
-                    $query->where('batch_id', $batch_id);
-                });
-            }
-        }
-
-        // filter search
-        if ($filters['partnerIndustrySearch'] != null) {
-            $query->where('name', 'like', '%' . $filters['partnerIndustrySearch'] . '%');
-        }
-
-        $query->where('status', '1');
-        $data = $query->orderBy('created_at', 'desc')->paginate(10)->appends([
-            'tab' => 'partner',
-            'partnerIndustrySearch' => $filters['partnerIndustrySearch'] ?? '',
-            'status' => $filters['status'] ?? '',
-        ]);
-
-        $data->through(function ($industry) use ($batch_id) {
-            $industry->setAttribute(
-                'status',
-                $industry->internship->where('batch_id', $batch_id)->isNotEmpty() ? 'Aktif' : 'Non Aktif'
-            );
-            return $industry;
-        });
-
-        return $data;
-    }
-
-    public function getRejectedIndustry($filters = [])
-    {
-        $query = Industry::query();
-
-        // filter search
-        if ($filters['rejectedIndustrySearch'] != null) {
-            $query->where('name', 'like', '%' . $filters['rejectedIndustrySearch'] . '%');
-        }
-
-        return $query->where('status', '2')->orderBy('created_at', 'desc')->paginate(10)->appends([
-            'tab' => 'rejected',
-            'rejectedIndustrySearch' => $filters['rejectedIndustrySearch'] ?? '',
-        ]);
-    }
-
+    /**
+     * Count industries based on internship status for a specific batch.
+     *
+     * @param  int     $batch_id
+     * @param  string  $status ('active' or 'inactive')
+     * @return int
+     */
     public function countIndustryByStatus($batch_id, $status)
     {
         if ($status == 'active') {
+            // Count industries linked to internships in the given batch
             return Industry::whereHas('internship', function ($query) use ($batch_id) {
                 $query->where('batch_id', $batch_id);
             })->count();
         } elseif ($status == 'inactive') {
+            // Count industries not linked to any internships in the given batch
             return Industry::where('status', '1')->whereDoesntHave('internship', function ($query) use ($batch_id) {
                 $query->where('batch_id', $batch_id);
             })->count();
         }
     }
 
+    /**
+     * Count industries by confirmation status.
+     *
+     * @param  string  $confirmStatus ('unconfirmed', 'partner', or 'rejected')
+     * @return int
+     */
     public function countIndustryByConfirmStatus($confirmStatus)
     {
         if ($confirmStatus == 'unconfirmed') {
@@ -102,42 +45,46 @@ class IndustryRepository
         }
     }
 
-    public function getPartnerIndustryList()
-    {
-        return Industry::where('status', '1')->get();
-    }
-
-    public function getActivePartnerIndustryList($batch_id)
-    {
-        return Industry::where('status', '1')->whereHas('internship', function ($query) use ($batch_id) {
-            $query->where('batch_id', $batch_id);
-        })->get();
-    }
-
+    /**
+     * Find an industry by its ID.
+     *
+     * @param  int  $id
+     * @return Industry|null
+     */
     public function findIndustryById($id)
     {
         return Industry::find($id);
     }
 
+    /**
+     * Create a new industry.
+     *
+     * @param  array  $data
+     * @return Industry
+     */
     public function createIndustry(array $data)
     {
         return Industry::create($data);
     }
 
+    /**
+     * Update an industry by ID.
+     *
+     * @param  int    $id
+     * @param  array  $data
+     * @return bool
+     */
     public function updateIndustry($id, array $data)
     {
         return Industry::where('id', $id)->update($data);
     }
 
-    public function updateIndustryRequestStatus($id, $status)
-    {
-        if ($status == 'accept') {
-            return Industry::where('id', $id)->update(['status' => '1']);
-        } else if ($status == 'reject') {
-            return Industry::where('id', $id)->update(['status' => '2']);
-        }
-    }
-
+    /**
+     * Delete an industry by ID.
+     *
+     * @param  int  $id
+     * @return bool
+     */
     public function deleteIndustry($id)
     {
         return Industry::where('id', $id)->delete();

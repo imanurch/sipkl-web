@@ -2,12 +2,12 @@
 
 namespace App\Http\Controllers\Student;
 
-use Illuminate\Http\Request;
 use App\Services\BatchService;
 use App\Services\LogbookService;
 use App\Services\StudentService;
 use App\Services\InternshipService;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateLogbookRequest;
 use Illuminate\Support\Facades\Auth;
 use Flasher\Toastr\Laravel\Facade\Toastr;
 use App\Notifications\LogbookNotification;
@@ -36,7 +36,6 @@ class LogbookStudentController extends Controller
 
     public function index()
     {
-        $user_id = Auth::user()->id;
         $student_id = session('user_bio')->id;
 
         $currentBatch = $this->batchService->getBatchByStatus('active');
@@ -50,13 +49,11 @@ class LogbookStudentController extends Controller
         ]);
     }
 
-    public function update(Request $request, $id)
+    public function update(UpdateLogbookRequest $request, $id)
     {
         try {
-            $validatedData = $request->validate([
-                'activities' => 'required',
-            ]);
-
+            $validatedData = $request->validated();
+            
             $this->logbookService->updateLogbook($id, $validatedData);
             $logbookData = $this->logbookService->getLogbookByLogbookId($id);
             if ($logbookData->internship->advisor != null) {
