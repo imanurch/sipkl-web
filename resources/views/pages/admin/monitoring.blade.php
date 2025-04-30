@@ -66,8 +66,8 @@
                 <th>No</th>
                 <th>Jenis Monitoring</th>
                 <th>Waktu</th>
-                <th>Guru Pembimbing</th>
-                <th>Kelompok - Industri</th>
+                <th class="text-nowrap">Guru Pembimbing</th>
+                <th class="text-nowrap">Industri</th>
                 <th>Keterangan</th>
                 <th>Dokumen</th>
                 <th>Generate</th>
@@ -76,11 +76,11 @@
             <x-slot name="tBody">
                 @foreach ($data as $dt)
                     <tr>
-                        <td class="text-center">{{ $loop->iteration }}</td>
-                        <td>{{ $dt->type }}</td>
-                        <td>{{ $dt->date }}</td>
-                        <td>{{ $dt->internship->advisor->name }}</td>
-                        <td>{{ $dt->internship->group_id }} - {{ $dt->internship->industry->name }}</td>
+                        <td class="text-center">{{ $loop->iteration ?? '' }}</td>
+                        <td>{{ $dt->type ?? '' }}</td>
+                        <td class="text-nowrap">{{ $dt->date ?? '' }}</td>
+                        <td>{{ $dt->internship->advisor->name ?? '' }}</td>
+                        <td>{{ $dt->internship->industry->name ?? '' }}</td>
                         <td class="">{{ $dt->note ?? '-' }}</td>
                         <td class="place-items-center">
                             @if (count($dt->monitoringDocument) > 0)
@@ -95,8 +95,12 @@
                             @endif
                         </td>
                         <td class="place-items-center">
-                            <button @click.prevent="generateDocumentModal=true;dataId={{ $dt }}"
-                                class="btn btn-xs btn-default-outline">Generate</button>
+                            @if ($dt->internship->advisor)
+                                <button @click.prevent="generateDocumentModal=true;dataId={{ $dt }}"
+                                    class="btn btn-xs btn-default-outline">Generate</button>
+                            @else
+                                Pembimbing Belum Diatur
+                            @endif
                         </td>
                         <x-table.action_table detail="hidden" :data="$dt"></x-table.action_table>
                     </tr>
@@ -115,14 +119,14 @@
                         {{-- isAdd / isEdit --}}
                         <input type="hidden" name="type" x-model="selected">
                         <div x-show="modalAction == 'isAdd' || modalAction == 'isEdit'">
-                            <button @click.prevent="option=!option" class="input input-select w-full" :disabled="isDelete"
+                            <button @click.prevent="option=!option" class="input input-select w-full" :disabled="modalAction == 'isDelete'"
                                 required>
                                 <span x-text="selected"
                                     :class="selected == 'Pilih Opsi' ? 'text-neutral-300' : 'text-neutral-800'"></span>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"
                                     fill="none">
                                     <path d="M5 7.5L10 12.5L15 7.5" stroke="#667085" stroke-width="0.933333"
-                                        stroke-linecap="round" stroke-linejoin="round" :hidden="isDelete" />
+                                        stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
                             </button>
                             <div x-show="option" @click.away="option=false">
@@ -145,7 +149,7 @@
                     </div>
                     <div class="input-group">
                         <label class="input-label" for="">Waktu</label>
-                        <input onclick="this.showPicker()" name="date" class="input" type="date"
+                        <input onclick="this.showPicker()" name="date" class="input" :type="modalAction == 'isDelete' ? 'text' : 'date'"
                             placeholder="Masukkan Tanggal" :disabled="modalAction == 'isView' || modalAction == 'isDelete'"
                             :value="modalAction != null ? dataId.date : ''" required>
                     </div>
@@ -155,13 +159,13 @@
                         <input type="hidden" name="internship_id" x-model="selectedValueInternship">
                         <div x-show="modalAction == 'isAdd'">
                             <button @click.prevent="optionInternship=!optionInternship" class="input input-select w-full"
-                                :disabled="isDelete" required>
+                                :disabled="modalAction == 'isDelete'" required>
                                 <span x-text="selectedInternship"
                                     :class="selected == 'Pilih Opsi' ? 'text-neutral-300' : 'text-neutral-800'"></span>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"
                                     fill="none">
                                     <path d="M5 7.5L10 12.5L15 7.5" stroke="#667085" stroke-width="0.933333"
-                                        stroke-linecap="round" stroke-linejoin="round" :hidden="isDelete" />
+                                        stroke-linecap="round" stroke-linejoin="round" />
                                 </svg>
                             </button>
                             <div x-show="optionInternship" @click.away="optionInternship=false">
@@ -211,13 +215,13 @@
                         <label class="input-label" for="">Jenis Dokumen</label>
                         <div>
                             <button @click.prevent="option=!option" class="input input-select w-full"
-                                :disabled="isDelete" required>
+                                :disabled="modalAction == 'isDelete'" required>
                                 <span x-text="selected"
                                     :class="selected == 'Pilih Opsi' ? 'text-neutral-300' : 'text-neutral-800'"></span>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
                                     viewBox="0 0 20 20" fill="none">
                                     <path d="M5 7.5L10 12.5L15 7.5" stroke="#667085" stroke-width="0.933333"
-                                        stroke-linecap="round" stroke-linejoin="round" :hidden="isDelete" />
+                                        stroke-linecap="round" stroke-linejoin="round"/>
                                 </svg>
                             </button>
                             <input type="hidden" name="documentGenerateType" id="documentType" x-model="selected">

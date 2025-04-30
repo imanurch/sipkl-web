@@ -17,6 +17,9 @@ class IndustryRequestController extends Controller
         $this->industryService = $industryService;
     }
 
+    /**
+     * Handle a new industry request submission and store the data.
+     */
     public function newIndustryRequest(StoreIndustryRequest $request)
     {
         try {

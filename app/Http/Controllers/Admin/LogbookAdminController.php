@@ -21,15 +21,18 @@ class LogbookAdminController extends Controller
         $this->batchService = $batchService;
     }
 
-    public function index($batch_id, $id)
-    {
-        $internData = $this->studentService->getStudentById($id);
-        $logbookData = $this->logbookService->getLogbookByStudentIdAndBatch($batch_id, $id);
+    /**
+     * Display logbook details for a specific student and batch.
+     */
+    // public function index($batch_id, $id)
+    // {
+    //     $internData = $this->studentService->getStudentById($id);
+    //     $logbookData = $this->logbookService->getLogbookByStudentIdAndBatch($batch_id, $id);
 
-        return view('pages.admin.logbook_detail', [
-            'internData' => $internData,
-            'logbookData' => $logbookData,
-            'pages' => 'logbook',
-        ]);
-    }
+    //     return view('pages.admin.logbook_detail', [
+    //         'internData' => $internData,
+    //         'logbookData' => $logbookData,
+    //         'pages' => 'logbook',
+    //     ]);
+    // }
 }

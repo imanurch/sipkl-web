@@ -31,6 +31,9 @@ class LogbookDetailAdvisorController extends Controller
         $this->studentService = $studentService;
     }
 
+    /**
+     * Display the detail logbook page with confirmation access.
+     */
     public function index($studentId, $internshipId)
     {
         $studentData = $this->studentService->getStudentById($studentId);
@@ -45,6 +48,9 @@ class LogbookDetailAdvisorController extends Controller
         ]);
     }
 
+    /**
+     * Handle logbook status confirmation (accept or revise) from advisor with optional feedback.
+     */
     public function statusConfirm(Request $request, $logbookId, $status)
     {
         try {

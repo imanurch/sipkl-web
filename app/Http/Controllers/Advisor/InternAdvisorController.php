@@ -20,6 +20,9 @@ class InternAdvisorController extends Controller
         $this->batchService = $batchService;
     }
 
+    /**
+     * Display the intern page with data and filters.
+     */
     public function index(Request $request)
     {
         $advisor_id = session('user_bio')->id;

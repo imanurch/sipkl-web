@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\DateFormatHelper;
 use App\Repositories\LogbookManagementRepository;
 use DateTime;
 use App\Repositories\LogbookRepository;
@@ -9,20 +10,27 @@ use App\Repositories\LogbookRepository;
 class LogbookService
 {
     protected $logbookRepository,
-    $logbookManagementRepository;
+        $logbookManagementRepository;
 
     // Constructor Injection
     public function __construct(
         LogbookRepository $logbookRepository,
-        LogbookManagementRepository $logbookManagementRepository)
-    {
+        LogbookManagementRepository $logbookManagementRepository
+    ) {
         $this->logbookRepository = $logbookRepository;
         $this->logbookManagementRepository = $logbookManagementRepository;
     }
 
     public function getLogbookByStudentIdAndBatch($batch_id, $student_id)
     {
-        return $this->logbookRepository->getLogbookByStudentIdAndBatch($batch_id, $student_id);
+        $data = $this->logbookRepository->getLogbookByStudentIdAndBatch($batch_id, $student_id);
+        foreach ($data as $dt) {
+            foreach ($dt as $log) {
+                $log->start_date = DateFormatHelper::dateFormat($log->start_date);
+                $log->end_date = DateFormatHelper::dateFormat($log->end_date);
+            }
+        }
+        return $data;
     }
 
     public function getLogbookByAdvisorCount($status, $batch_id, $advisor_id)
@@ -47,7 +55,14 @@ class LogbookService
 
     public function getLogbookByStudentAndInternshipId($student_id, $internship_id)
     {
-        return $this->logbookRepository->getLogbookByStudentAndInternshipId($student_id, $internship_id);
+        $data = $this->logbookRepository->getLogbookByStudentAndInternshipId($student_id, $internship_id);
+        foreach ($data as $dt) {
+            foreach ($dt as $log) {
+                $log->start_date = DateFormatHelper::dateFormat($log->start_date);
+                $log->end_date = DateFormatHelper::dateFormat($log->end_date);
+            }
+        }
+        return $data;
     }
 
     public function countLogbookByAdvisorStatus($status, $batch_id, $advisor_id)

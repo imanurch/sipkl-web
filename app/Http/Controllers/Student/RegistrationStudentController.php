@@ -41,9 +41,15 @@ class RegistrationStudentController extends Controller
         $this->registrationService = $registrationService;
         $this->userService = $userService;
         $this->downloadService = $downloadService;
-        $this->student_id = session('user_bio')->id;
+        $this->middleware(function ($request, $next) {
+            $this->student_id = session('user_bio')?->id;
+            return $next($request);
+        });
     }
 
+    /**
+     * Display registration page.
+     */
     public function index(Request $request)
     {
         $industryData = $this->industryService->getPartnerIndustryList();
@@ -76,10 +82,11 @@ class RegistrationStudentController extends Controller
         }
     }
 
+    /**
+     * Display registration history data.
+     */
     public function history()
     {
-
-        // history
         $historyData = $this->registrationService->getAllHistoryRegistrationByStudentId($this->student_id);
         foreach ($historyData as $dt) {
             $dt->status = match ($dt->status) {
@@ -94,6 +101,9 @@ class RegistrationStudentController extends Controller
         ]);
     }
 
+    /**
+     * Download registration document file.
+     */
     public function downloadFile($type, $filename)
     {
         if ($type == 'surat_permohonan' || $type == 'surat_balasan') {
@@ -103,6 +113,9 @@ class RegistrationStudentController extends Controller
         }
     }
 
+    /**
+     * Repeat the registration process by resetting step of the last registration.
+     */
     public function repeatRegistration($lastRegistrationId)
     {
         $this->registrationService->updateStatusRegistration($lastRegistrationId, 'reject');

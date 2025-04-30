@@ -37,10 +37,6 @@
                                     <input name="password" class="input" type="password"
                                         placeholder="Masukkan Password" required>
                                 </div>
-                                {{-- <div class="flex space-x-2 place-items-center">
-                                    <input type="checkbox" name="remember" id="">
-                                    <label for="" class="input-label">Ingat Saya</label>
-                                </div> --}}
                             </div>
                             <button type="submit" class="btn btn-xs btn-default-fill w-full">Login</button>
                         </div>

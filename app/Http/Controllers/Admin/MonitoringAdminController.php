@@ -54,6 +54,9 @@ class MonitoringAdminController extends Controller
         $this->deleteDocumentService = $deleteDocumentService;
     }
 
+    /**
+     * Display monitoring data and related filters.
+     */
     public function index(Request $request)
     {
         $batchData = $this->batchService->getAllBatch('');
@@ -78,6 +81,9 @@ class MonitoringAdminController extends Controller
         ]);
     }
 
+    /**
+     * Store a newly created monitoring record.
+     */
     public function store(StoreMonitoringRequest $request)
     {
         try {
@@ -91,6 +97,9 @@ class MonitoringAdminController extends Controller
         return redirect()->back();
     }
 
+    /**
+     * Update an existing monitoring record.
+     */
     public function update(UpdateMonitoringRequest $request, $id)
     {
         try {
@@ -115,6 +124,9 @@ class MonitoringAdminController extends Controller
         return redirect()->back();
     }
 
+    /**
+     * Remove a monitoring record and associated documents.
+     */
     public function destroy($id)
     {
         $doc = $this->monitoringDocumentService->getMonitoringDocumentByMonitoringId($id);
@@ -131,6 +143,9 @@ class MonitoringAdminController extends Controller
         return redirect()->back();
     }
 
+    /**
+     * Generate monitoring document based on request type.
+     */
     public function generateSurat(Request $request)
     {
         $monitoring = $this->monitoringService->getById($request->monitoring_id);
@@ -220,6 +235,9 @@ class MonitoringAdminController extends Controller
         return back();
     }
 
+    /**
+     * Download monitoring document file.
+     */
     public function downloadFile($type, $filename)
     {
         return $this->downloadService->monitoringDocumentDownload($type, $filename);

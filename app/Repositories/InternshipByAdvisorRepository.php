@@ -6,7 +6,7 @@ use App\Models\Student;
 use App\Models\Industry;
 use App\Models\Internship;
 
-class InternshipRepository
+class InternshipByAdvisorRepository
 {
     /**
      * Get paginated list of students assigned to a specific advisor with optional search and batch filter.

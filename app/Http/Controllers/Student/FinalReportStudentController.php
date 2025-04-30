@@ -46,6 +46,9 @@ class FinalReportStudentController extends Controller
         $this->deleteDocumentService = $deleteDocumentService;
     }
 
+    /**
+     * Display final report page.
+     */
     public function index()
     {
         $student_id = session('user_bio')->id;
@@ -80,6 +83,9 @@ class FinalReportStudentController extends Controller
         ]);
     }
 
+    /**
+     * Update or store a final report record.
+     */
     public function store(Request $request)
     {
         $student_id = session('user_bio')->id;
@@ -126,6 +132,9 @@ class FinalReportStudentController extends Controller
         return redirect()->back();
     }
 
+    /**
+     * Download final report document file.
+     */
     public function downloadLaporanAkhir($filename)
     {
         return $this->downloadService->internDocumentDownload('laporan akhir', $filename);

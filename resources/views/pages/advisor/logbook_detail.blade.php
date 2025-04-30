@@ -31,7 +31,13 @@
                     <x-slot name="logbookContent">
                         @foreach ($logs as $log)
                             <x-logbook.content_logbook :data="$log">
-                                <x-slot name="period">{{ $log->start_date }} s/d {{ $log->end_date }}</x-slot>
+                                <x-slot name="period">
+                                    @if ($log->start_date != $log->end_date)
+                                        {{ $log->start_date }} - {{ $log->end_date }}
+                                    @else
+                                        {{ $log->start_date }}
+                                    @endif
+                                </x-slot>
                                 <x-slot name="content">{{ $log->activities }}</x-slot>
                             </x-logbook.content_logbook>
                         @endforeach

@@ -88,7 +88,7 @@ class RegistrationConfirmController extends Controller
         $registrationData = $this->registrationService->getRegistrationById($registrationId);
 
         if ($registrationData->status == $newStatus) {
-            Toastr::addError('Status tidak berubah.');
+            Toastr::addInfo('Tidak ada perubahan status.');
             return redirect()->back();
         }
 

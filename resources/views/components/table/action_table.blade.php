@@ -12,7 +12,7 @@
                     stroke="#079455" stroke-width="0.933333" stroke-linecap="round" stroke-linejoin="round" />
             </svg>
         </button>
-        <button @click="setFormAction('isEdit', {{ $data->id }});modalAction='isEdit';dataId={{ $data->toJson() }}"
+        <button @click="setFormAction('isEdit', {{ $data->id }});modalAction='isEdit';dataId={{ $data->toJson() }};{{ isset($registrationTeamMember) && $registrationTeamMember ? 'teamMember(' . $data->group->groupMember->toJson() . ')' : '' }}"
             class="{{ $edit ?? '' }}">
             <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 18 18" fill="none">
                 <path

@@ -24,6 +24,9 @@ class AccountAdvisorController extends Controller
         $this->userService = $userService;
     }
 
+    /**
+     * Display the advisor account page.
+     */
     public function index()
     {
         $user_id = Auth::user()->id;
@@ -35,7 +38,11 @@ class AccountAdvisorController extends Controller
         ]);
     }
 
-
+    /**
+     * Update the account credentials of the advisor user.
+     *
+     * @param UpdateAccountRequest $request
+     */
     public function updateAccount(UpdateAccountRequest $request)
     {
         $request->validated();
@@ -52,6 +59,11 @@ class AccountAdvisorController extends Controller
         return redirect()->back();
     }
 
+    /**
+     * Update the profile information of the advisor user.
+     *
+     * @param UpdateAdvisorProfileRequest $request
+     */
     public function updateProfile(UpdateAdvisorProfileRequest $request)
     {
         $validatedData = $request->validated();

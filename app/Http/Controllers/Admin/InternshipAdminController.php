@@ -49,6 +49,9 @@ class InternshipAdminController extends Controller
         $this->documentGenerateService = $documentGenerateService;
     }
 
+    /**
+     * Display a listing of internship data with filters and formatted dates.
+     */
     public function index(Request $request)
     {
         // batch data
@@ -64,11 +67,11 @@ class InternshipAdminController extends Controller
         // table data
         $data = $this->internshipService->getInternship($filters);
 
-        foreach($data as $dt){
+        foreach ($data as $dt) {
             $dt->start_date = DateFormatHelper::dateFormat($dt->start_date);
             $dt->end_date = DateFormatHelper::dateFormat($dt->end_date);
-            foreach($dt->internDocument as $doc){
-                if($doc->type == 'surat jalan'){
+            foreach ($dt->internDocument as $doc) {
+                if ($doc->type == 'surat jalan') {
                     $dt->surat_jalan = true;
                 }
             }
@@ -86,6 +89,9 @@ class InternshipAdminController extends Controller
         ]);
     }
 
+    /**
+     * Assign or update advisor for a specific internship.
+     */
     public function updateAdvisor(Request $request, $internship_id)
     {
         try {
@@ -100,6 +106,9 @@ class InternshipAdminController extends Controller
         return redirect()->back();
     }
 
+    /**
+     * Remove an internship and its related documents from the system.
+     */
     public function destroy($id)
     {
         $doc = $this->internDocumentService->getInternDocumentByInternshipId($id);
@@ -121,6 +130,9 @@ class InternshipAdminController extends Controller
         return redirect()->back();
     }
 
+    /**
+     * Generate and store official internship documents (Surat Jalan).
+     */
     public function generateDocument(Request $request)
     {
         $internship = $this->internshipService->getInternshipByInternshipId($request->internship_id);
@@ -170,8 +182,11 @@ class InternshipAdminController extends Controller
         return redirect()->back();
     }
 
+    /**
+     * Handle download request for a specific internship document file.
+     */
     public function downloadFile($filename)
     {
-        return $this->downloadService->internDocumentDownload('surat jalan',$filename);
+        return $this->downloadService->internDocumentDownload('surat jalan', $filename);
     }
 }

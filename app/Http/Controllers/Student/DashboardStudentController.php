@@ -2,14 +2,12 @@
 
 namespace App\Http\Controllers\Student;
 
-use Illuminate\Http\Request;
 use App\Services\BatchService;
 use App\Services\AdvisorService;
 use App\Services\StudentService;
 use App\Services\InternshipService;
 use App\Http\Controllers\Controller;
 use App\Services\AssessmentService;
-use Illuminate\Support\Facades\Auth;
 
 class DashboardStudentController extends Controller
 {
@@ -35,6 +33,9 @@ class DashboardStudentController extends Controller
         $this->assessmentService = $assessmentService;
     }
 
+    /**
+     * Display the student dashboard with user profile data.
+     */
     public function index()
     {
         $student_id = session('user_bio')->id;

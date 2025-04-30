@@ -65,6 +65,12 @@ class AssessmentAdvisorController extends Controller
         $this->downloadService = $downloadService;
     }
 
+    /**
+     * Display a list of assessments with filters, counts, and data for the active batch.
+     *
+     * @param Request $request
+     * @return \Illuminate\View\View
+     */
     public function index(Request $request)
     {
         $advisor_id = session('user_bio')->id;
@@ -111,6 +117,13 @@ class AssessmentAdvisorController extends Controller
         ]);
     }
 
+    /**
+     * Update the assessment for a student.
+     *
+     * @param UpdateAssessmentRequest $request
+     * @param int $id Assessment ID
+     * @return \Illuminate\Http\RedirectResponse
+     */
     public function update(UpdateAssessmentRequest $request, $id)
     {
         $request->validated();
@@ -150,6 +163,9 @@ class AssessmentAdvisorController extends Controller
         return redirect()->back();
     }
 
+    /**
+     * Download final report document file.
+     */
     public function downloadLaporanAkhir($filename)
     {
         $this->downloadService->internDocumentDownload('laporan akhir', $filename);

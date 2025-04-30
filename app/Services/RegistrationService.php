@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\DateFormatHelper;
 use App\Repositories\RegistrationRepository;
 use App\Repositories\StudentRegistrationRepository;
 
@@ -22,7 +23,28 @@ class RegistrationService
 
     public function getRegistration($filters = [])
     {
-        return $this->registrationRepository->getRegistration($filters);
+        $data = $this->registrationRepository->getRegistration($filters);
+        foreach ($data as $dt) {
+            $dt->start_date = DateFormatHelper::dateFormat($dt->start_date);
+            $dt->end_date = DateFormatHelper::dateFormat($dt->end_date);
+
+            if ($dt->RegistrationDocument) {
+                foreach ($dt->registrationDocument as $doc) {
+                    $url = ($doc->url != '' ? $doc->url : null);
+                    if ($doc->type == 'surat permohonan') {
+                        $dt->surat_permohonan = $url;
+                    } else if ($doc->type == 'surat balasan') {
+                        $dt->surat_balasan = $url;
+                    }
+                }
+            }
+            $dt->status = match ($dt->status) {
+                '0' => 'Belum Dikonfirmasi',
+                '1' => 'Diterima',
+                default => 'Ditolak',
+            };
+        }
+        return $data;
     }
 
     public function getRegistrationByStatusCount($status, $batch_id)

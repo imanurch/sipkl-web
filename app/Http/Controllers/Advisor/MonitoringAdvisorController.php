@@ -51,6 +51,9 @@ class MonitoringAdvisorController extends Controller
         $this->deleteDocumentService = $deleteDocumentService;
     }
 
+    /**
+     * Display monitoring data and related filters.
+     */
     public function index(Request $request)
     {
         $advisor_id = session('user_bio')->id;
@@ -78,11 +81,17 @@ class MonitoringAdvisorController extends Controller
         ]);
     }
 
+    /**
+     * Download monitoring document file.
+     */
     public function downloadFile($type, $filename)
     {
         return $this->downloadService->monitoringDocumentDownload($type, $filename);
     }
 
+    /**
+     * Store a newly created monitoring record.
+     */
     public function store(StoreMonitoringRequest $request)
     {
         try {
@@ -101,6 +110,9 @@ class MonitoringAdvisorController extends Controller
         return redirect()->back();
     }
 
+    /**
+     * Update an existing monitoring record.
+     */
     public function update(UpdateMonitoringRequest $request, $id)
     {
         try {
@@ -127,6 +139,9 @@ class MonitoringAdvisorController extends Controller
         return redirect()->back();
     }
 
+    /**
+     * Remove a monitoring record and associated documents.
+     */
     public function destroy($id)
     {
         try {

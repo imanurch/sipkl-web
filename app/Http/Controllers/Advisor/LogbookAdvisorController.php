@@ -30,6 +30,9 @@ class LogbookAdvisorController extends Controller
         $this->advisorService = $advisorService;
     }
 
+    /**
+     * Display the logbook page.
+     */
     public function index(Request $request)
     {
         $advisor_id = session('user_bio')->id;

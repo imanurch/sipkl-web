@@ -8,7 +8,6 @@ use App\Services\StudentService;
 use App\Services\InternshipService;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\UpdateLogbookRequest;
-use Illuminate\Support\Facades\Auth;
 use Flasher\Toastr\Laravel\Facade\Toastr;
 use App\Notifications\LogbookNotification;
 use Illuminate\Support\Facades\Notification;
@@ -34,6 +33,9 @@ class LogbookStudentController extends Controller
         $this->studentService = $studentService;
     }
 
+    /**
+     * Display the logbook page.
+     */
     public function index()
     {
         $student_id = session('user_bio')->id;
@@ -49,6 +51,9 @@ class LogbookStudentController extends Controller
         ]);
     }
 
+     /**
+     * Update the student's logbook entry and notify the advisor if applicable.
+     */
     public function update(UpdateLogbookRequest $request, $id)
     {
         try {

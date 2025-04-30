@@ -20,6 +20,9 @@ class IndustryAdvisorController extends Controller
         $this->batchService = $batchService;
     }
 
+    /**
+     * Display the industry page with data and filters.
+     */
     public function index(Request $request)
     {
         $advisor_id = session('user_bio')->id;

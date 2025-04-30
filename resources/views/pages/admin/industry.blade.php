@@ -186,14 +186,14 @@
                                         <label class="input-label" for="">Pilih Data</label>
                                         <div>
                                             <button @click.prevent="option=!option" class="input input-select w-full"
-                                                :disabled="isDelete" required>
+                                                required>
                                                 <span x-text="selected"
                                                     :class="selected == 'Pilih Opsi' ? 'text-neutral-300' : 'text-neutral-800'"></span>
                                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
                                                     viewBox="0 0 20 20" fill="none">
                                                     <path d="M5 7.5L10 12.5L15 7.5" stroke="#667085"
                                                         stroke-width="0.933333" stroke-linecap="round"
-                                                        stroke-linejoin="round" :hidden="isDelete" />
+                                                        stroke-linejoin="round"/>
                                                 </svg>
                                             </button>
                                             <input type="hidden" name="data_type" x-model="selected">

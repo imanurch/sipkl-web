@@ -67,6 +67,9 @@ class RegistrationAdminController extends Controller
         $this->deleteDocumentService = $deleteDocumentService;
     }
 
+    /**
+     * Display registration data and related filters.
+     */
     public function index(Request $request)
     {
         // batch data
@@ -82,27 +85,7 @@ class RegistrationAdminController extends Controller
 
         // table data
         $data = $this->registrationService->getRegistration($filters);
-        foreach ($data as $dt) {
-            $dt->start_date = DateFormatHelper::dateFormat($dt->start_date);
-            $dt->end_date = DateFormatHelper::dateFormat($dt->end_date);
-
-            if ($dt->RegistrationDocument) {
-                foreach ($dt->registrationDocument as $doc) {
-                    $url = ($doc->url != '' ? $doc->url : null);
-                    if ($doc->type == 'surat permohonan') {
-                        $dt->surat_permohonan = $url;
-                    } else if ($doc->type == 'surat balasan') {
-                        $dt->surat_balasan = $url;
-                    }
-                }
-            }
-            $dt->status = match ($dt->status) {
-                '0' => 'Belum Dikonfirmasi',
-                '1' => 'Diterima',
-                default => 'Ditolak',
-            };
-        }
-
+        
         // card data
         $unconfirmedRegistration = $this->registrationService->getRegistrationByStatusCount('unconfirmed', $batch_id);
         $acceptedRegistration = $this->registrationService->getRegistrationByStatusCount('accepted', $batch_id);
@@ -119,11 +102,17 @@ class RegistrationAdminController extends Controller
         ]);
     }
 
+    /**
+     * Download registration document file.
+     */
     public function downloadFile($type, $filename)
     {
-        return $this->downloadService->monitoringDocumentDownload($type, $filename);
+        return $this->downloadService->registrationDocumentDownload($type, $filename);
     }
 
+    /**
+     * Generate registration document.
+     */
     public function generateDocument(Request $request)
     {
         $registration_data = $this->registrationService->getRegistrationById($request->registration_id);
@@ -176,6 +165,9 @@ class RegistrationAdminController extends Controller
         }
     }
 
+    /**
+     * Remove a registration record and related data.
+     */
     public function destroy($id)
     {
         $doc = $this->registrationDocumentService->getRegistrationDocumentByRegistrationId($id);

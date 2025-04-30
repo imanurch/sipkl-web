@@ -49,10 +49,13 @@ class StudentManagementController extends Controller
         $this->importDataService = $importDataService;
     }
 
+    /**
+     * Display the student management page with optional search filter.
+     */
     public function index(Request $request)
     {
         $batch_id = $this->batchService->getRelevantBatch($request->batch);
-        
+
         $lastYear = $this->studentService->getLastYearStudent()->year;
         $year = $request->year ?? ($currentBatch->year ?? $lastYear);
 
@@ -96,6 +99,9 @@ class StudentManagementController extends Controller
         ]);
     }
 
+    /**
+     * Store a new student user and student profile.
+     */
     public function store(StoreStudentRequest $request)
     {
         try {
@@ -126,6 +132,9 @@ class StudentManagementController extends Controller
         return redirect()->back();
     }
 
+    /**
+     * Update the student user and student profile.
+     */
     public function update(UpdateStudentRequest $request, $id)
     {
         try {
@@ -166,6 +175,9 @@ class StudentManagementController extends Controller
         return redirect()->back();
     }
 
+    /**
+     * Remove a student record.
+     */
     public function destroy($id)
     {
         $user_id = $this->studentService->getStudentById($id)->user_id;
@@ -178,6 +190,9 @@ class StudentManagementController extends Controller
         return redirect()->back();
     }
 
+    /**
+     * Import student data from the uploaded file and store them in the database.
+     */
     public function import(ImportFileRequest $request)
     {
         $request->validated();
@@ -230,6 +245,9 @@ class StudentManagementController extends Controller
         return redirect()->back();
     }
 
+    /**
+     * Download the template for importing student data.
+     */
     public function downloadTemplateFile()
     {
         return $this->downloadService->templateImportDataDownload('template_import_student.xlsx');

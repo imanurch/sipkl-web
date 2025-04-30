@@ -20,6 +20,9 @@ class DashboardAdvisorController extends Controller
         $this->batchService = $batchService;
     }
 
+    /**
+     * Display the advisor dashboard with user profile data.
+     */
     public function index(Request $request)
     {
         $advisor_id = session('user_bio')->id;

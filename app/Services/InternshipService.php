@@ -4,21 +4,25 @@ namespace App\Services;
 
 use App\Repositories\InternRepository;
 use App\Repositories\InternshipRepository;
+use App\Repositories\InternshipByAdvisorRepository;
 
 class InternshipService
 {
     protected 
     $internshipRepository,
-    $internRepository;
+    $internRepository,
+    $internshipByAdvisorRepository;
 
     // Constructor Injection
     public function __construct(
         InternshipRepository $internshipRepository,
-        InternRepository $internRepository
+        InternRepository $internRepository,
+        InternshipByAdvisorRepository $internshipByAdvisorRepository
         )
     {
         $this->internshipRepository = $internshipRepository;
         $this->internRepository = $internRepository;
+        $this->internshipByAdvisorRepository = $internshipByAdvisorRepository;
     }
 
     public function getInternship($filters = [])
@@ -29,11 +33,6 @@ class InternshipService
     public function getAllInternshipList($batch)
     {
         return $this->internshipRepository->getAllInternshipList($batch);
-    }
-
-    public function getInternshipListByAdvisor($advisor_id, $batch)
-    {
-        return $this->internshipRepository->getInternshipListByAdvisor($advisor_id, $batch);
     }
 
     public function getIntern($filters = [])
@@ -51,24 +50,29 @@ class InternshipService
         return $this->internRepository->countIntern($batch_id);
     }
 
+    public function getInternshipListByAdvisor($advisor_id, $batch)
+    {
+        return $this->internshipByAdvisorRepository->getInternshipListByAdvisor($advisor_id, $batch);
+    }
+
     public function getInternByAdvisorCount($batch_id, $advisor_id)
     {
-        return $this->internshipRepository->countInternByAdvisor($batch_id, $advisor_id);
+        return $this->internshipByAdvisorRepository->countInternByAdvisor($batch_id, $advisor_id);
     }
 
     public function getInternByAdvisor($filters = [], $advisor_id)
     {
-        return $this->internshipRepository->getInternByAdvisor($filters, $advisor_id);
+        return $this->internshipByAdvisorRepository->getInternByAdvisor($filters, $advisor_id);
     }
 
     public function getIndustryByAdvisorCount($batch_id, $advisor_id)
     {
-        return $this->internshipRepository->countIndustryByAdvisor($batch_id, $advisor_id);
+        return $this->internshipByAdvisorRepository->countIndustryByAdvisor($batch_id, $advisor_id);
     }
 
     public function getIndustryByAdvisor($filters = [], $advisor_id)
     {
-        return $this->internshipRepository->getIndustryByAdvisor($filters, $advisor_id);
+        return $this->internshipByAdvisorRepository->getIndustryByAdvisor($filters, $advisor_id);
     }
 
     public function getInternshipByStudentId($batch_id, $student_id)
@@ -93,7 +97,7 @@ class InternshipService
 
     public function updateInternshipAdvisor($internship_id, $advisor_id)
     {
-        return $this->internshipRepository->updateInternshipAdvisor($internship_id, $advisor_id);
+        return $this->internshipByAdvisorRepository->updateInternshipAdvisor($internship_id, $advisor_id);
     }
 
     public function deleteInternship($id)

@@ -24,6 +24,9 @@ class AccountStudentController extends Controller
         $this->userService = $userService;
     }
 
+    /**
+     * Display the student account page.
+     */
     public function index()
     {
         $user_id = Auth::user()->id;
@@ -35,7 +38,11 @@ class AccountStudentController extends Controller
         ]);
     }
 
-
+    /**
+     * Update the account credentials of the student user.
+     *
+     * @param UpdateAccountRequest $request
+     */
     public function updateAccount(UpdateAccountRequest $request)
     {
         $request->validated();
@@ -52,6 +59,11 @@ class AccountStudentController extends Controller
         return redirect()->back();
     }
 
+    /**
+     * Update the profile information of the student user.
+     *
+     * @param UpdateStudentProfileRequest $request
+     */
     public function updateProfile(UpdateStudentProfileRequest $request)
     {
         $validatedData = $request->validated();

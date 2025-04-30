@@ -30,6 +30,9 @@ class OutputController extends Controller
         $this->internshipOutputService = $internshipOutputService;
     }
 
+    /**
+     * Display output data and related filters.
+     */
     public function index(Request $request)
     {
         // batch data
@@ -77,6 +80,9 @@ class OutputController extends Controller
         ]);
     }
 
+    /**
+     * Download final report document file.
+     */
     public function downloadFinalReport($filename)
     {
         return $this->downloadService->internDocumentDownload('laporan akhir', $filename);

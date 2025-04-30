@@ -2,6 +2,7 @@
 
 namespace App\Services;
 
+use App\Helpers\DateFormatHelper;
 use App\Repositories\MonitoringRepository;
 
 class MonitoringService
@@ -16,7 +17,11 @@ class MonitoringService
 
     public function getMonitoring($batch_id, $filters)
     {
-        return $this->monitoringRepository->getMonitoring($batch_id, $filters);
+        $data = $this->monitoringRepository->getMonitoring($batch_id, $filters);
+        foreach ($data as $dt) {
+            $dt->date = DateFormatHelper::dateFormat($dt->date);
+        }
+        return $data;
     }
 
     public function getMonitoringByAdvisorIdAndBatch($advisor_id, $batch_id, $filters)

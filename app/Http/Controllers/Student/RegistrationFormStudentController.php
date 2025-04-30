@@ -63,8 +63,14 @@ class RegistrationFormStudentController extends Controller
         $this->registrationDocumentService = $registrationDocumentService;
         $this->internDocumentService = $internDocumentService;
         $this->userService = $userService;
-        $this->student_id = session('user_bio')->id;
-        $this->registration_id = session()->get('registration_id');
+        $this->middleware(function ($request, $next) {
+            $this->student_id = session('user_bio')?->id;
+            return $next($request);
+        });
+        $this->middleware(function ($request, $next) {
+            $this->registration_id = session()->get('registration_id');
+            return $next($request);
+        });
     }
 
     private function notification()
@@ -73,6 +79,9 @@ class RegistrationFormStudentController extends Controller
         Notification::send($users, new InternshipRegistrationNotification());
     }
 
+    /**
+     * Save internship selected location and display 2nd step form.
+     */
     public function step2(Request $request)
     {
         try {
@@ -101,6 +110,9 @@ class RegistrationFormStudentController extends Controller
         }
     }
 
+    /**
+     * Save team member selected and display 3rd step form.
+     */
     public function step3(Request $request)
     {
         try {
@@ -128,6 +140,9 @@ class RegistrationFormStudentController extends Controller
         }
     }
 
+    /**
+     * Store internship registration to database and display 4th step form.
+     */
     public function step4(StoreRegistrationRequest $request)
     {
         try {
@@ -196,6 +211,9 @@ class RegistrationFormStudentController extends Controller
         }
     }
 
+    /**
+     * Display 4th step form.
+     */
     public function step4View()
     {
         $registrationData = $this->registrationService->getRegistrationById($this->registration_id);
@@ -212,6 +230,9 @@ class RegistrationFormStudentController extends Controller
         ]);
     }
 
+    /**
+     * Store registration document and display 5th step form.
+     */
     public function step5(Request $request)
     {
         try {
@@ -244,6 +265,9 @@ class RegistrationFormStudentController extends Controller
         }
     }
 
+    /**
+     * Display 5th step form.
+     */
     public function step5View()
     {
         $registrationData = $this->registrationService->getRegistrationById($this->registration_id);
