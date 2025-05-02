@@ -52,7 +52,7 @@
                     @foreach ($registrationData->registrationDocument as $dt)
                         @if ($dt->type == 'surat permohonan')
                             <a href="{{ route('student.registration.download.file', ['type' => 'surat_permohonan', 'filename' => $dt->url]) }}"
-                                class="btn btn-xs btn-default-fill">
+                                class="btn btn-xs btn-default-fill" target="_blank">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
                                     viewBox="0 0 14 14" fill="none">
                                     <path
@@ -71,7 +71,7 @@
                     @foreach ($registrationData->registrationDocument as $dt)
                         @if ($dt->type == 'surat balasan')
                             <a href="{{ route('student.registration.download.file', ['type' => 'surat_balasan', 'filename' => $dt->url]) }}"
-                                class="btn btn-xs btn-default-fill">
+                                class="btn btn-xs btn-default-fill" target="_blank">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
                                     viewBox="0 0 14 14" fill="none">
                                     <path
@@ -89,7 +89,7 @@
                     <span>:</span>
                     @if ($registrationData->surat_jalan != 'Belum Tersedia')
                         <a href="{{ route('student.registration.download.file', ['type' => 'surat_jalan', 'filename' => $registrationData->surat_jalan]) }}"
-                            class="btn btn-xs btn-default-fill">
+                            class="btn btn-xs btn-default-fill" target="_blank">
                             <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14"
                                 fill="none">
                                 <path

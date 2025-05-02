@@ -54,10 +54,10 @@ class AssessmentByAdvisorRepository
      * @param int $advisor_id
      * @return int
      */
-    public function countNotAssessedByAdvisor($advisor_id)
+    public function countNotAssessedByAdvisor($advisor_id, $batch_id)
     {
-        return Assessment::whereHas('internship', function ($query) use ($advisor_id) {
-            $query->where('advisor_id', $advisor_id);
+        return Assessment::whereHas('internship', function ($query) use ($advisor_id, $batch_id) {
+            $query->where('advisor_id', $advisor_id)->where('batch_id', $batch_id);
         })
             ->where(function ($query) {
                 $query->whereDoesntHave('technical_assessment')
@@ -70,8 +70,7 @@ class AssessmentByAdvisorRepository
                     ->orWhereHas('final_report_assessment', function ($q) {
                         $q->whereNull('score');
                     });
-            })
-            ->count();
+            })->count();
     }
 
     /**
@@ -80,12 +79,11 @@ class AssessmentByAdvisorRepository
      * @param int $advisor_id
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function getAssessedByAdvisor($advisor_id)
+    public function getAssessedByAdvisor($advisor_id, $batch_id)
     {
-        return Assessment::whereHas('internship', function ($query) use ($advisor_id) {
-            $query->where('advisor_id', $advisor_id);
-        })
-            ->whereHas('technical_assessment')
+        return Assessment::whereHas('internship', function ($query) use ($advisor_id, $batch_id) {
+            $query->where('advisor_id', $advisor_id)->where('batch_id', $batch_id);
+        })->whereHas('technical_assessment')
             ->whereHas('non_technical_assessment', function ($query) {
                 $query->whereNotNull('score');
             })

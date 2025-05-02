@@ -69,9 +69,9 @@ class AssessmentAdminController extends Controller
         ];
 
         // Get counts for not assessed, passed, and failed assessments
-        $countNotAssessed = $this->assessmentService->getNotAssessedCount();
-        $countPass = $this->assessmentService->getAssessedCount('pass');
-        $countNotPass = $this->assessmentService->getAssessedCount('notPass');
+        $countNotAssessed = $this->assessmentService->getNotAssessedCount($batch_id);
+        $countPass = $this->assessmentService->getAssessedCount($batch_id, 'pass');
+        $countNotPass = $this->assessmentService->getAssessedCount($batch_id, 'notPass');
 
         // Fetch assessment data based on the filters
         $data = $this->assessmentService->getAssessment($filters);

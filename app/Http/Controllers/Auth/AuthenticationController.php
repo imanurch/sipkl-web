@@ -48,10 +48,6 @@ class AuthenticationController extends Controller
                 $request->session()->regenerate();
                 $user_bio = $this->adminService->getAdminByUserId($user->id);
                 Session::put('user_bio', $user_bio);
-                $user_data = $this->userService->getUserById($user->id);
-                if ($user_data && !$user_data->hasVerifiedEmail()) {
-                    $user_data->sendEmailVerificationNotification();
-                }
                 return redirect()->route('admin.dashboard');
             } else if ($user->role == 'advisor') {
                 $request->session()->regenerate();
@@ -64,11 +60,10 @@ class AuthenticationController extends Controller
                 Session::put('user_bio', $user_bio);
                 return redirect()->route('student.dashboard');
             }
+        } else{
+            Toastr::addError('Email atau password Anda tidak cocok');
+            return back();
         }
-
-        return back()->withErrors([
-            'email' => 'The provided credentials do not match our records.',
-        ])->onlyInput('email');
     }
 
     public function logout(Request $request)

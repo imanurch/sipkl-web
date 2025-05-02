@@ -136,6 +136,7 @@ class IndustryManagementController extends Controller
     public function updateStatusIndustry($id, Request $request)
     {
         if ($request->status == 'reject') {
+            Toastr::addInfo('Tidak ada perubahan status');
             return back();
         }
         try {

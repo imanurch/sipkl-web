@@ -4,6 +4,7 @@ namespace App\Repositories;
 
 use DateTime;
 use App\Models\Logbook;
+use App\Helpers\DateFormatHelper;
 
 class LogbookRepository
 {
@@ -19,8 +20,7 @@ class LogbookRepository
         return Logbook::whereHas('internship', function ($query) use ($batch_id) {
             $query->where('batch_id', $batch_id);
         })->where('student_id', $student_id)->get()->groupBy(function ($log) {
-            $datetime = new DateTime($log->start_date);
-            return $datetime->format('F Y');
+            return DateFormatHelper::monthYearFormat($log->start_date);
         });
     }
 
@@ -102,8 +102,7 @@ class LogbookRepository
     public function getLogbookByStudentAndInternshipId($student_id, $internship_id)
     {
         return Logbook::where('student_id', $student_id)->where('internship_id', $internship_id)->get()->groupBy(function ($log) {
-            $datetime = new DateTime($log->start_date);
-            return $datetime->format('F Y');
+            return DateFormatHelper::monthYearFormat($log->start_date);
         });
     }
 }

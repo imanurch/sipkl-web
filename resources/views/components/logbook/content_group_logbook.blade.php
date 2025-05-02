@@ -1,4 +1,4 @@
-<div class="space-y-6" x-data={logbookContent:true}>
+<div class="space-y-3" x-data={logbookContent:true}>
     <div class="flex space-x-3 place-items-center">
         <span class="text-xs-reguler">Bulan {{ $month }}</span>
         <svg class="cursor-pointer" @click="logbookContent=!logbookContent" xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 16 16" fill="none">

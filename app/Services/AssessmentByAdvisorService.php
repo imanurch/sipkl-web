@@ -32,9 +32,9 @@ class AssessmentByAdvisorService
      * @param int $advisor_id
      * @return int
      */
-    public function getNotAssessedCountByAdvisor($advisor_id)
+    public function getNotAssessedCountByAdvisor($advisor_id, $batch_id)
     {
-        return $this->assessmentByAdvisorRepository->countNotAssessedByAdvisor($advisor_id);
+        return $this->assessmentByAdvisorRepository->countNotAssessedByAdvisor($advisor_id, $batch_id);
     }
 
     /**
@@ -44,10 +44,10 @@ class AssessmentByAdvisorService
      * @param string $status (either 'pass' or 'not pass')
      * @return int
      */
-    public function getAssessedCountByAdvisor($advisor_id, $status)
+    public function getAssessedCountByAdvisor($advisor_id, $batch_id, $status)
     {
         // Fetch assessments for the advisor
-        $data = $this->assessmentByAdvisorRepository->getAssessedByAdvisor($advisor_id);
+        $data = $this->assessmentByAdvisorRepository->getAssessedByAdvisor($advisor_id, $batch_id);
 
         $countPass = 0;
         $countNotPass = 0;

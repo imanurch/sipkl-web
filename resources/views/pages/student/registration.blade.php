@@ -10,7 +10,8 @@
             anggota kelompok.</li>
         <li>Jika lokasi PKL belum tersedia, ajukan lokasi baru dengan klik "<span class="text-xs-semibold">Pengajuan Lokasi
                 Baru</span>".</li>
-        <li>File permohonan PKL dan surat jalan akan tersedia jika admin PKL sudah membuatkan surat. Hubungi admin PKL jika membutuhkan informasi lebih lanjut</li>
+        <li>File permohonan PKL dan surat jalan akan tersedia jika admin PKL sudah membuatkan surat. Hubungi admin PKL jika
+            membutuhkan informasi lebih lanjut</li>
     </x-guide>
 
     <div class="space-y-4">
@@ -133,8 +134,7 @@
                     <x-not_found_empty_state>
                         <x-slot name="title">Pendaftaran tidak tersedia</x-slot>
                         <x-slot name="desc">Saat ini bukan periode pendaftaran PKL. Hubungi admin PKL untuk info lebih
-                            lanjut
-                            ya!</x-slot>
+                            lanjut ya!</x-slot>
                     </x-not_found_empty_state>
                 @endif
             </div>
@@ -154,13 +154,13 @@
                                 <div class="border border-neutral-50 rounded overflow-x-auto overflow-hidden">
                                     <table class="table">
                                         <thead>
-                                            <th>NO</th>
-                                            <th>KELOMPOK</th>
-                                            <th>NAMA</th>
-                                            <th>WAKTU</th>
-                                            <th>GURU PEMBIMBING</th>
-                                            <th>LOKASI PKL</th>
-                                            <th>STATUS</th>
+                                            <th>No</th>
+                                            <th>Kelompok</th>
+                                            <th>Nama Anggota</th>
+                                            <th>Waktu</th>
+                                            <th class="text-nowrap">Guru Pembimbing</th>
+                                            <th class="text-nowrap">Lokasi PKL</th>
+                                            <th>Status</th>
                                         </thead>
                                         <tbody>
                                             @foreach ($historyData as $dt)
@@ -172,12 +172,13 @@
                                                         <ul>
                                                             @foreach ($dt->group->groupMember as $member)
                                                                 <li>{{ $loop->iteration }}.
-                                                                    {{ $member->student->name ?? '' }}
+                                                                    {{ $member->student->name ?? '' }} (NIS
+                                                                    {{ $member->student->nis ?? '' }})
                                                                 </li>
                                                             @endforeach
                                                         </ul>
                                                     </td>
-                                                    <td>{{ $dt->start_date ?? '' }} s/d {{ $dt->end_date ?? '' }}</td>
+                                                    <td>{{ $dt->start_date ?? '' }} - {{ $dt->end_date ?? '' }}</td>
                                                     @if ($dt->advisor)
                                                         <td>{{ $dt->advisor->name }}</td>
                                                     @else

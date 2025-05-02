@@ -107,7 +107,7 @@ class RegistrationStudentController extends Controller
     public function downloadFile($type, $filename)
     {
         if ($type == 'surat_permohonan' || $type == 'surat_balasan') {
-            return $this->downloadService->monitoringDocumentDownload($type, $filename);
+            return $this->downloadService->registrationDocumentDownload($type, $filename);
         } else {
             return $this->downloadService->internDocumentDownload($type, $filename);
         }

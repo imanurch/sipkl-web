@@ -150,7 +150,7 @@
             <x-table.table>
                 <x-slot name="tableTitle">Industri Mitra</x-slot>
                 <x-slot name="filterActionForm">industryManagement?tab=partner</x-slot>
-                <x-slot name="partnerSearchKeyword">partnerSearchKeyword</x-slot>      
+                <x-slot name="mainSearchName">partnerSearchKeyword</x-slot>      
                 <x-slot name="mainSearchAddition">
                     <input type="hidden" name="tab" value="partner">
                 </x-slot>          

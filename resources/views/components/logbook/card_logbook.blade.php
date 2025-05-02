@@ -17,8 +17,7 @@
         </div>
         <div>
             <h6 class="text-xs-medium">Minggu Ke- {{ $week }}</h6>
-            <span class="text-xs-reguler">{{ strftime('%d %B', strtotime($data->start_date)) }} s/d
-                {{ strftime('%d %B', strtotime($data->end_date)) }}</span>
+            <span class="text-xs-reguler">{{ $data->start_date }} - {{ $data->end_date }}</span>
         </div>
     </div>
     <svg @click="modalAction='{{ $data->status == '1' ? 'isView' : ($data->activities != null ? 'isEdit' : 'isAdd') }}';dataId={{ $data->toJson() }};id='{{ $data->id }}'"

@@ -77,7 +77,7 @@ class AssessmentAdvisorController extends Controller
 
         // batch data
         $batch_id = $this->batchService->getRelevantBatch($request->batch);
-        
+
         // table filters
         $batchData = $this->batchService->getAllBatch('');
         $filters = [
@@ -86,9 +86,9 @@ class AssessmentAdvisorController extends Controller
         ];
 
         // card
-        $countNotAssessed = $this->assessmentByAdvisorService->getNotAssessedCountByAdvisor($advisor_id);
-        $countPass = $this->assessmentByAdvisorService->getAssessedCountByAdvisor($advisor_id, 'pass');
-        $countNotPass = $this->assessmentByAdvisorService->getAssessedCountByAdvisor($advisor_id, 'notPass');
+        $countNotAssessed = $this->assessmentByAdvisorService->getNotAssessedCountByAdvisor($advisor_id, $batch_id);
+        $countPass = $this->assessmentByAdvisorService->getAssessedCountByAdvisor($advisor_id, $batch_id, 'pass');
+        $countNotPass = $this->assessmentByAdvisorService->getAssessedCountByAdvisor($advisor_id, $batch_id, 'notPass');
 
         // table data
         $data = $this->assessmentByAdvisorService->getAssessmentByAdvisor($advisor_id, $filters);

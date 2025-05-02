@@ -27,9 +27,9 @@
             @endif
             @if ($data != null)
                 <div class="flex place-items-center space-x-2">
-                    <span class="text-xs-reguler">Lihat File (Diunggah pada {{ $data->updated_at }}) :</span>
+                    <span class="text-xs-reguler">Lihat File (Diunggah pada {{ $data->updated_time }}) :</span>
                     <a href="{{ route('student.finalReport.downloadLaporanAkhir', ['filename' => $data->url]) }}"
-                        class="btn btn-xs btn-default-fill">
+                        class="btn btn-xs btn-default-fill" target="_blank">
                         <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 14 14"
                             fill="none">
                             <path

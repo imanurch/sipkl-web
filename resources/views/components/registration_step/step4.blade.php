@@ -38,7 +38,7 @@
                         @if ($dt->type == 'surat permohonan')
                             @if ($dt->url != '')
                                 <a href="{{ route('student.registration.download.file', ['type' => 'surat_permohonan', 'filename' => $dt->url]) }}"
-                                    class="btn btn-xs btn-default-fill">
+                                    class="btn btn-xs btn-default-fill" target="_blank">
                                     <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14"
                                         viewBox="0 0 14 14" fill="none">
                                         <path

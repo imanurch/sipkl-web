@@ -9,14 +9,13 @@ use App\Repositories\StudentRegistrationRepository;
 class RegistrationService
 {
     protected $registrationRepository,
-    $studentRegistrationRepository;
+        $studentRegistrationRepository;
 
     // Constructor Injection
     public function __construct(
         RegistrationRepository $registrationRepository,
         StudentRegistrationRepository $studentRegistrationRepository
-        )
-    {
+    ) {
         $this->registrationRepository = $registrationRepository;
         $this->studentRegistrationRepository = $studentRegistrationRepository;
     }
@@ -59,6 +58,15 @@ class RegistrationService
 
     public function getRegistrationById($id)
     {
+        $data = $this->registrationRepository->findRegistrationById($id);
+        $data->start_date = DateFormatHelper::dateFormat($data->start_date);
+        $data->end_date = DateFormatHelper::dateFormat($data->end_date);
+
+        return $data;
+    }
+
+    public function getOriginalRegistrationById($id)
+    {
         return $this->registrationRepository->findRegistrationById($id);
     }
 
@@ -69,7 +77,12 @@ class RegistrationService
 
     public function getAllHistoryRegistrationByStudentId($student_id)
     {
-        return $this->studentRegistrationRepository->getAllHistoryRegistrationByStudentId($student_id);
+        $data = $this->studentRegistrationRepository->getAllHistoryRegistrationByStudentId($student_id);
+        foreach ($data as $dt) {
+            $dt->start_date = DateFormatHelper::dateFormat($dt->start_date);
+            $dt->end_date = DateFormatHelper::dateFormat($dt->end_date);
+        }
+        return $data;
     }
 
     public function updateStatusRegistration($id, $status)

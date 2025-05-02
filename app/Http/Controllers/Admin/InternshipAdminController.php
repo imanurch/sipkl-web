@@ -148,15 +148,18 @@ class InternshipAdminController extends Controller
                         $internData = $this->studentService->getStudentById($intern_id);
 
                         $data = [
+                            'school_phone_num'  => $school_profile->phone_num,
+                            'school_website'  => $school_profile->website,
+                            'school_email'  => $school_profile->email,
                             'letter_num'  => $letter_num,
                             'intern_name'  => $internData->name,
                             'intern_nis'  => $internData->nis,
-                            'internship_start_date'  => $internship->start_date,
-                            'internship_end_date'  => $internship->end_date,
+                            'internship_start_date'  => DateFormatHelper::dateFormat($internship->start_date),
+                            'internship_end_date'  => DateFormatHelper::dateFormat($internship->end_date),
                             'industry_name'  => $internship->industry->name,
                             'industry_address'  => $internship->industry->address,
                             'intern_transport'  => $intern_transport,
-                            'create_date' => date('d F Y'),
+                            'create_date' => DateFormatHelper::dateFormat(date('d M Y')),
                             'principal_name'  => $school_profile->principal_name,
                             'principal_nip'  => $school_profile->principal_nip,
                             'principal_signature'  => $school_profile->principal_signature,

@@ -14,7 +14,7 @@
                     <div class="flex flex-col space-y-2">
                         @foreach ($teamMember as $dt)
                             <input name="student_id[]" type="hidden" value="{{ $dt->id ?? '' }}">
-                            <input class="input" type="text" disabled value="{{ $dt->name }}">
+                            <input class="input" type="text" disabled value="{{ $dt->name ?? ''}}">
                         @endforeach
                     </div>
                 </div>

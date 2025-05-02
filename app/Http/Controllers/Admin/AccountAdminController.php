@@ -51,11 +51,8 @@ class AccountAdminController extends Controller
         try {
             $this->userService->updateAccountUser($request);
             Toastr::addSuccess('Data akun berhasil diubah!');
-        } catch (\Illuminate\Validation\ValidationException $e) {
-            $errorMessage = collect($e->errors())->flatten()->first();
-            Toastr::addError($errorMessage);
         } catch (\Exception $e) {
-            Toastr::addError('Data akun gagal diubah!');
+            Toastr::addError($e->getMessage());
         }
         return redirect()->back();
     }

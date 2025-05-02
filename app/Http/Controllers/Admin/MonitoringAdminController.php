@@ -177,7 +177,7 @@ class MonitoringAdminController extends Controller
                 'internship_team_decree'  => $school_profile->internship_team_decree,
             ], $common_data);
         } elseif ($request->documentGenerateType == 'SPPD') {
-            $data = [
+            $data = array_merge([
                 'advisor_name' => $advisor->name,
                 'advisor_position' => $advisor->position_id,
                 'advisor_level' => $advisor->level_id,
@@ -185,7 +185,7 @@ class MonitoringAdminController extends Controller
                 'industry_name' => $industry->name,
                 'monitoring_date' => DateFormatHelper::dateFormat($monitoring->date),
                 'transportation' => $request->transportation,
-            ];
+            ]);
         } elseif ($request->documentGenerateType == 'Surat Pengantar') {
             $intern_data = [];
             foreach ($internship->group->groupMember as $member) {

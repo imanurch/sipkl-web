@@ -73,7 +73,7 @@
                                 @endforeach
                             </ul>
                         </td>
-                        <td class="whitespace-nowrap">{{ $dt->start_date }} <br>s/d
+                        <td class="whitespace-nowrap">{{ $dt->start_date }} <br>-
                             <br>{{ $dt->end_date }}
                         </td>
                         <td>
@@ -139,7 +139,7 @@
                     <div class="input-group">
                         <label class="input-label" for="">Waktu</label>
                         <input name="time" class="input" type="text" disabled
-                            :value="modalAction != null ? dataId.start_date + ' s/d ' + dataId.end_date : ''">
+                            :value="modalAction != null ? dataId.start_date + ' - ' + dataId.end_date : ''">
                     </div>
                     <div class="input-group">
                         <label class="input-label" for="">Guru Pembimbing</label>

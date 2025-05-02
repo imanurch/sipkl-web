@@ -81,7 +81,7 @@
                         <td class="text-nowrap">{{ $dt->date ?? '' }}</td>
                         <td>{{ $dt->internship->advisor->name ?? '' }}</td>
                         <td>{{ $dt->internship->industry->name ?? '' }}</td>
-                        <td class="">{{ $dt->note ?? '-' }}</td>
+                        <td class="min-w-44">{{ $dt->note ?? '-' }}</td>
                         <td class="place-items-center">
                             @if (count($dt->monitoringDocument) > 0)
                                 <div class="flex space-x-2">
@@ -119,14 +119,13 @@
                         {{-- isAdd / isEdit --}}
                         <input type="hidden" name="type" x-model="selected">
                         <div x-show="modalAction == 'isAdd' || modalAction == 'isEdit'">
-                            <button @click.prevent="option=!option" class="input input-select w-full" :disabled="modalAction == 'isDelete'"
-                                required>
-                                <span x-text="selected"
-                                    :class="selected == 'Pilih Opsi' ? 'text-neutral-300' : 'text-neutral-800'"></span>
+                            <button @click.prevent="option=!option" class="input input-select w-full"
+                                :disabled="modalAction == 'isDelete'" required>
+                                <span x-text="selected" class="text-neutral-800"></span>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"
                                     fill="none">
                                     <path d="M5 7.5L10 12.5L15 7.5" stroke="#667085" stroke-width="0.933333"
-                                        stroke-linecap="round" stroke-linejoin="round"/>
+                                        stroke-linecap="round" stroke-linejoin="round" />
                                 </svg>
                             </button>
                             <div x-show="option" @click.away="option=false">
@@ -149,19 +148,19 @@
                     </div>
                     <div class="input-group">
                         <label class="input-label" for="">Waktu</label>
-                        <input onclick="this.showPicker()" name="date" class="input" :type="modalAction == 'isDelete' ? 'text' : 'date'"
-                            placeholder="Masukkan Tanggal" :disabled="modalAction == 'isView' || modalAction == 'isDelete'"
+                        <input onclick="this.showPicker()" name="date" class="input"
+                            :type="modalAction == 'isDelete' ? 'text' : 'date'" placeholder="Masukkan Tanggal"
+                            :disabled="modalAction == 'isView' || modalAction == 'isDelete'"
                             :value="modalAction != null ? dataId.date : ''" required>
                     </div>
                     <div class="input-group">
-                        <label class="input-label" for="">Kelompok - Industri</label>
+                        <label class="input-label" for="">Industri - Pembimbing</label>
                         {{-- isAdd / isEdit --}}
                         <input type="hidden" name="internship_id" x-model="selectedValueInternship">
                         <div x-show="modalAction == 'isAdd'">
                             <button @click.prevent="optionInternship=!optionInternship" class="input input-select w-full"
                                 :disabled="modalAction == 'isDelete'" required>
-                                <span x-text="selectedInternship"
-                                    :class="selected == 'Pilih Opsi' ? 'text-neutral-300' : 'text-neutral-800'"></span>
+                                <span x-text="selectedInternship" class="text-neutral-800"></span>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 20 20"
                                     fill="none">
                                     <path d="M5 7.5L10 12.5L15 7.5" stroke="#667085" stroke-width="0.933333"
@@ -171,11 +170,16 @@
                             <div x-show="optionInternship" @click.away="optionInternship=false">
                                 <ul class="border border-brand-600 rounded py-2 my-2 max-h-32 overflow-auto">
                                     @foreach ($internshipListData as $dt)
-                                        <li @click.prevent="optionInternship=false;
-                                        selectedInternship='{{ $dt->group_id ?? '' }} - {{ $dt->industry->name ?? '' }} (Pembimbing {{ $dt->advisor->name ?? '' }})';selectedValueInternship='{{ $dt->id }}'"
-                                            class="text-xs-reguler px-4 py-2 hover:bg-brand-600 hover:text-neutral-0 hover:text-xs-medium">
-                                            {{ $dt->group_id ?? '' }} - {{ $dt->industry->name ?? '' }} (Pembimbing
-                                            {{ $dt->advisor->name ?? '' }})</li>
+                                        @if ($dt->advisor != null)
+                                            <li @click.prevent="optionInternship=false;
+                                        selectedInternship='{{ $dt->industry->name ?? '' }} (Pembimbing {{ $dt->advisor->name ?? '' }})';selectedValueInternship='{{ $dt->id }}'"
+                                                class="text-xs-reguler px-4 py-2 hover:bg-brand-600 hover:text-neutral-0 hover:text-xs-medium">
+                                                {{ $dt->industry->name ?? '' }} (Pembimbing
+                                                {{ $dt->advisor->name ?? '' }})</li>
+                                        @else
+                                            <li class="text-xs-reguler text-neutral-400 px-4 py-2">
+                                                {{ $dt->industry->name ?? '' }} (Pembimbing Belum Diatur) </li>
+                                        @endif
                                     @endforeach
                                 </ul>
                             </div>
@@ -216,12 +220,11 @@
                         <div>
                             <button @click.prevent="option=!option" class="input input-select w-full"
                                 :disabled="modalAction == 'isDelete'" required>
-                                <span x-text="selected"
-                                    :class="selected == 'Pilih Opsi' ? 'text-neutral-300' : 'text-neutral-800'"></span>
+                                <span x-text="selected" class="text-neutral-800"></span>
                                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20"
                                     viewBox="0 0 20 20" fill="none">
                                     <path d="M5 7.5L10 12.5L15 7.5" stroke="#667085" stroke-width="0.933333"
-                                        stroke-linecap="round" stroke-linejoin="round"/>
+                                        stroke-linecap="round" stroke-linejoin="round" />
                                 </svg>
                             </button>
                             <input type="hidden" name="documentGenerateType" id="documentType" x-model="selected">

@@ -4,12 +4,7 @@ module.exports = {
     theme: {
         extend: {},
         fontFamily: {
-            // primary: ["IBM Plex Sans", "sans-serif"],
-            sans: ["Inter","sans-serif"],
-            ibm: ['IBM Plex Sans'],
-            // sans: ['Roboto'],
-            // sans: ['Lato'],
-            // sans: ['Open Sans'],
+            sans: ["Inter"],
         },
         colors: {
             neutral: {

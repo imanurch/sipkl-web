@@ -50,19 +50,22 @@ class AssessmentRepository
      *
      * @return int
      */
-    public function countNotAssessed()
+    public function countNotAssessed($batch_id)
     {
-        return Assessment::whereDoesntHave('technical_assessment')
-            ->orWhereDoesntHave('non_technical_assessment')
-            ->orWhereDoesntHave('final_report_assessment')
-            ->orWhereDoesntHave('test_assessment')
-            ->orWhereHas('non_technical_assessment', function ($query) {
-                $query->whereNull('score');
-            })
-            ->orWhereHas('final_report_assessment', function ($query) {
-                $query->whereNull('score');
-            })
-            ->count();
+        return Assessment::whereHas('internship', function ($query) use ($batch_id) {
+            $query->where('batch_id', $batch_id);
+        })->where(function ($query) {
+            $query->whereDoesntHave('technical_assessment')
+                ->orWhereDoesntHave('non_technical_assessment')
+                ->orWhereDoesntHave('final_report_assessment')
+                ->orWhereDoesntHave('test_assessment')
+                ->orWhereHas('non_technical_assessment', function ($query) {
+                    $query->whereNull('score');
+                })
+                ->orWhereHas('final_report_assessment', function ($query) {
+                    $query->whereNull('score');
+                });
+        })->count();
     }
 
     /**
@@ -70,17 +73,18 @@ class AssessmentRepository
      *
      * @return \Illuminate\Database\Eloquent\Collection
      */
-    public function getAssessed()
+    public function getAssessed($batch_id)
     {
-        return Assessment::whereHas('technical_assessment')
+        return Assessment::whereHas('internship', function ($query) use ($batch_id) {
+            $query->where('batch_id', $batch_id);
+        })->whereHas('technical_assessment')
             ->whereHas('non_technical_assessment', function ($query) {
                 $query->whereNotNull('score');
             })
             ->whereHas('final_report_assessment', function ($query) {
                 $query->whereNotNull('score');
             })
-            ->whereHas('test_assessment')
-            ->get();
+            ->whereHas('test_assessment')->get();
     }
 
     /**

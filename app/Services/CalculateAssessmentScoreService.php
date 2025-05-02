@@ -36,6 +36,7 @@ class CalculateAssessmentScoreService
     public function calculateTechnicalScore($data)
     {
         $technical_score = 0;
+        $technical_score_average = 0;
         $technical_aspect = [];
         $technical_aspect_score = [];
 
@@ -64,6 +65,7 @@ class CalculateAssessmentScoreService
     public function calculateNonTechnicalScore($data)
     {
         $non_technical_score = 0;
+        $non_technical_score_average = 0;
 
         // Summing the non-technical aspect scores
         foreach ($data->non_technical_assessment as $aspect_score) {
@@ -90,6 +92,7 @@ class CalculateAssessmentScoreService
     public function calculateFinalReportScore($data)
     {
         $final_report_score = 0;
+        $final_report_score_average = 0;
 
         // Summing the final report aspect scores
         foreach ($data->final_report_assessment as $aspect_score) {

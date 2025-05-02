@@ -49,7 +49,7 @@
         <br><span style="display: inline-block;min-width: 8rem">Kepentingan</span><span style="display: inline-block">:
             Melaksanakan kegiatan Praktik Kerja Lapangan (PKL)</span>
         <br><span style="display: inline-block;min-width: 8rem">Tanggal</span><span style="display: inline-block">:
-            {{ $internship_start_date ?? '#####' }} sampai dengan {{ $internship_end_date ?? '#####' }}</span>
+            {{ $internship_start_date ?? '#####' }} - {{ $internship_end_date ?? '#####' }}</span>
         <br><span style="display: inline-block;min-width: 8rem">Tujuan Lokasi</span><span
             style="display: inline-block">: {{ $industry_name ?? '#####' }}</span>
         <br><span style="display: inline-block;min-width: 8rem">Alamat</span><span style="display: inline-block">:

@@ -15,12 +15,11 @@ class StudentRegistrationRepository
      */
     public function getRegistrationByStudentId($batch_id, $student_id)
     {
-        // Get the registration for a student in the given batch, excluding step '0'
         return Registration::whereHas('group.groupMember.student', function ($query) use ($student_id, $batch_id) {
             $query->where('id', $student_id);
-        })->with('industry:id,name,address') // Load related industry info
+        })->with('industry:id,name,address')
             ->where('batch_id', $batch_id)
-            ->where('step', '!=', '0') // Exclude registrations where step is '0'
+            ->where('step', '!=', '0')
             ->first();
     }
 
@@ -32,11 +31,9 @@ class StudentRegistrationRepository
      */
     public function getAllHistoryRegistrationByStudentId($student_id)
     {
-        // Get all historical registrations for the student, paginated
         return Registration::whereHas('group.groupMember.student', function ($query) use ($student_id) {
             $query->where('id', $student_id);
-        })->with('industry:id,name,address') // Load related industry info
-            ->paginate(5); // Paginate results, 5 per page
+        })->with('industry:id,name,address')->paginate(5);
     }
 
     /**
@@ -48,7 +45,6 @@ class StudentRegistrationRepository
      */
     public function updateRegistrationStep($id, $step)
     {
-        // Update the 'step' of the registration by ID
         return Registration::where('id', $id)->update(['step' => $step]);
     }
 
@@ -60,7 +56,6 @@ class StudentRegistrationRepository
      */
     public function createRegistration(array $data)
     {
-        // Create a new registration record with the given data
         return Registration::create($data);
     }
 }

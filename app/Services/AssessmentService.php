@@ -34,9 +34,9 @@ class AssessmentService
      * 
      * @return int
      */
-    public function getNotAssessedCount()
+    public function getNotAssessedCount($batch_id)
     {
-        return $this->assessmentRepository->countNotAssessed();
+        return $this->assessmentRepository->countNotAssessed($batch_id);
     }
 
     /**
@@ -45,10 +45,10 @@ class AssessmentService
      * @param string $status (either 'pass' or 'not pass')
      * @return int
      */
-    public function getAssessedCount($status)
+    public function getAssessedCount($batch_id, $status)
     {
         // Fetch all assessments
-        $data = $this->assessmentRepository->getAssessed();
+        $data = $this->assessmentRepository->getAssessed($batch_id);
 
         $countPass = 0;
         $countNotPass = 0;

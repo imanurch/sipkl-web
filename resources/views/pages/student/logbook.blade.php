@@ -61,9 +61,9 @@
                     </div>
                     <div class="form-body">
                         <div class="input-group">
-                            <label class="input-label" for="">Tanggal</label>
+                            <label class="input-label" for="">Tanggal/Periode</label>
                             <input class="input" type="text"
-                                :value="modalAction != null ? dataId.start_date + ' s/d ' + dataId.end_date : ''" disabled>
+                                :value="modalAction != null ? dataId.start_date + ' - ' + dataId.end_date : ''" disabled>
                         </div>
                         <div class="input-group">
                             <label class="input-label" for="">Kegiatan</label>

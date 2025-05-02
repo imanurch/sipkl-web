@@ -7,7 +7,6 @@
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
     @vite('resources/css/app.css')
     <title>SIPKL</title>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
 </head>
 
 <body>
@@ -52,8 +51,8 @@
                     </p>
                     <p class="text-sm sm:text-md text-neutral-0">- Bill Gates</p>
                 </div>
-            </div>         
-            
+            </div>
+
             <img class="object-none object-top  h-full w-full" src="{{ url('storage/images/school.jpg') }}"
                 alt="">
         </div>

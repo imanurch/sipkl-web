@@ -88,7 +88,7 @@ class AdvisorRepository
      */
     public function getAdvisorList()
     {
-        return Advisor::get();
+        return Advisor::orderBy('name','asc')->get();
     }
 
     /**

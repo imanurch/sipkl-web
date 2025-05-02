@@ -80,4 +80,54 @@ class DateFormatHelper
 
         return date("Y", strtotime($date)). '/' .(date("Y", strtotime($date))+1);
     }
+
+    public static function monthYearFormat(?string $date): ?string
+    {
+        if (empty($date)) {
+            return null;
+        }
+
+        $bulan = [
+            'January' => 'Januari',
+            'February' => 'Februari',
+            'March' => 'Maret',
+            'April' => 'April',
+            'May' => 'Mei',
+            'June' => 'Juni',
+            'July' => 'Juli',
+            'August' => 'Agustus',
+            'September' => 'September',
+            'October' => 'Oktober',
+            'November' => 'November',
+            'December' => 'Desember',
+        ];
+
+        $timestamp = strtotime($date);
+        return ($bulan[date('F', $timestamp)] ?? date('F', $timestamp)) . ' ' . date("Y", strtotime($date));
+    }
+
+    public static function dateTimeFormat(?string $date): ?string
+    {
+        if (empty($date)) {
+            return null;
+        }
+        
+        $bulan = [
+            'January' => 'Januari',
+            'February' => 'Februari',
+            'March' => 'Maret',
+            'April' => 'April',
+            'May' => 'Mei',
+            'June' => 'Juni',
+            'July' => 'Juli',
+            'August' => 'Agustus',
+            'September' => 'September',
+            'October' => 'Oktober',
+            'November' => 'November',
+            'December' => 'Desember',
+        ];
+
+        $timestamp = strtotime($date);
+        return date('d', $timestamp) . ' ' . ($bulan[date('F', $timestamp)] ?? date('F', $timestamp)) . ' ' . date('Y', $timestamp) . ' ' . date('H:i:s', $timestamp);
+    }
 }

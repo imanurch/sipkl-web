@@ -60,7 +60,7 @@ class RegistrationConfirmController extends Controller
             DB::transaction(function () use ($registrationId, $status) {
                 $this->registrationService->updateStatusRegistration($registrationId, $status);
 
-                $registrationData = $this->registrationService->getRegistrationById($registrationId);
+                $registrationData = $this->registrationService->getOriginalRegistrationById($registrationId);
 
                 $data = [
                     'group_id' => $registrationData->group_id,

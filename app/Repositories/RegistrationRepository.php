@@ -78,7 +78,7 @@ class RegistrationRepository
     {
         return Registration::with(
             'group',
-            'group.groupMember.student:id,nisn,name,department_id',
+            'group.groupMember.student:id,user_id,nisn,name,department_id',
             'group.groupMember.student.department:id,name',
             'industry:id,name,address',
             'registrationDocument'

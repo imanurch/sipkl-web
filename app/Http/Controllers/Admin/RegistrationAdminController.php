@@ -144,9 +144,9 @@ class RegistrationAdminController extends Controller
 
             $this->notification($intern_group_data);
 
-            Toastr::addSuccess('Surat Permohonan berhasil dibuat. Silahkan refresh halaman!');
+            Toastr::addSuccess('Surat Permohonan berhasil dibuat.');
         } catch (\Exception $e) {
-            Toastr::addError('Surat Permohonan gagal dibuat. Silahkan refresh halaman!');
+            Toastr::addError('Surat Permohonan gagal dibuat.');
         }
         return redirect()->back();
     }

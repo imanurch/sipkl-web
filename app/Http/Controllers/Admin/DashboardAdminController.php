@@ -27,10 +27,10 @@ class DashboardAdminController extends Controller
     /**
      * Display the admin dashboard with summary data based on selected or active batch.
      */
-    public function index(Request $request)
+    public function index()
     {
-        $batch_id = $this->batchService->getBatchByStatus('active');
-        
+        $batch_id = $this->batchService->getBatchByStatus('active')->id;
+
         $intern = $this->internshipService->getInternCount($batch_id);
         $advisor = $this->advisorService->getAdvisorByStatusCount($batch_id, 'active');
         $industry = $this->industryService->getIndustryByStatusCount($batch_id, 'active');

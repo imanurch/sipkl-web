@@ -56,8 +56,8 @@ class LogbookService
     public function getLogbookByStudentAndInternshipId($student_id, $internship_id)
     {
         $data = $this->logbookRepository->getLogbookByStudentAndInternshipId($student_id, $internship_id);
-        foreach ($data as $dt) {
-            foreach ($dt as $log) {
+        foreach ($data as $logs) {
+            foreach ($logs as $log) {
                 $log->start_date = DateFormatHelper::dateFormat($log->start_date);
                 $log->end_date = DateFormatHelper::dateFormat($log->end_date);
             }
@@ -92,7 +92,7 @@ class LogbookService
                 'end_date'      => $current_end->format('Y-m-d')
             ];
 
-            return $this->logbookManagementRepository->createLogbook($logbook_data);
+            $this->logbookManagementRepository->createLogbook($logbook_data);
 
             $logbook_start_date = clone $current_end;
             $logbook_start_date->modify('+1 day');

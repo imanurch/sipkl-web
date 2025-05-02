@@ -29,7 +29,7 @@
 
     <div x-data="{ modalAction: null, modalConfirm: null, id: null, dataId: [], option: false, selected: 'Pilih Opsi', valueSelected: null, generateDocumentModal: false }">
         <x-table.table>
-            <x-slot name="tableTitle">Pendaftaran PKL</x-slot>
+            <x-slot name="tableTitle">Pendaftaran PKL </x-slot>
             <x-slot name="filterActionForm">registration</x-slot>
             <x-slot name="filter">
                 <div class="space-y-1 w-full">

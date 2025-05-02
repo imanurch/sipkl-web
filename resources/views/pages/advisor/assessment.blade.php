@@ -185,8 +185,17 @@
                     <div x-show="modalAction=='isEdit'" class="space-y-3">
                         <label class="text-xs" for="">Penilaian Aspek Teknis</label>
                         <div class="space-y-1">
-                            <div id="technicalAspectFields" class="space-y-2">
-                                {{-- technicalAspectFields --}}
+                            <div class="space-y-2">
+                                <div id="technicalAspectFields" class="space-y-2">
+                                    {{-- technicalAspectFields --}}
+                                </div>
+                                <div class="flex space-x-2">
+                                    <input name="technical_aspect[]" class="input w-2/3" placeholder="Aspek Teknis"
+                                        required>
+                                    <input name="technical_score[]" class="input w-1/3" placeholder="Nilai" required>
+                                    <button onclick="removeField(this)"
+                                        class="btn btn-xs btn-error-fill h-fit">Hapus</button>
+                                </div>
                             </div>
                             <button @click.prevent="addTechnicalAspect()" class="btn btn-xs btn-default-fill h-fit">Tambah
                                 Aspek</button>
