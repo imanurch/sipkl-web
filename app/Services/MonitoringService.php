@@ -26,7 +26,11 @@ class MonitoringService
 
     public function getMonitoringByAdvisorIdAndBatch($advisor_id, $batch_id, $filters)
     {
-        return $this->monitoringRepository->getMonitoringByAdvisorIdAndBatch($advisor_id, $batch_id, $filters);
+        $data = $this->monitoringRepository->getMonitoringByAdvisorIdAndBatch($advisor_id, $batch_id, $filters);
+        foreach ($data as $dt) {
+            $dt->date = DateFormatHelper::dateFormat($dt->date);
+        }
+        return $data;
     }
 
     public function getById($id)

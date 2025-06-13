@@ -40,8 +40,9 @@ class DashboardStudentController extends Controller
     {
         $student_id = session('user_bio')->id;
 
-        $currentBatch = $this->batchService->getBatchByStatus('active');
-        $batch_id = $currentBatch != null ? $currentBatch->id : '';
+        $batch_id = $this->batchService->getBatchByStatus('active')?->id;
+        // $currentBatch = $this->batchService->getBatchByStatus('active');
+        // $batch_id = $currentBatch != null ? $currentBatch->id : '';
 
         $studentData = $this->studentService->getStudentById($student_id);
         $internshipData = $this->internshipService->getInternshipByStudentId($batch_id, $student_id);

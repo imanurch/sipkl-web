@@ -24,7 +24,7 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         User::factory()
-            ->count(6)
+            ->count(3)
             ->state(new Sequence(
                 [
                     'username' => 'admin',
@@ -53,20 +53,13 @@ class DatabaseSeeder extends Seeder
         Department::factory()
             ->count(3)
             ->state(new Sequence(
-                [
-                    'name' => 'RPL',
-                ],
-                [
-                    'name' => 'DPIB',
-                ],
-                [
-                    'name' => 'K3R',
-                ],
+                ['name' => 'RPL'],
+                ['name' => 'DPIB'],
+                ['name' => 'K3R'],
             ))
             ->create();
 
         Admin::factory()
-            ->count(4)
             ->state(new Sequence(
                 [
                     'user_id' => '1',

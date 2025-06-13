@@ -93,6 +93,23 @@ class LogbookRepository
     }
 
     /**
+     * Check if all logbooks are confirmed for a student and internship.
+     *
+     * @param int $internship_id
+     * @param int $student_id
+     * @return bool
+     */
+    public function checkIsConfirmedLogbookByInternshipAndStudentId($internship_id, $student_id)
+    {
+        $isNotConfirmed = Logbook::where('student_id', $student_id)->where('internship_id', $internship_id)->whereNotNull('activities')->whereIn('status', ['0'])->count();
+        if ($isNotConfirmed == 0) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
+    /**
      * Get and group logbooks by month and year for a student and internship.
      *
      * @param int $student_id

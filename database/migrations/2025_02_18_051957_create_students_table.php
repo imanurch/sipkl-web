@@ -21,7 +21,6 @@ return new class extends Migration
             $table->foreignId('department_id')->constrained('departments');
             $table->string('year');
             $table->string('phone_num')->unique();
-            // $table->string('password');
             $table->timestamps();
         });
     }

@@ -168,6 +168,6 @@ class AssessmentAdvisorController extends Controller
      */
     public function downloadLaporanAkhir($filename)
     {
-        $this->downloadService->internDocumentDownload('laporan akhir', $filename);
+        return $this->downloadService->internDocumentDownload('laporan akhir', $filename);
     }
 }

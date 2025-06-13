@@ -210,18 +210,7 @@ class StudentManagementController extends Controller
             DB::transaction(function () use ($validData) {
                 foreach ($validData as $data) {
                     $data['password'] = Hash::make($data['password']);
-                    $data['role'] = 'student';
-                    $data['gender'] = match ($data['gender']) {
-                        'Laki-Laki' => 'men',
-                        'Perempuan' => 'women',
-                        default => 'men',
-                    };
-                    $data['department'] = match ($data['department']) {
-                        'RPL' => '1',
-                        'DPIB' => '2',
-                        default => '3',
-                    };
-
+                    
                     $newUser = $this->userService->addUser($data);
 
                     $studentData = [

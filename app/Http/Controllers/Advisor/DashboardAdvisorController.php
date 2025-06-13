@@ -27,8 +27,9 @@ class DashboardAdvisorController extends Controller
     {
         $advisor_id = session('user_bio')->id;
 
-        $currentBatch = $this->batchService->getBatchByStatus('active');
-        $batch_id = $currentBatch != null ? $currentBatch->id : '';
+        $batch_id = $this->batchService->getBatchByStatus('active')?->id;
+        // $currentBatch = $this->batchService->getBatchByStatus('active');
+        // $batch_id = $currentBatch != null ? $currentBatch->id : '';
 
         $data = $this->advisorService->getAdvisorById($advisor_id);
 

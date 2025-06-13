@@ -71,7 +71,7 @@
                         </td>
                         <td style="text-align: left">
                             <li style="list-style: none">a. {{ $advisor_level ?? '' }}</li>
-                            <li style="list-style: none">b. {{ $advisor_position ?? '' }}'</li>
+                            <li style="list-style: none">b. {{ $advisor_position ?? '' }}</li>
                         </td>
                     </tr>
                     <tr>

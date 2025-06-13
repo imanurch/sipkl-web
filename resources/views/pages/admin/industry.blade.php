@@ -45,13 +45,16 @@
         {{-- tabs --}}
         <div class="flex w-full justify-between border-b border-neutral-100">
             <div class="flex">
-                <button @click="window.location.href = '/admin/industryManagement?tab=unconfirmed'" class="text-sm-medium py-3 px-6"
+                <button @click="window.location.href = '/admin/industryManagement?tab=unconfirmed'"
+                    class="text-sm-medium py-3 px-6"
                     :class="tabs == 'unconfirmed' ? 'text-brand-500 border-b border-brand-500 hover:text-brand-500' :
                         'text-neutral-400 hover:text-neutral-700'">Pengajuan</button>
-                <button @click="window.location.href = '/admin/industryManagement?tab=partner'" class="text-sm-medium py-3 px-6"
+                <button @click="window.location.href = '/admin/industryManagement?tab=partner'"
+                    class="text-sm-medium py-3 px-6"
                     :class="tabs == 'partner' ? 'text-brand-500 border-b border-brand-500 hover:text-brand-500' :
                         'text-neutral-400 hover:text-neutral-700'">Mitra</button>
-                <button @click="window.location.href = '/admin/industryManagement?tab=rejected'" class="text-sm-medium py-3 px-6"
+                <button @click="window.location.href = '/admin/industryManagement?tab=rejected'"
+                    class="text-sm-medium py-3 px-6"
                     :class="tabs == 'rejected' ? 'text-brand-500 border-b border-brand-500 hover:text-brand-500' :
                         'text-neutral-400 hover:text-neutral-700'">Ditolak</button>
             </div>
@@ -113,9 +116,7 @@
                     </h6>
                     <div class="flex justify-center py-3 space-x-4 border-t border-success-400">
                         <button @click="modalConfirm=null" class="btn btn-xs btn-success-outline">Tidak</button>
-                        <a :href="`{{ route('admin.industryRequest.status.confirm', ['industryId' => 'id', 'status' => 'accept']) }}`
-                        .replace('id', id)"
-                            class="btn btn-xs btn-success-fill">Ya</a>
+                        <button @click="setConfirmAction('accept',id)" class="btn btn-xs btn-success-fill">Ya</button>
                     </div>
                 </div>
             </div>
@@ -129,9 +130,7 @@
                     </h6>
                     <div class="flex justify-center py-3 space-x-4 border-t border-error-400">
                         <button @click="modalConfirm=null" class="btn btn-xs btn-error-outline">Tidak</button>
-                        <a :href="`{{ route('admin.industryRequest.status.confirm', ['industryId' => 'id', 'status' => 'reject']) }}`
-                        .replace('id', id)"
-                            class="btn btn-xs btn-error-fill">Ya</a>
+                        <button @click="setConfirmAction('reject',id)" class="btn btn-xs btn-success-fill">Ya</button>
                     </div>
                 </div>
             </div>
@@ -150,10 +149,10 @@
             <x-table.table>
                 <x-slot name="tableTitle">Industri Mitra</x-slot>
                 <x-slot name="filterActionForm">industryManagement?tab=partner</x-slot>
-                <x-slot name="mainSearchName">partnerSearchKeyword</x-slot>      
+                <x-slot name="mainSearchName">partnerSearchKeyword</x-slot>
                 <x-slot name="mainSearchAddition">
                     <input type="hidden" name="tab" value="partner">
-                </x-slot>          
+                </x-slot>
                 <x-slot name="btnAdd">
                     <x-table.import></x-table.import>
                     <div>
@@ -193,7 +192,7 @@
                                                     viewBox="0 0 20 20" fill="none">
                                                     <path d="M5 7.5L10 12.5L15 7.5" stroke="#667085"
                                                         stroke-width="0.933333" stroke-linecap="round"
-                                                        stroke-linejoin="round"/>
+                                                        stroke-linejoin="round" />
                                                 </svg>
                                             </button>
                                             <input type="hidden" name="data_type" x-model="selected">
@@ -289,8 +288,7 @@
                             <label class="input-label" for="">Alamat</label>
                             <input name="address" class="input" type="text" placeholder="Masukkan Alamat"
                                 :disabled="modalAction == 'isDelete'"
-                                :value="modalAction == 'isEdit' || modalAction=='isDelete' ? dataId.address : ''"
-                                required>
+                                :value="modalAction == 'isEdit' || modalAction=='isDelete' ? dataId.address : ''" required>
                         </div>
                         <div class="input-group">
                             <label class="input-label" for="">Email</label>
@@ -510,6 +508,16 @@
                 form.action = `{{ route('admin.industryManagement.update', ':id') }}`.replace(':id', id);
             } else if (modalAction === 'isDelete' && id) {
                 form.action = `{{ route('admin.industryManagement.destroy', ':id') }}`.replace(':id', id);
+            }
+        }
+    </script>
+
+    <script>
+        function setConfirmAction(status = null, id = null) {
+            if (status == 'accept') {
+                window.location.href = "industryRequest/confirmation/" + id + "/accept"
+            } else if (status === 'reject' && id) {
+                window.location.href = "industryRequest/confirmation/" + id + "/reject"
             }
         }
     </script>

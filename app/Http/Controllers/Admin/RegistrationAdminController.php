@@ -115,7 +115,7 @@ class RegistrationAdminController extends Controller
      */
     public function generateDocument(Request $request)
     {
-        $registration_data = $this->registrationService->getRegistrationById($request->registration_id);
+        $registration_data = $this->registrationService->getOriginalRegistrationById($request->registration_id);
         $school_profile = $this->schoolProfileService->getSchoolProfile();
         $intern_group_data = $registration_data->group->groupMember;
 

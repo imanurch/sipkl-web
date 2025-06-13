@@ -57,7 +57,7 @@
         </div>
         <div>
             <p>Dengan hormat,</p>
-            <p>Sesuai dengan surat kesediaan penerimaan peserta Praktik Kerja Lapangan (PKL) Nomor: ##########3 yang
+            <p>Sesuai dengan surat kesediaan penerimaan peserta Praktik Kerja Lapangan (PKL) yang
                 telah
                 disepakati bersama, maka dengan ini kami tarik kembali peserta didik SMK Negeri 1 Pajangan yang telah
                 selesai melaksanakan kegiatan PKL tahun pelajaran {{ $academic_year ?? '' }} di

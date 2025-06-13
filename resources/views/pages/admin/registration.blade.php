@@ -86,7 +86,8 @@
                             <ul class="text-left">
                                 @foreach ($dt->group->groupMember as $member)
                                     <li class="whitespace-nowrap overflow-hidden text-ellipsis block max-w-40">
-                                        {{ $loop->iteration }}. {{ $member->student->name ?? '' }}</li>
+                                        {{ $loop->iteration }}. {{ $member->student->name ?? '' }}
+                                        ({{ $member->student->department->name ?? '' }})</li>
                                 @endforeach
                             </ul>
                         </td>
@@ -226,9 +227,6 @@
                 <div class="flex justify-center py-3 space-x-4 border-t border-success-400">
                     <button @click="modalConfirm=null" class="btn btn-xs btn-success-outline">Tidak</button>
                     <button @click="setConfirmAction('accept',id)" class="btn btn-xs btn-success-fill">Ya</button>
-                    {{-- <a :href="`{{ route('admin.registration.status.confirm', ['registrationId' => 'id', 'status' => 'accept']) }}`
-                    .replace('id', id)"
-                        class="btn btn-xs btn-success-fill">Ya</a> --}}
                 </div>
             </div>
         </div>
@@ -244,9 +242,6 @@
                 <div class="flex justify-center py-3 space-x-4 border-t border-error-400">
                     <button @click="modalConfirm=null" class="btn btn-xs btn-error-outline">Tidak</button>
                     <button @click="setConfirmAction('reject',id)" class="btn btn-xs btn-success-fill">Ya</button>
-                    {{-- <a :href="`{{ route('admin.registration.status.confirm', ['registrationId' => 'id', 'status' => 'reject']) }}`
-                    .replace('id', id)"
-                        class="btn btn-xs btn-error-fill">Ya</a> --}}
                 </div>
             </div>
         </div>
@@ -306,12 +301,7 @@
 
     <script>
         function setConfirmAction(status = null, id = null) {
-            console.log(status === "accept" ? 'yes' : 'no');
-
-
             if (status == 'accept') {
-                console.log("OTW ACC")
-
                 window.location.href = "registration/confirmation/" + id + "/accept"
             } else if (status === 'reject' && id) {
                 window.location.href = "registration/confirmation/" + id + "/reject"

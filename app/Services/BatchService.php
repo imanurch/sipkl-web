@@ -58,7 +58,7 @@ class BatchService
     public function getRelevantBatch($batchRequest)
     {
         $currentBatch = $this->batchRepository->getActiveOrLastBatch();
-        $batch_id = $batchRequest ?? ($currentBatch->id ?? '');
+        $batch_id = $batchRequest ?? ($currentBatch?->id ?? '');
 
         return $batch_id;
     }

@@ -10,12 +10,6 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 class Registration extends Model
 {
     use HasFactory;
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = ['group_id', 'industry_id', 'start_date', 'end_date', 'batch_id', 'status', 'step'];
 
     public function group(): BelongsTo

@@ -179,13 +179,13 @@ class MonitoringAdminController extends Controller
         } elseif ($request->documentGenerateType == 'SPPD') {
             $data = array_merge([
                 'advisor_name' => $advisor->name,
-                'advisor_position' => $advisor->position_id,
-                'advisor_level' => $advisor->level_id,
+                'advisor_position' => $advisor->advisorPosition->name,
+                'advisor_level' => $advisor->advisorLevel->name,
                 'advisor_nip' => $advisor->nip,
                 'industry_name' => $industry->name,
                 'monitoring_date' => DateFormatHelper::dateFormat($monitoring->date),
                 'transportation' => $request->transportation,
-            ]);
+            ], $common_data);
         } elseif ($request->documentGenerateType == 'Surat Pengantar') {
             $intern_data = [];
             foreach ($internship->group->groupMember as $member) {

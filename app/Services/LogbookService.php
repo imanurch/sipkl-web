@@ -48,6 +48,11 @@ class LogbookService
         return $this->logbookRepository->checkIsCompleteLogbookByInternshipAndStudentId($internship_id, $student_id);
     }
 
+    public function checkIsConfirmedLogbookByInternshipAndStudentId($internship_id, $student_id)
+    {
+        return $this->logbookRepository->checkIsConfirmedLogbookByInternshipAndStudentId($internship_id, $student_id);
+    }
+
     public function updateLogbook($id, array $data)
     {
         return $this->logbookManagementRepository->updateLogbook($id, $data);

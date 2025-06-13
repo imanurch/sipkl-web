@@ -64,7 +64,7 @@ class AdvisorManagementController extends Controller
     public function index(Request $request)
     {
         $batch_id = $this->batchService->getRelevantBatch($request->batch);
-        
+
         // table filters
         $departmentData = $this->departmentService->getAllDepartment();
         $batchData = $this->batchService->getAllBatch('');
@@ -218,7 +218,7 @@ class AdvisorManagementController extends Controller
                 foreach ($validData as $data) {
                     $newUser = $this->userService->addUser($data);
                     $data['password'] = Hash::make($data['password']);
-                    $data['role'] = 'advisor';
+
                     $advisorData = [
                         'user_id' => $newUser->id ?? '',
                         'name' => $data['name'],

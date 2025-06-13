@@ -1,9 +1,8 @@
 @extends('layouts.app')
 
 @section('page-title', 'Pendaftaran PKL')
-@section('profil', 'Student')
-@section('content')
 
+@section('content')
     <x-guide guideTitle="Pendaftaran">
         <li>Ikuti langkah pendaftaran sesuai petunjuk yang tertera.</li>
         <li>Hanya <span class="text-xs-semibold">satu perwakilan kelompok yang perlu mendaftar</span> dan mengisi data
@@ -206,5 +205,5 @@
             @endif
         </div>
     </div>
-
 @endsection
+

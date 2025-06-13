@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Admin;
 use Illuminate\Http\Request;
 use App\Services\BatchService;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\UpdateAdministrationDataRequest;
 use App\Services\SchoolProfileService;
 use Flasher\Toastr\Laravel\Facade\Toastr;
 
@@ -45,7 +46,7 @@ class AdministrationDataController extends Controller
      *
      * @param Request $request
      */
-    public function update(Request $request)
+    public function update(UpdateAdministrationDataRequest $request)
     {
         $validatedData = $request->validated();
 

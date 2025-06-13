@@ -2,24 +2,24 @@
 
 namespace App\Services;
 
+use App\Helpers\DateFormatHelper;
 use App\Repositories\InternRepository;
 use App\Repositories\InternshipRepository;
 use App\Repositories\InternshipByAdvisorRepository;
 
 class InternshipService
 {
-    protected 
-    $internshipRepository,
-    $internRepository,
-    $internshipByAdvisorRepository;
+    protected
+        $internshipRepository,
+        $internRepository,
+        $internshipByAdvisorRepository;
 
     // Constructor Injection
     public function __construct(
         InternshipRepository $internshipRepository,
         InternRepository $internRepository,
         InternshipByAdvisorRepository $internshipByAdvisorRepository
-        )
-    {
+    ) {
         $this->internshipRepository = $internshipRepository;
         $this->internRepository = $internRepository;
         $this->internshipByAdvisorRepository = $internshipByAdvisorRepository;
@@ -77,7 +77,13 @@ class InternshipService
 
     public function getInternshipByStudentId($batch_id, $student_id)
     {
-        return $this->internshipRepository->getInternshipByStudentId($batch_id, $student_id);
+        $data = $this->internshipRepository->getInternshipByStudentId($batch_id, $student_id);
+        if ($data != null) {
+            $data->start_date = DateFormatHelper::dateFormat($data->start_date);
+            $data->end_date = DateFormatHelper::dateFormat($data->end_date);
+        }
+
+        return $data;
     }
 
     public function getInternshipByInternshipId($internship_id)

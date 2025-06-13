@@ -80,7 +80,7 @@
                         <h6 class="text-xs-reguler w-32" for="">Waktu Pelaksanaan</h6>
                         <span>:</span>
                         <input class="input w-full" type="text"
-                            value="{{ strftime('%d %B %Y', strtotime($internshipData->start_date)) ?? '' }} - {{ strftime('%d %B %Y', strtotime($internshipData->end_date)) ?? '' }}"
+                            value="{{ $internshipData->start_date ?? '' }} - {{ $internshipData->end_date ?? '' }}"
                             disabled>
                     </div>
                 </div>

@@ -63,9 +63,6 @@ class AdminManagementController extends Controller
                 ]);
             });
 
-            if ($newUser && !$newUser->hasVerifiedEmail()) {
-                $newUser->sendEmailVerificationNotification();
-            }
             Toastr::addSuccess('Data admin berhasil disimpan!');
         } catch (\Illuminate\Validation\ValidationException $e) {
             Toastr::addError($e->errors()['password'][0]);

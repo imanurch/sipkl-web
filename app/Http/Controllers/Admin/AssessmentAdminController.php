@@ -239,6 +239,14 @@ class AssessmentAdminController extends Controller
         $num = 1;
 
         foreach ($data as $dt) {
+            $aspects = $dt->technical_aspect ?? [];
+            $scores = $dt->technical_aspect_score ?? [];
+            $lines = [];
+            foreach ($aspects as $index => $aspect) {
+                $score = $scores[$index] ?? '-';
+                $lines[] = "{$aspect} = {$score}";
+            }
+
             $sheet->setCellValue('A' . $row, $num);
             $sheet->setCellValue('B' . $row, $dt->student->name);
             $sheet->setCellValue('C' . $row, $dt->student->nis);
@@ -247,18 +255,18 @@ class AssessmentAdminController extends Controller
             $sheet->setCellValue('F' . $row, DateFormatHelper::academicYearFormat($dt->student->year));
             $sheet->setCellValue('G' . $row, $dt->internship->industry->name);
             $sheet->setCellValue('H' . $row, $dt->internship->industry->address);
-            $sheet->setCellValue('I' . $row, $dt->technical_aspect != null ? rtrim($dt->technical_aspect) : '');
+            $sheet->setCellValue('I' . $row, implode("\n", $lines));
             $sheet->getStyle('I' . $row)->getAlignment()->setWrapText(true);
-            $sheet->setCellValue('J' . $row, $dt->non_technical_aspect['Kedisiplinan'] ?? '');
-            $sheet->setCellValue('K' . $row, $dt->non_technical_aspect['Kerja Sama'] ?? '');
-            $sheet->setCellValue('L' . $row, $dt->non_technical_aspect['Inisiatif'] ?? '');
-            $sheet->setCellValue('M' . $row, $dt->non_technical_aspect['Tanggung Jawab'] ?? '');
-            $sheet->setCellValue('N' . $row, $dt->non_technical_aspect['Jujur dan Santun'] ?? '');
-            $sheet->setCellValue('O' . $row, $dt->final_report['Sikap'] ?? '');
-            $sheet->setCellValue('P' . $row, $dt->final_report['Tata Tulis'] ?? '');
-            $sheet->setCellValue('Q' . $row, $dt->final_report['Ketepatan Waktu'] ?? '');
-            $sheet->setCellValue('R' . $row, $dt->final_report['Ketertiban'] ?? '');
-            $sheet->setCellValue('S' . $row, $dt->final_report['Keseluruhan Laporan'] ?? '');
+            $sheet->setCellValue('J' . $row, $dt->Kedisiplinan ?? '');
+            $sheet->setCellValue('K' . $row, $dt->Kerja_Sama ?? '');
+            $sheet->setCellValue('L' . $row, $dt->Inisiatif ?? '');
+            $sheet->setCellValue('M' . $row, $dt->Tanggung_Jawab ?? '');
+            $sheet->setCellValue('N' . $row, $dt->Jujur_dan_Santun ?? '');
+            $sheet->setCellValue('O' . $row, $dt->Sikap ?? '');
+            $sheet->setCellValue('P' . $row, $dt->Tata_Tulis ?? '');
+            $sheet->setCellValue('Q' . $row, $dt->Ketepatan_Waktu ?? '');
+            $sheet->setCellValue('R' . $row, $dt->Ketertiban ?? '');
+            $sheet->setCellValue('S' . $row, $dt->Keseluruhan_Laporan ?? '');
             $sheet->setCellValue('T' . $row, $dt->test_assessment != null ? $dt->test_assessment->score : '');
             $sheet->setCellValue('U' . $row, $dt->internship_score ?? 'Nilai Belum Lengkap');
             $sheet->setCellValue('V' . $row, $dt->internship_status ?? 'Nilai Belum Lengkap');

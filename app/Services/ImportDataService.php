@@ -144,7 +144,7 @@ class ImportDataService
                 $data['department_id'] = $this->mapDepartment($data['department_id']);
                 $data['position_id'] = $this->mapPosition($data['position_id']);
                 $data['level_id'] = $this->mapLevel($data['level_id']);
-                $data['status'] = '1';
+                $data['role'] = 'advisor';
                 $validData[] = $data;
             }
         }
@@ -226,7 +226,7 @@ class ImportDataService
                 // Map data fields and prepare for import
                 $data['gender'] = $this->mapGender($data['gender']);
                 $data['department_id'] = $this->mapDepartment($data['department_id']);
-                $data['status'] = '1';
+                $data['role'] = 'student';
                 $validData[] = $data;
             }
         }

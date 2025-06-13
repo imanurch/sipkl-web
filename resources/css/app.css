@@ -4,9 +4,6 @@
 @tailwind components;
 @tailwind utilities;
 
-@layer base {
-}
-
 @layer utilities {
     /* TYPOGRAPHY */
     /* DISPLAY XL */

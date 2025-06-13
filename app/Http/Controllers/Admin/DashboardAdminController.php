@@ -29,7 +29,7 @@ class DashboardAdminController extends Controller
      */
     public function index()
     {
-        $batch_id = $this->batchService->getBatchByStatus('active')->id;
+        $batch_id = $this->batchService->getBatchByStatus('active')?->id;
 
         $intern = $this->internshipService->getInternCount($batch_id);
         $advisor = $this->advisorService->getAdvisorByStatusCount($batch_id, 'active');

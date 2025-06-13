@@ -26,7 +26,7 @@ class BatchManagementController extends Controller
     {
         $searchFilters = $request->searchKeyword;
         $data = $this->batchService->getAllBatch($searchFilters);
-        $data->active_batch = $this->batchService->getBatchByStatus('active');
+        // $data->active_batch = $this->batchService->getBatchByStatus('active');
 
         return view('pages.admin.batch', [
             'data' => $data,
@@ -71,7 +71,12 @@ class BatchManagementController extends Controller
      */
     public function setActiveBatch($id)
     {
-        $this->batchService->setActiveBatch($id);
+        try {
+            $this->batchService->setActiveBatch($id);
+            Toastr::addSuccess('Berhasil mengatur Batch Aktif!');
+        } catch (\Exception $e) {
+            Toastr::addError('Gagal mengatur Batch Aktif!');
+        }
         return back();
     }
 

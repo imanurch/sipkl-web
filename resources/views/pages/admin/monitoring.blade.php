@@ -205,7 +205,7 @@
                 @click.away="generateDocumentModal=false">
                 <div class="form-header">
                     @csrf
-                    <h3>Generate Surat Tugas</h3>
+                    <h3>Generate Dokumen</h3>
                     <svg @click="generateDocumentModal=false,selected='Pilih Opsi'" class="cursor-pointer"
                         xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 28 28"
                         fill="none">

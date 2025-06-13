@@ -42,7 +42,7 @@ class AssessmentRepository
             'non_technical_assessment',
             'final_report_assessment',
             'test_assessment',
-        )->paginate(5);
+        )->paginate(10);
     }
 
     /**
